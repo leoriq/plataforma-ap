@@ -8,8 +8,7 @@ const LoginForm = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-  const handleSubmit = async (evt: any) => {
-    evt.preventDefault()
+  const handleSubmit = async () => {
     try {
       const res = await signIn('credentials', {
         redirect: false,
@@ -22,7 +21,7 @@ const LoginForm = () => {
       } else {
         // setError("invalid email or password");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       // setError(error);
     }
     alert(`Submitting Username ${username} with Password ${password}`)
@@ -47,7 +46,14 @@ const LoginForm = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
       </label>
-      <input type="submit" value="Submit" onClick={handleSubmit} />
+      <input
+        type="submit"
+        value="Submit"
+        onClick={(e) => {
+          e.preventDefault()
+          handleSubmit()
+        }}
+      />
     </form>
   )
 }
