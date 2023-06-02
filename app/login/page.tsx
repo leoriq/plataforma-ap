@@ -1,8 +1,8 @@
-import styles from "./page.module.css";
-import { type NextPage } from "next";
-import LoginForm from "./components/LoginForm";
+import styles from './login.module.css'
+import { type NextPage } from 'next'
+import LoginForm from '~/app/login/components/LoginForm'
 
-const Home: NextPage = () => {
+const Login: NextPage = () => {
   return (
     <>
       <main className={styles.main}>
@@ -13,7 +13,7 @@ const Home: NextPage = () => {
         </div>
       </main>
     </>
-  );
-};
+  )
+}
 
-export default Home;
+export default Login

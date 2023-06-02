@@ -1,10 +1,28 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import styles from './LoginForm.module.scss'
-import { signIn } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
+import { redirect } from 'next/navigation'
 
 const LoginForm = () => {
+  const { data: session } = useSession()
+  useEffect(() => {
+    const user = session?.user
+    switch (user?.role) {
+      case 'COORDINATOR':
+        redirect('/coordinator')
+      case 'STUDENT':
+        redirect('/student')
+      case 'INSTRUCTOR':
+        redirect('/instructor')
+      case 'MATERIAL':
+        redirect('/material')
+      default:
+        break
+    }
+  }, [session])
+
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
@@ -16,15 +34,13 @@ const LoginForm = () => {
         password: password,
       })
 
-      if (!res?.error) {
-        // router.push(callbackUrl);
-      } else {
+      if (res?.error) {
         // setError("invalid email or password");
       }
     } catch (error: unknown) {
       // setError(error);
     }
-    alert(`Submitting Username ${username} with Password ${password}`)
+    alert(`Submitted Username ${username} with Password ${password}`)
   }
 
   return (

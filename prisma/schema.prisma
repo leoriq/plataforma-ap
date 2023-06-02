@@ -13,8 +13,17 @@ datasource db {
     shadowDatabaseUrl = env("DATABASE_URL_NON_POOLING") // used for migrations
 }
 
+enum Role {
+    COORDINATOR
+    REP_INSTRUCTOR
+    INSTRUCTOR
+    MATERIAL
+    STUDENT
+}
+
 model User {
     id       String @id @default(cuid())
     email    String @unique
     password String
+    role     Role   @default(STUDENT)
 }
