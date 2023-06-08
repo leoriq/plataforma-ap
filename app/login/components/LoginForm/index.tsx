@@ -2,14 +2,23 @@
 
 import { useEffect, useState } from 'react'
 import styles from './LoginForm.module.scss'
-import { signIn, useSession } from 'next-auth/react'
+import { signIn, signOut, useSession } from 'next-auth/react'
 import { redirect } from 'next/navigation'
 
-const LoginForm = () => {
+export default function LoginForm() {
+  const [signedIn, setSignedIn] = useState(false)
   const { data: session } = useSession()
+
   useEffect(() => {
-    const user = session?.user
-    switch (user?.role) {
+    if (!session) {
+      return
+    }
+    if (!signedIn) {
+      signOut()
+      return
+    }
+    const role = session?.user.role
+    switch (role) {
       case 'COORDINATOR':
         redirect('/coordinator')
       case 'STUDENT':
@@ -37,10 +46,10 @@ const LoginForm = () => {
       if (res?.error) {
         // setError("invalid email or password");
       }
+      setSignedIn(true)
     } catch (error: unknown) {
       // setError(error);
     }
-    alert(`Submitted Username ${username} with Password ${password}`)
   }
 
   return (
@@ -73,5 +82,3 @@ const LoginForm = () => {
     </form>
   )
 }
-
-export default LoginForm

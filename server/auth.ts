@@ -1,5 +1,4 @@
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
-import { type GetServerSidePropsContext } from 'next'
 import {
   getServerSession,
   type NextAuthOptions,
@@ -7,14 +6,11 @@ import {
   User,
 } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { env } from '~/env.mjs'
 import { prisma } from 'server/db'
 import { compare } from 'bcrypt'
 
 declare module 'next-auth' {
   interface User {
-    id: string
-    email: string
     role: string
   }
   interface Session extends DefaultSession {
@@ -24,7 +20,7 @@ declare module 'next-auth' {
 
 export const authOptions: NextAuthOptions = {
   pages: {
-    signIn: '/',
+    signIn: '/login',
   },
   adapter: PrismaAdapter(prisma),
   session: {
@@ -52,13 +48,16 @@ export const authOptions: NextAuthOptions = {
           },
         })
 
-        if (!user || !(await compare(credentials.password, user.password))) {
+        if (!user?.password) {
+          return null
+        }
+
+        if (!(await compare(credentials.password, user.password))) {
           return null
         }
 
         return {
           id: user.id,
-          email: user.email,
           role: user.role,
         }
       },
