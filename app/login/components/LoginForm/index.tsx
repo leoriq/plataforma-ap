@@ -26,12 +26,16 @@ export default function LoginForm() {
     switch (role) {
       case 'COORDINATOR':
         router.push('/coordinator/instructor')
+        break
       case 'STUDENT':
         router.push('/student')
+        break
       case 'INSTRUCTOR':
         router.push('/instructor')
+        break
       case 'MATERIAL':
         router.push('/material')
+        break
       default:
         break
     }
