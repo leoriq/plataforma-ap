@@ -1,4 +1,4 @@
-export default async function MaterialManagement() {
+export default function MaterialManagement() {
   return (
     <>
       <h1>Material</h1>

@@ -1,3 +1,4 @@
+import { User } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerAuthSession } from '~/server/auth'
@@ -14,7 +15,7 @@ export async function POST(request: NextRequest) {
     if (!requestingUser)
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
 
-    const { email, role } = await request.json()
+    const { email, role } = (await request.json()) as User
     if (!email || !role)
       return NextResponse.json(
         { error: 'Missing email or role' },

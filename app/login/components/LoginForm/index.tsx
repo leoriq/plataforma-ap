@@ -30,7 +30,7 @@ export default function LoginForm() {
       default:
         break
     }
-  }, [session])
+  }, [session, signedIn])
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
