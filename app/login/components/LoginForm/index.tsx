@@ -3,11 +3,14 @@
 import { useEffect, useState } from 'react'
 import styles from './LoginForm.module.scss'
 import { signIn, signOut, useSession } from 'next-auth/react'
-import { redirect } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 export default function LoginForm() {
   const [signedIn, setSignedIn] = useState(false)
   const { data: session } = useSession()
+
+  const router = useRouter()
+  const redirectPath = useSearchParams().get('redirect')
 
   useEffect(() => {
     if (!session) {
@@ -17,16 +20,18 @@ export default function LoginForm() {
       signOut()
       return
     }
+
+    if (redirectPath) router.push(redirectPath)
     const role = session?.user.role
     switch (role) {
       case 'COORDINATOR':
-        redirect('/coordinator')
+        router.push('/coordinator/instructor')
       case 'STUDENT':
-        redirect('/student')
+        router.push('/student')
       case 'INSTRUCTOR':
-        redirect('/instructor')
+        router.push('/instructor')
       case 'MATERIAL':
-        redirect('/material')
+        router.push('/material')
       default:
         break
     }

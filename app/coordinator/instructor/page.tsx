@@ -1,5 +1,6 @@
 import { prisma } from '~/server/db'
 import DeleteUserButton from '../components/DeleteUserButton'
+import Link from 'next/link'
 
 export default async function InstructorManagement() {
   const instructors = await prisma.user.findMany({
@@ -24,7 +25,7 @@ export default async function InstructorManagement() {
           </li>
         ))}
       </ul>
-      <a href="instructor/add">Adicionar Instrutor</a>
+      <Link href="instructor/add">Adicionar Instrutor</Link>
     </>
   )
 }

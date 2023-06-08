@@ -1,5 +1,6 @@
 import { prisma } from '~/server/db'
 import DeleteUserButton from '../components/DeleteUserButton'
+import Link from 'next/link'
 
 export default async function MaterialManagement() {
   const materials = await prisma.user.findMany({
@@ -24,7 +25,7 @@ export default async function MaterialManagement() {
           </li>
         ))}
       </ul>
-      <a href="material/add">Add Material</a>
+      <Link href="material/add">Add Material</Link>
     </>
   )
 }

@@ -1,6 +1,7 @@
 import isAuthorized from '~/utils/isAuthorized'
 import styles from './coordinator.module.scss'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 
 export default async function Login({
   children,
@@ -14,8 +15,8 @@ export default async function Login({
   return (
     <>
       <nav className={styles.nav}>
-        <a href="/coordinator/instructor">Instrutor</a>
-        <a href="/coordinator/material">Material</a>
+        <Link href="/coordinator/instructor">Instrutor</Link>
+        <Link href="/coordinator/material">Material</Link>
       </nav>
       <main className={styles.main}>{children}</main>
     </>
