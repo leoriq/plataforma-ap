@@ -1,6 +1,5 @@
-import { User } from '@prisma/client'
-import { revalidatePath } from 'next/cache'
-import { NextRequest, NextResponse } from 'next/server'
+import type { User } from '@prisma/client'
+import { type NextRequest, NextResponse } from 'next/server'
 import { getServerAuthSession } from '~/server/auth'
 import { prisma } from '~/server/db'
 
@@ -16,25 +15,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
 
     const { email, role } = (await request.json()) as User
+    console.log('user', email, role)
+
     if (!email || !role)
       return NextResponse.json(
         { error: 'Missing email or role' },
         { status: 400 }
       )
 
+    const emailsArray = email.split(',')
+
     if (requestingUser.role === 'COORDINATOR') {
-      const user = await prisma.user.create({
-        data: { email, role },
+      const users = await prisma.user.createMany({
+        data: emailsArray.map((email) => ({ email, role })),
       })
-      return NextResponse.json({ user })
+      return NextResponse.json({ users })
     }
 
     if (requestingUser.role === 'INSTRUCTOR') {
       if (role === 'STUDENT') {
-        const user = await prisma.user.create({
-          data: { email, role },
+        const users = await prisma.user.createMany({
+          data: emailsArray.map((email) => ({ email, role })),
         })
-        return NextResponse.json({ user })
+        return NextResponse.json({ users })
       }
     }
 
@@ -69,16 +72,12 @@ export async function DELETE(request: NextRequest) {
 
     if (requestingUser.role === 'COORDINATOR') {
       await prisma.user.delete({ where: { id: selectedUserId } })
-      const revalidate = request.nextUrl.searchParams.get('revalidate')
-      if (revalidate) revalidatePath(revalidate)
       return NextResponse.json({ success: true })
     }
 
     if (requestingUser.role === 'INSTRUCTOR') {
       if (selectedUser.role === 'STUDENT') {
         await prisma.user.delete({ where: { id: selectedUserId } })
-        const revalidate = request.nextUrl.searchParams.get('revalidate')
-        if (revalidate) revalidatePath(revalidate)
         return NextResponse.json({ success: true })
       }
     }

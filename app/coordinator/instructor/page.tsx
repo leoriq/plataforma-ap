@@ -24,6 +24,7 @@ export default async function InstructorManagement() {
           </li>
         ))}
       </ul>
+      <a href="instructor/add">Adicionar Instrutor</a>
     </>
   )
 }

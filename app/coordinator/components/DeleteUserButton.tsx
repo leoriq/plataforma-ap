@@ -1,6 +1,7 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { useCallback } from 'react'
 import api from '~/utils/api'
 
 interface Props {
@@ -9,14 +10,12 @@ interface Props {
 
 export default function DeleteUserButton({ id }: Props) {
   const pathname = usePathname()
+  const router = useRouter()
 
-  return (
-    <button
-      onClick={() => {
-        api.delete('/api/user', { params: { id, revalidate: pathname } })
-      }}
-    >
-      Delete
-    </button>
-  )
+  const handleDelete = useCallback(async () => {
+    await api.delete('/api/user', { params: { id, revalidate: pathname } })
+    router.refresh()
+  }, [id, pathname, router])
+
+  return <button onClick={() => void handleDelete()}>Delete</button>
 }
