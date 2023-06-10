@@ -15,7 +15,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
 
     const { email, role } = (await request.json()) as User
-    console.log('user', email, role)
 
     if (!email || !role)
       return NextResponse.json(

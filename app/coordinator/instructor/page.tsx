@@ -25,7 +25,7 @@ export default async function InstructorManagement() {
           </li>
         ))}
       </ul>
-      <Link href="instructor/add">Adicionar Instrutor</Link>
+      <Link href="/coordinator/instructor/add">Adicionar Instrutor</Link>
     </>
   )
 }

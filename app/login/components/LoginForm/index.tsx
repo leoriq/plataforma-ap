@@ -67,7 +67,7 @@ export default function LoginForm() {
       <label>
         Username:
         <input
-          type="text"
+          type="email"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
