@@ -1,4 +1,4 @@
-import { User } from '@prisma/client'
+import type { User } from '@prisma/client'
 import { NextResponse, type NextRequest } from 'next/server'
 import { prisma } from '~/server/db'
 import { hash } from 'bcrypt'
@@ -28,7 +28,7 @@ export async function PATCH(request: NextRequest) {
       data: { fullName, password: hashedPassword, imageFileId },
     })
 
-    const { password: _, ...userWithoutPassword } = user
+    const userWithoutPassword = { ...user, password: undefined }
 
     return NextResponse.json(userWithoutPassword, { status: 200 })
   } catch (error) {

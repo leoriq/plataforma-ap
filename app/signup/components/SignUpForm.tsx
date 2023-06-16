@@ -35,7 +35,7 @@ export default function SignUpForm() {
       password: formData.password,
     })
     router.push('/login')
-  }, [formData])
+  }, [formData, router])
 
   return (
     <form>

@@ -39,7 +39,7 @@ export default function LoginForm() {
       default:
         break
     }
-  }, [session, signedIn])
+  }, [session, signedIn, router, redirectPath])
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
