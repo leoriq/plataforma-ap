@@ -41,21 +41,37 @@ export default function SignUpForm() {
     <form>
       <label>
         Nome Completo (como no documento):
-        <input type="text" name="fullName" onChange={handleChange} />
+        <input
+          type="text"
+          name="fullName"
+          value={formData.fullName}
+          onChange={handleChange}
+        />
       </label>
       <label>
         Email:
-        <input type="text" name="email" onChange={handleChange} />
+        <input
+          type="text"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+        />
       </label>
       <label>
         Senha:
-        <input type="password" name="password" onChange={handleChange} />
+        <input
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={handleChange}
+        />
       </label>
       <label>
         Confirmação de senha:
         <input
           type="password"
           name="passwordConfirmation"
+          value={formData.passwordConfirmation}
           onChange={handleChange}
         />
       </label>

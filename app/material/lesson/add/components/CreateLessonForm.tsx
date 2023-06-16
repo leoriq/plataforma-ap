@@ -84,7 +84,7 @@ export default function CreateLessonForm({ collectionId }: Props) {
 
       {lesson.videoUrl.map((url, index) => (
         <label key={index}>
-          URL do vídeo {index + 1}:
+          ID do YouTube {index + 1}:
           <input
             type="text"
             name={String(index)}

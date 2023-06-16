@@ -23,11 +23,10 @@ export default function AddUserForm({ role }: Props) {
     <form>
       <label>
         Emails (inserir um por linha):
-        <textarea onChange={(e) => setEmail(e.target.value)} />
+        <textarea value={email} onChange={(e) => setEmail(e.target.value)} />
       </label>
       <input
         type="submit"
-        value="Submit"
         onClick={(e) => {
           e.preventDefault()
           handleSubmit()
