@@ -16,6 +16,7 @@ export default function CreateLessonForm({ collectionId }: Props) {
     body: '',
     videoUrl: [],
     lessonCollectionId: collectionId,
+    fileId: null,
   })
 
   const handleChange = useCallback(
