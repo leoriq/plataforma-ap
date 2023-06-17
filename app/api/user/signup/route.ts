@@ -5,7 +5,7 @@ import { hash } from 'bcrypt'
 
 export async function PATCH(request: NextRequest) {
   try {
-    const { fullName, email, password, imageFileId } =
+    const { fullName, email, password, profilePictureId } =
       (await request.json()) as User
 
     if (!email || !password || !fullName)
@@ -25,7 +25,7 @@ export async function PATCH(request: NextRequest) {
 
     const user = await prisma.user.update({
       where: { email },
-      data: { fullName, password: hashedPassword, imageFileId },
+      data: { fullName, password: hashedPassword, profilePictureId },
     })
 
     const userWithoutPassword = { ...user, password: undefined }

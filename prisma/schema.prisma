@@ -28,32 +28,34 @@ enum AnswerType {
 }
 
 model File {
-    id         String       @id @default(cuid())
-    name       String
-    title      String?
-    url        String
-    createdAt  DateTime     @default(now())
-    updatedAt  DateTime     @updatedAt
-    User       User[]
-    Question1  Question[]   @relation("audio")
-    Question2  Question[]   @relation("image")
-    UserAnswer UserAnswer[]
-    Lesson     Lesson[]
+    id               String       @id @default(cuid())
+    name             String
+    title            String?
+    uploadedBy       User         @relation("uploadedBy", fields: [uploadedById], references: [id])
+    uploadedById     String
+    createdAt        DateTime     @default(now())
+    updatedAt        DateTime     @updatedAt
+    ProfilePictureOf User[]       @relation("profilePictureOf")
+    Question1        Question[]   @relation("audio")
+    Question2        Question[]   @relation("image")
+    UserAnswer       UserAnswer[]
+    Lesson           Lesson[]
 }
 
 model User {
-    id          String       @id @default(cuid())
-    email       String       @unique
-    password    String?
-    role        Role         @default(STUDENT)
-    fullName    String?
-    image       File?        @relation(fields: [imageFileId], references: [id])
-    imageFileId String?
-    Class       Class?       @relation(fields: [classId], references: [id])
-    classId     String?
-    UserReport  UserReport[]
-    createdAt   DateTime     @default(now())
-    updatedAt   DateTime     @updatedAt
+    id               String       @id @default(cuid())
+    email            String       @unique
+    password         String?
+    fullName         String?
+    role             Role         @default(STUDENT)
+    profilePicture   File?        @relation("profilePictureOf", fields: [profilePictureId], references: [id])
+    profilePictureId String?
+    Class            Class?       @relation(fields: [classId], references: [id])
+    classId          String?
+    createdAt        DateTime     @default(now())
+    updatedAt        DateTime     @updatedAt
+    UploadedFiles    File[]       @relation("uploadedBy")
+    UserReport       UserReport[]
 }
 
 model Class {
