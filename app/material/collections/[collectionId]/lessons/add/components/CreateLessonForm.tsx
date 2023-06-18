@@ -16,8 +16,10 @@ export default function CreateLessonForm({ collectionId }: Props) {
     body: '',
     videoUrl: [],
     lessonCollectionId: collectionId,
-    fileId: null,
+    documentFileId: null,
   })
+  const [fileTitle, setFileTitle] = useState('')
+  const [file, setFile] = useState<File>()
 
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -67,9 +69,20 @@ export default function CreateLessonForm({ collectionId }: Props) {
     [setLesson]
   )
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
+    if (file) {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('title', fileTitle)
+      lesson.documentFileId = (
+        (await api.post('/api/upload', formData)).data as {
+          file: { id: string }
+        }
+      ).file.id
+    }
+
     api.post('/api/lesson', lesson)
-  }, [lesson])
+  }, [lesson, file, fileTitle])
 
   return (
     <form>
@@ -99,6 +112,25 @@ export default function CreateLessonForm({ collectionId }: Props) {
       <button type="button" onClick={handleAddVideoUrl}>
         Adicionar vídeo
       </button>
+
+      <label>
+        Arquivo:
+        <input
+          type="file"
+          name="documentFileId"
+          onChange={(e) => setFile(e.target.files?.[0])}
+        />
+      </label>
+
+      <label>
+        Título do arquivo:
+        <input
+          type="text"
+          name="fileTitle"
+          value={fileTitle}
+          onChange={(e) => setFileTitle(e.target.value)}
+        />
+      </label>
 
       <button
         type="submit"

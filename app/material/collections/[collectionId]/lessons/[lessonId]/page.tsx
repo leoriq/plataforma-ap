@@ -1,17 +1,14 @@
 import { prisma } from '~/server/db'
 
 export default async function MaterialLessonPage({
-  searchParams,
+  params,
 }: {
-  searchParams: { [key: string]: string | undefined }
+  params: { collectionId: string; lessonId: string }
 }) {
-  if (!searchParams.id) {
-    return <h1>Id is required</h1>
-  }
-
+  const { lessonId } = params
   const lesson = await prisma.lesson.findUnique({
     where: {
-      id: searchParams.id,
+      id: lessonId,
     },
   })
 

@@ -28,123 +28,145 @@ enum AnswerType {
 }
 
 model File {
-    id               String       @id @default(cuid())
-    name             String
-    title            String?
-    uploadedBy       User         @relation("uploadedBy", fields: [uploadedById], references: [id])
-    uploadedById     String
-    createdAt        DateTime     @default(now())
-    updatedAt        DateTime     @updatedAt
-    ProfilePictureOf User[]       @relation("profilePictureOf")
-    Question1        Question[]   @relation("audio")
-    Question2        Question[]   @relation("image")
-    UserAnswer       UserAnswer[]
-    Lesson           Lesson[]
+    id           String  @id @default(cuid())
+    name         String
+    title        String?
+    uploadedById String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    ProfilePictureOf User?
+    QuestionAudioOf  Question?   @relation("audio")
+    QuestionImageOf  Question?   @relation("image")
+    UserAnswerOf     UserAnswer?
+    LessonDocumentOf Lesson?
 }
 
 model User {
-    id               String       @id @default(cuid())
-    email            String       @unique
-    password         String?
-    fullName         String?
-    role             Role         @default(STUDENT)
-    profilePicture   File?        @relation("profilePictureOf", fields: [profilePictureId], references: [id])
-    profilePictureId String?
-    Class            Class?       @relation(fields: [classId], references: [id])
+    id       String  @id @default(cuid())
+    email    String  @unique
+    password String?
+    fullName String?
+    role     Role
+
+    ProfilePicture   File?   @relation(fields: [profilePictureId], references: [id])
+    profilePictureId String? @unique
+    Class            Class?  @relation(fields: [classId], references: [id])
     classId          String?
-    createdAt        DateTime     @default(now())
-    updatedAt        DateTime     @updatedAt
-    UploadedFiles    File[]       @relation("uploadedBy")
-    UserReport       UserReport[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    UserReport UserReport[]
 }
 
 model Class {
-    id                 String           @id @default(cuid())
-    name               String
-    description        String?
-    students           User[]
-    Collection         LessonCollection @relation(fields: [lessonCollectionId], references: [id])
+    id          String  @id @default(cuid())
+    name        String
+    description String?
+
+    Collection         LessonCollection @relation(fields: [lessonCollectionId], references: [id], onDelete: Restrict)
     lessonCollectionId String
-    createdAt          DateTime         @default(now())
-    updatedAt          DateTime         @updatedAt
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    students User[]
 }
 
 model LessonCollection {
-    id          String   @id @default(cuid())
+    id          String  @id @default(cuid())
     name        String
     description String?
-    Classes     Class[]
-    Lessons     Lesson[]
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    Classes Class[]
+    Lessons Lesson[]
 }
 
 model Lesson {
-    id                 String           @id @default(cuid())
-    title              String
-    body               String
-    videoUrl           String[]
-    document           File?            @relation(fields: [fileId], references: [id])
-    Questionnaires     Questionaire[]
-    Collection         LessonCollection @relation(fields: [lessonCollectionId], references: [id])
+    id       String   @id @default(cuid())
+    title    String
+    body     String
+    videoUrl String[]
+
+    document           File?            @relation(fields: [documentFileId], references: [id], onDelete: Restrict)
+    documentFileId     String?          @unique
+    Collection         LessonCollection @relation(fields: [lessonCollectionId], references: [id], onDelete: Cascade)
     lessonCollectionId String
-    createdAt          DateTime         @default(now())
-    updatedAt          DateTime         @updatedAt
-    fileId             String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    Questionnaires Questionnaire[]
 }
 
-model Questionaire {
-    id         String       @id @default(cuid())
-    title      String
-    questions  Question[]
-    Lesson     Lesson?      @relation(fields: [lessonId], references: [id])
-    lessonId   String?
+model Questionnaire {
+    id    String @id @default(cuid())
+    title String
+
+    Lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+    lessonId String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    Questions  Question[]
     UserReport UserReport[]
-    createdAt  DateTime     @default(now())
-    updatedAt  DateTime     @updatedAt
 }
 
 model Question {
-    id             String       @id @default(cuid())
-    title          String
-    description    String?
-    Audio          File?        @relation("audio", fields: [imageFileId], references: [id])
-    Image          File?        @relation("image", fields: [audioFileId], references: [id])
-    videoUrl       String?
-    answerType     AnswerType
-    options        String[]
-    maxGrade       Int
-    UserAnswer     UserAnswer[]
-    Questionaire   Questionaire @relation(fields: [questionaireId], references: [id])
-    questionaireId String
-    createdAt      DateTime     @default(now())
-    updatedAt      DateTime     @updatedAt
-    imageFileId    String?
-    audioFileId    String?
+    id          String     @id @default(cuid())
+    title       String
+    description String?
+    videoUrl    String?
+    answerType  AnswerType
+    options     String[]
+    maxGrade    Int
+
+    Questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [id], onDelete: Cascade)
+    questionnaireId String
+    Image           File?         @relation("image", fields: [audioFileId], references: [id], onDelete: Restrict)
+    imageFileId     String?       @unique
+    Audio           File?         @relation("audio", fields: [imageFileId], references: [id], onDelete: Restrict)
+    audioFileId     String?       @unique
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    UserAnswer UserAnswer[]
 }
 
 model UserReport {
-    id             String       @id @default(cuid())
-    gradeOutOf100  Int
-    User           User         @relation(fields: [userId], references: [id])
-    userId         String
-    Questionaire   Questionaire @relation(fields: [questionaireId], references: [id])
-    questionaireId String
-    answers        UserAnswer[]
-    createdAt      DateTime     @default(now())
-    updatedAt      DateTime     @updatedAt
+    id            String @id @default(cuid())
+    gradeOutOf100 Int
+
+    User            User          @relation(fields: [userId], references: [id])
+    userId          String
+    Questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [id])
+    questionnaireId String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    answers UserAnswer[]
 }
 
 model UserAnswer {
-    id           String      @id @default(cuid())
+    id     String  @id @default(cuid())
+    grade  Int
+    answer String?
+
+    Question     Question    @relation(fields: [questionId], references: [id])
     questionId   String
-    question     Question    @relation(fields: [questionId], references: [id])
-    answer       String?
     Audio        File?       @relation(fields: [audioFileId], references: [id])
-    audioFileId  String?
-    grade        Int
+    audioFileId  String?     @unique
     UserReport   UserReport? @relation(fields: [userReportId], references: [id])
     userReportId String?
-    createdAt    DateTime    @default(now())
-    updatedAt    DateTime    @updatedAt
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
