@@ -14,9 +14,26 @@ h6 {
   font-family: var(--roboto-slab);
 }
 
-a {
-  color: inherit;
+a,
+button {
+  all: none;
   text-decoration: none;
+  cursor: pointer;
+  background: #404266;
+  color: #fff;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  box-sizing: border-box;
+}
+
+nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background: #40426630;
+  color: #fff;
+  gap: 1rem;
 }
 
 * {

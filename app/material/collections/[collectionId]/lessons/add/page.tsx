@@ -1,18 +1,19 @@
 import CreateLessonForm from './components/CreateLessonForm'
 
 export default function CreateLessonPage({
-  searchParams,
+  params,
 }: {
-  searchParams: { [key: string]: string | undefined }
+  params: { collectionId: string }
 }) {
-  if (!searchParams.collectionId) {
+  const { collectionId } = params
+  if (!collectionId) {
     return <h1>Lesson collection id is required</h1>
   }
 
   return (
     <>
       <h1>Create Lesson</h1>
-      <CreateLessonForm collectionId={searchParams.collectionId} />
+      <CreateLessonForm collectionId={collectionId} />
     </>
   )
 }
