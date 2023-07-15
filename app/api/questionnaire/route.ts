@@ -34,7 +34,6 @@ export async function POST(request: NextRequest) {
         answerType,
         options,
         maxGrade,
-        questionnaireId,
         imageFileId,
         audioFileId,
       } = question
@@ -45,7 +44,6 @@ export async function POST(request: NextRequest) {
         answerType,
         options,
         maxGrade,
-        questionnaireId,
         imageFileId,
         audioFileId,
       }
@@ -58,13 +56,12 @@ export async function POST(request: NextRequest) {
       )
 
     const questionsValid = Questions.every((question) => {
-      const { title, answerType, options, maxGrade, questionnaireId } = question
+      const { title, answerType, options, maxGrade } = question
       return (
         title &&
         AnswerType[answerType] &&
         (options || answerType !== 'OPTIONS') &&
-        maxGrade &&
-        questionnaireId
+        maxGrade
       )
     })
 
@@ -117,7 +114,7 @@ export async function PUT(request: NextRequest) {
       deleteQuestionsIds?: string[]
     }
 
-    const { id, title, lessonId } = requestBody
+    const { id, title } = requestBody
 
     const Questions = requestBody.Questions.map((question) => {
       const {
@@ -128,7 +125,6 @@ export async function PUT(request: NextRequest) {
         answerType,
         options,
         maxGrade,
-        questionnaireId,
         imageFileId,
         audioFileId,
       } = question
@@ -140,7 +136,6 @@ export async function PUT(request: NextRequest) {
         answerType,
         options,
         maxGrade,
-        questionnaireId,
         imageFileId,
         audioFileId,
       }
@@ -150,15 +145,13 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Missing id, title' }, { status: 400 })
 
     const questionsValid = Questions.every((question) => {
-      const { id, title, answerType, options, maxGrade, questionnaireId } =
-        question
+      const { id, title, answerType, options, maxGrade } = question
       return (
         id &&
         title &&
         AnswerType[answerType] &&
         (options || answerType !== 'OPTIONS') &&
-        maxGrade &&
-        questionnaireId
+        maxGrade
       )
     })
 
@@ -171,11 +164,10 @@ export async function PUT(request: NextRequest) {
         { status: 400 }
       )
 
-    const lesson = await prisma.questionnaire.update({
+    const questionnaire = await prisma.questionnaire.update({
       where: { id },
       data: {
         title,
-        lessonId,
         Questions: {
           upsert: Questions.map((question) => ({
             where: { id: question.id },
@@ -188,7 +180,7 @@ export async function PUT(request: NextRequest) {
         },
       },
     })
-    return NextResponse.json({ lesson })
+    return NextResponse.json({ questionnaire })
   } catch (error) {
     return NextResponse.json(
       { error: 'Internal Server Error' },

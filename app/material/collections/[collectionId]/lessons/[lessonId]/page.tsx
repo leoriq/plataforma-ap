@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { prisma } from '~/server/db'
 
 export default async function MaterialLessonPage({
@@ -5,10 +6,14 @@ export default async function MaterialLessonPage({
 }: {
   params: { collectionId: string; lessonId: string }
 }) {
-  const { lessonId } = params
+  const { lessonId, collectionId } = params
   const lesson = await prisma.lesson.findUnique({
     where: {
       id: lessonId,
+    },
+    include: {
+      document: true,
+      Questionnaires: true,
     },
   })
 
@@ -31,6 +36,32 @@ export default async function MaterialLessonPage({
           allowFullScreen
         />
       ))}
+      {lesson.document && (
+        <a
+          href={`/api/upload?id=${lesson.document.id}`}
+          download={lesson.document.name}
+        >
+          {lesson.document.title}
+        </a>
+      )}
+      <Link
+        href={`/material/collections/${collectionId}/lessons/${lessonId}/edit`}
+      >
+        Editar
+      </Link>
+      {lesson.Questionnaires.map((questionnaire) => (
+        <Link
+          href={`/material/collections/${collectionId}/lessons/${lessonId}/questionnaire/${questionnaire.id}`}
+          key={questionnaire.id}
+        >
+          {questionnaire.title}
+        </Link>
+      ))}
+      <Link
+        href={`/material/collections/${collectionId}/lessons/${lessonId}/questionnaire/add`}
+      >
+        Criar um questionário
+      </Link>
     </>
   )
 }

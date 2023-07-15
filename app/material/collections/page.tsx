@@ -17,11 +17,14 @@ export default async function MaterialCollectionsPage() {
             <h2>{collection.name}</h2>
             <p>{collection.description}</p>
             {collection.Lessons.map((lesson) => (
-              <Link href={`/material/lesson?id=${lesson.id}`} key={lesson.id}>
+              <Link
+                href={`/material/collections/${collection.id}/lessons/${lesson.id}`}
+                key={lesson.id}
+              >
                 {lesson.title}
               </Link>
             ))}
-            <Link href={`/material/lesson/add?collectionId=${collection.id}`}>
+            <Link href={`/material/collections/${collection.id}/lessons/add`}>
               Criar uma aula
             </Link>
           </li>

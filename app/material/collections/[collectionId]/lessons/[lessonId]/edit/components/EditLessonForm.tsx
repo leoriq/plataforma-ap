@@ -75,18 +75,23 @@ export default function EditLessonForm({ lesson: uneditedLesson }: Props) {
       ).file.id
     }
 
-    api.post('/api/lesson', lesson)
+    api.put('/api/lesson', lesson)
   }, [lesson, file, fileTitle])
 
   return (
     <form>
       <label>
         Título:
-        <input type="text" name="title" onChange={handleChange} />
+        <input
+          type="text"
+          name="title"
+          value={lesson.title}
+          onChange={handleChange}
+        />
       </label>
       <label>
         Corpo:
-        <textarea name="body" onChange={handleChange} />
+        <textarea name="body" value={lesson.body} onChange={handleChange} />
       </label>
 
       {lesson.videoUrl.map((url, index) => (
