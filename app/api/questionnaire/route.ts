@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
 
-    const lesson = await prisma.questionnaire.create({
+    const questionnaire = await prisma.questionnaire.create({
       data: {
         title,
         lessonId,
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
         },
       },
     })
-    return NextResponse.json({ lesson })
+    return NextResponse.json({ questionnaire })
   } catch (error) {
     return NextResponse.json(
       { error: 'Internal Server Error' },
