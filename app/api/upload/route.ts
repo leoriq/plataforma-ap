@@ -42,14 +42,14 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const session = await getServerAuthSession()
-  if (!session)
-    return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
-  const requestingUser = await prisma.user.findUnique({
-    where: { id: session.user.id },
-  })
-  if (!requestingUser)
-    return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
+  // const session = await getServerAuthSession()
+  // if (!session)
+  //   return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
+  // const requestingUser = await prisma.user.findUnique({
+  //   where: { id: session.user.id },
+  // })
+  // if (!requestingUser)
+  //   return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
 
   const id = request.nextUrl.searchParams.get('id')
   if (!id)
