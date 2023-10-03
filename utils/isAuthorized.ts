@@ -27,4 +27,10 @@ export default async function isAuthorized(role?: Role) {
   if (user.role === role) {
     return true
   }
+
+  if (user.role === 'REP_INSTRUCTOR' && role === 'INSTRUCTOR') {
+    return true
+  }
+
+  return false
 }

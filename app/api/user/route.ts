@@ -32,15 +32,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ users })
     }
 
-    if (requestingUser.role === 'INSTRUCTOR') {
-      if (role === 'STUDENT') {
-        const users = await prisma.user.createMany({
-          data: emailsArray.map((email) => ({ email, role })),
-        })
-        return NextResponse.json({ users })
-      }
-    }
-
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   } catch (error) {
     return NextResponse.json(
@@ -61,7 +52,7 @@ export async function PATCH(request: NextRequest) {
     if (!requestingUser)
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
 
-    const { fullName, email, password, newPassword, profilePictureId } =
+    const { fullName, email, password, newPassword, profilePictureFileId } =
       (await request.json()) as User & { newPassword?: string }
 
     let newPasswordHash: string | undefined
@@ -79,7 +70,7 @@ export async function PATCH(request: NextRequest) {
         fullName,
         email,
         password: newPasswordHash,
-        profilePictureId,
+        profilePictureFileId,
       },
     })
 

@@ -12,7 +12,7 @@ export default async function MaterialLessonPage({
       id: lessonId,
     },
     include: {
-      document: true,
+      Document: true,
       Questionnaires: true,
     },
   })
@@ -36,12 +36,12 @@ export default async function MaterialLessonPage({
           allowFullScreen
         />
       ))}
-      {lesson.document && (
+      {lesson.Document && (
         <a
-          href={`/api/upload?id=${lesson.document.id}`}
-          download={lesson.document.name}
+          href={`/api/upload?id=${lesson.Document.id}`}
+          download={lesson.Document.name}
         >
-          {lesson.document.title}
+          {lesson.Document.title}
         </a>
       )}
       <Link

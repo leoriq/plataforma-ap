@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import styles from './LoginForm.module.scss'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { Role } from '@prisma/client'
 
 export default function LoginForm() {
   const [signedIn, setSignedIn] = useState(false)
@@ -22,7 +23,7 @@ export default function LoginForm() {
     }
 
     if (redirectPath) router.push(redirectPath)
-    const role = session?.user.role
+    const role = session?.user.role as Role
     switch (role) {
       case 'COORDINATOR':
         router.push('/coordinator/instructor')
@@ -30,6 +31,7 @@ export default function LoginForm() {
       case 'STUDENT':
         router.push('/student')
         break
+      case 'REP_INSTRUCTOR':
       case 'INSTRUCTOR':
         router.push('/instructor')
         break

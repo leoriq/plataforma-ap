@@ -24,9 +24,9 @@ export default async function ProfilePage() {
       <h1>{user.fullName}</h1>
       <p>{user.email}</p>
       <p>{user.role}</p>
-      {user.profilePictureId && (
+      {user.profilePictureFileId && (
         <Image
-          src={`/api/upload?id=${user.profilePictureId}`}
+          src={`/api/upload?id=${user.profilePictureFileId}`}
           alt={user.fullName || user.email}
         />
       )}

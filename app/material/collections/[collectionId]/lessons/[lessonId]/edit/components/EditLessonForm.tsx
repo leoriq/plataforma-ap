@@ -6,7 +6,7 @@ import api from '~/utils/api'
 
 interface Props {
   lesson: Lesson & {
-    document: DBFile | null
+    Document: DBFile | null
   }
 }
 
@@ -112,10 +112,10 @@ export default function EditLessonForm({ lesson: uneditedLesson }: Props) {
         Adicionar vídeo
       </button>
 
-      {lesson.document ? (
+      {lesson.Document ? (
         <>
           <p>
-            {lesson.document.title} - {lesson.document.name}
+            {lesson.Document.title} - {lesson.Document.name}
           </p>
           <button
             type="button"
