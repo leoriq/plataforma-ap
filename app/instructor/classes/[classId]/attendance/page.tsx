@@ -13,7 +13,8 @@ export default async function ClassAttendancePage({
       Students: {
         include: {
           MeetingsAttended: true,
-          MeetingsJustified: true,
+          MeetingsExcused: true,
+          MeetingsAbsent: true,
         },
       },
     },
@@ -33,7 +34,7 @@ export default async function ClassAttendancePage({
   const meetingsJustifiedByStudent = new Map(
     classObj.Students.map((student) => [
       student.id,
-      new Set(student.MeetingsJustified.map((meeting) => meeting.id)),
+      new Set(student.MeetingsExcused.map((meeting) => meeting.id)),
     ])
   )
 

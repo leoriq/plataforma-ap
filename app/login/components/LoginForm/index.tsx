@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import styles from './LoginForm.module.scss'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Role } from '@prisma/client'
+import type { Role } from '@prisma/client'
 
 export default function LoginForm() {
   const [signedIn, setSignedIn] = useState(false)

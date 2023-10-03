@@ -1,5 +1,4 @@
-import { User } from 'next-auth'
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { getServerAuthSession } from '~/server/auth'
 import { prisma } from '~/server/db'
 

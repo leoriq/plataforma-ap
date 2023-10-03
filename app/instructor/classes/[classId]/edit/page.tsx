@@ -32,12 +32,12 @@ export default async function EditClassPage({
   })
   const collectionsPromise = prisma.lessonCollection.findMany()
 
-  let responseClass = await classPromise
+  const responseClass = await classPromise
   if (!responseClass) {
     return <h1>Class not found</h1>
   }
 
-  let selectedClass = {
+  const selectedClass = {
     id: responseClass.id,
     name: responseClass.name,
     description: responseClass.description || undefined,

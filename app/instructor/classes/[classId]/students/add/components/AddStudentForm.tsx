@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react'
 import api from '~/utils/api'
 
 interface Props {
-  classId: String
+  classId: string
 }
 
 export default function AddStudentForm({ classId }: Props) {
@@ -16,7 +16,7 @@ export default function AddStudentForm({ classId }: Props) {
       email: email.replaceAll('\n', ','),
       classId,
     })
-  }, [email])
+  }, [email, classId])
 
   return (
     <form>

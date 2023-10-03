@@ -1,8 +1,8 @@
 'use client'
 
-import { LessonCollection, User } from '@prisma/client'
-import { ChangeEvent, useCallback, useState } from 'react'
-import { ClassRequestBody } from '~/app/api/class/route'
+import type { LessonCollection, User } from '@prisma/client'
+import { type ChangeEvent, useCallback, useState } from 'react'
+import type { ClassRequestBody } from '~/app/api/class/route'
 import api from '~/utils/api'
 
 interface Props {
@@ -26,13 +26,13 @@ export default function EditClassForm({
         [name]: value,
       }))
     },
-    [newClass]
+    [setNewClass]
   )
 
   const handleSubmit = useCallback(() => {
     const payload = { ...newClass, id: selectedClass.id }
     api.put('/api/collection', payload)
-  }, [newClass])
+  }, [newClass, selectedClass.id])
 
   return (
     <form>
