@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="Camada_1" data-name="Camada 1" viewBox="229.59 68.98 240.74 562.64">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #f4f4f9;
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <path class="cls-1"
+    d="M390.81,302.56a120.36,120.36,0,1,0-79.79.67V591.09a39.9,39.9,0,1,0,79.79,0V550.86h55.92V470.73H390.81ZM350,146.76a42.65,42.65,0,1,1-42.65,42.65A42.66,42.66,0,0,1,350,146.76Z">
+  </path>
+</svg>

@@ -10,16 +10,22 @@ export async function PATCH(request: NextRequest) {
 
     if (!email || !password || !fullName)
       return NextResponse.json(
-        { error: 'Missing fullName, email or password' },
+        { error: 'Missing name, email or password' },
         { status: 400 }
       )
 
     const existingUser = await prisma.user.findUnique({ where: { email } })
     if (!existingUser)
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+      return NextResponse.json(
+        { error: 'Email not found, contact your instructor' },
+        { status: 404 }
+      )
 
     if (existingUser.password)
-      return NextResponse.json({ error: 'Conflict' }, { status: 409 })
+      return NextResponse.json(
+        { error: 'Account already exists. Try logging in' },
+        { status: 409 }
+      )
 
     const hashedPassword = await hash(password, 12)
 

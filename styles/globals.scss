@@ -1,0 +1,43 @@
+html {
+  height: 100%;
+  font-family: var(--montserrat);
+  color: var(--black);
+  background: var(--white);
+
+  --primary: #404266;
+  --accent-pink: #f07a7a;
+  --accent-yellow: #f2c454;
+
+  --dark: #211f45;
+  --light: #f5f5fa;
+
+  --black: #0a0a0a;
+  --white: #ffffff;
+
+  --success: #79cdb3;
+  --danger: #d5403d;
+  --info: #328bbe;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  min-height: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--roboto-slab);
+}
+
+* {
+  box-sizing: border-box;
+}

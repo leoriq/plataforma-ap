@@ -1,4 +1,4 @@
-import '~/styles/globals.css'
+import '~/styles/globals.scss'
 import { Providers } from './providers'
 import { Roboto_Slab } from 'next/font/google'
 import { Montserrat } from 'next/font/google'
