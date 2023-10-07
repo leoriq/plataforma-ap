@@ -1,9 +1,13 @@
 .button {
+  --color: var(--dark);
+  --color-inverted: var(--light);
+
   all: unset;
   font-family: var(--montserrat);
+  font-weight: 700;
   cursor: pointer;
-  background-color: var(--dark);
-  color: var(--light);
+  background-color: var(--color);
+  color: var(--color-inverted);
   border-radius: 2px;
   padding: 12px 12px;
   box-sizing: border-box;
@@ -28,6 +32,16 @@
     box-shadow: none;
     cursor: wait;
   }
+}
+
+.accent-pink {
+  --color: var(--accent-pink);
+  --color-inverted: var(--light);
+}
+
+.accent-yellow {
+  --color: var(--accent-yellow);
+  --color-inverted: var(--light);
 }
 
 @property --loading {

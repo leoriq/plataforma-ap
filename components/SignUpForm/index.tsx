@@ -1,14 +1,16 @@
 'use client'
 
 import { signIn } from 'next-auth/react'
-import { permanentRedirect } from 'next/navigation'
-import { type ChangeEvent, useCallback, useState } from 'react'
+import { redirect } from 'next/navigation'
+import { type ChangeEvent, useCallback, useState, useMemo } from 'react'
 import api from '~/utils/api'
 import Button from '../Button'
 
 import styles from './SignUpForm.module.scss'
-import isEmail from '~/utils/isEmail'
 import { AxiosError } from 'axios'
+import { UserSignUpRequestZod } from '~/schemas/UserSignUpRequest'
+import FormInput from '../FormInput'
+import Link from 'next/link'
 
 export default function SignUpForm() {
   const [formData, setFormData] = useState({
@@ -17,7 +19,16 @@ export default function SignUpForm() {
     password: '',
     passwordConfirmation: '',
   })
-  const [error, setError] = useState('')
+  const [forceShowErrors, setForceShowErrors] = useState(false)
+
+  const errors = useMemo(() => {
+    const result = UserSignUpRequestZod.safeParse(formData)
+    if (result.success) return null
+
+    return result.error.format()
+  }, [formData])
+
+  const [generalError, setGeneralError] = useState('')
 
   const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target
@@ -28,10 +39,10 @@ export default function SignUpForm() {
   }, [])
 
   const handleSubmit = useCallback(async () => {
-    if (formData.password !== formData.passwordConfirmation) {
-      setError('Passwords do not match')
-      return
-    }
+    setForceShowErrors(true)
+    if (errors) return
+    if (formData.password !== formData.passwordConfirmation) return
+
     try {
       await api.patch('/api/user/sign-up', formData)
     } catch (error) {
@@ -39,11 +50,11 @@ export default function SignUpForm() {
 
       if (error instanceof AxiosError) {
         if (error.response?.status === 500) {
-          setError('Something went wrong. Try again later')
+          setGeneralError('Something went wrong. Try again later')
           return
         }
-        setError(
-          (error.response?.data?.error as string) ||
+        setGeneralError(
+          (error.response?.data as string) ||
             'Something went wrong. Try again later'
         )
       }
@@ -57,65 +68,58 @@ export default function SignUpForm() {
         password: formData.password,
       })
     } catch (e) {}
-    permanentRedirect('/login')
+    redirect('/login')
   }, [formData])
 
   return (
     <form className={styles.form}>
       <h2>Sign Up</h2>
 
-      <label
-        className={formData.fullName.length > 5 ? undefined : styles.danger}
-      >
-        Full name:
-        <input
-          type="text"
-          name="fullName"
-          value={formData.fullName}
-          onChange={handleChange}
-        />
-      </label>
-      <label
-        className={
-          formData.email &&
-          (isEmail(formData.email) ? undefined : styles.danger)
-        }
-      >
-        Email:
-        <input
-          type="text"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-      </label>
-      <label>
-        Password:
-        <input
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-        />
-      </label>
-      <label
-        className={
-          formData.passwordConfirmation &&
-          (formData.password === formData.passwordConfirmation
-            ? undefined
-            : styles.danger)
-        }
-      >
-        Password confirmation:
-        <input
-          type="password"
-          name="passwordConfirmation"
-          value={formData.passwordConfirmation}
-          onChange={handleChange}
-        />
-      </label>
+      <FormInput
+        type="text"
+        name="fullName"
+        value={formData.fullName}
+        onChange={handleChange}
+        label="Full name"
+        errors={errors?.fullName?._errors}
+        eager={forceShowErrors}
+      />
 
-      {error && <p className={styles.error}>{error}</p>}
+      <FormInput
+        type="text"
+        name="email"
+        value={formData.email}
+        onChange={handleChange}
+        label="Email"
+        errors={errors?.email?._errors}
+        eager={forceShowErrors}
+      />
+
+      <FormInput
+        type="password"
+        name="password"
+        value={formData.password}
+        onChange={handleChange}
+        label="Password"
+        errors={errors?.password?._errors}
+        eager={forceShowErrors}
+      />
+
+      <FormInput
+        type="password"
+        name="passwordConfirmation"
+        value={formData.passwordConfirmation}
+        onChange={handleChange}
+        label="Password confirmation"
+        errors={
+          formData.password !== formData.passwordConfirmation
+            ? ['Passwords do not match']
+            : undefined
+        }
+        eager={forceShowErrors}
+      />
+
+      {generalError && <span className={styles.error}>{generalError}</span>}
 
       <Button
         type="submit"
@@ -124,9 +128,13 @@ export default function SignUpForm() {
           e.preventDefault()
           await handleSubmit()
         }}
+        color="accent-yellow"
       >
         Sign Up
       </Button>
+      <Link href="/login">
+        Already registered? <span>Login here!</span>
+      </Link>
     </form>
   )
 }

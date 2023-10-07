@@ -1,20 +1,9 @@
 import { Role } from '@prisma/client'
 import { getServerAuthSession } from '~/server/auth'
-import { prisma } from '~/server/db'
 
 export default async function isAuthorized(role?: Role) {
   const session = await getServerAuthSession()
-  const id = session?.user.id
-
-  if (!id) {
-    return false
-  }
-
-  const user = await prisma.user.findUnique({
-    where: {
-      id,
-    },
-  })
+  const user = session?.user
 
   if (!user) {
     return false

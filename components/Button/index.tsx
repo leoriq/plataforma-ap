@@ -7,22 +7,22 @@ import {
   useState,
 } from 'react'
 import styles from './Button.module.scss'
+import classnames from 'classnames'
 
 type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U
 
-export default function Button(
-  props: Overwrite<
-    DetailedHTMLProps<
-      ButtonHTMLAttributes<HTMLButtonElement>,
-      HTMLButtonElement
-    >,
-    {
-      onClick?: (
-        e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
-      ) => Promise<void> | void
-    }
-  >
-) {
+type Props = Overwrite<
+  DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>,
+  {
+    onClick?: (
+      e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
+    ) => Promise<void> | void
+  } & {
+    color?: string
+  }
+>
+
+export default function Button(props: Props) {
   const [loading, setLoading] = useState(false)
 
   async function handleClick(
@@ -39,12 +39,12 @@ export default function Button(
       setLoading(false)
     }
   }
-
-  const className = [
+  const className = classnames(
     styles.button,
-    loading ? styles.loading : '',
     props.className,
-  ].join(' ')
+    props.color ? styles[props.color] : '',
+    loading ? styles.loading : ''
+  )
 
   return (
     <button

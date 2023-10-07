@@ -1,7 +1,8 @@
 .form {
   display: flex;
   flex-direction: column;
-  width: fit-content;
+  flex: 1;
+  max-width: 400px;
   padding: 3rem;
   background: var(--light);
   border-radius: 2px;
@@ -13,45 +14,9 @@
     color: var(--dark);
   }
 
-  label {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 0.5rem;
-    color: var(--dark);
-
-    &:after {
-      display: block;
-      content: '';
-      height: 2px;
-      background-color: lightgray;
-      width: 100%;
-
-      transition: --p-danger 0.5s;
-
-      background-image: radial-gradient(
-        circle,
-        var(--accent-pink) var(--p-danger),
-        rgba(0, 0, 0, 0) var(--p-danger)
-      );
-    }
-
-    &.danger:after {
-      --p-danger: 100%;
-    }
-  }
-
-  input {
-    all: unset;
-    width: 100%;
-    border: none;
-    font-size: 1rem;
-    margin-top: 8px;
-  }
-
   .error {
-    color: var(--accent-pink);
+    display: block;
+    color: var(--danger);
     font-size: 0.75rem;
     margin: 0;
   }
@@ -61,6 +26,7 @@
     color: var(--dark);
 
     span {
+      font-weight: 700;
       color: var(--accent-pink);
     }
 
@@ -68,14 +34,4 @@
       text-decoration: underline;
     }
   }
-}
-
-.button {
-  background: var(--accent-pink);
-}
-
-@property --p-danger {
-  syntax: '<percentage>';
-  inherits: false;
-  initial-value: 0%;
 }

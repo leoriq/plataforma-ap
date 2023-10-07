@@ -7,11 +7,12 @@ import {
 } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from 'server/db'
+import type { User as UserDB } from '@prisma/client'
 import { compare } from 'bcrypt'
 
 declare module 'next-auth' {
-  interface User {
-    role: string
+  interface User extends UserDB {
+    password: undefined
   }
   interface Session extends DefaultSession {
     user: User
@@ -21,6 +22,7 @@ declare module 'next-auth' {
 export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/login',
+    signOut: '/signout',
   },
   adapter: PrismaAdapter(prisma),
   session: {
@@ -30,12 +32,8 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: 'Sign in',
       credentials: {
-        email: {
-          label: 'Email',
-          type: 'email',
-          placeholder: 'example@example.com',
-        },
-        password: { label: 'Password', type: 'password' },
+        email: {},
+        password: {},
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials.password) {
@@ -57,8 +55,8 @@ export const authOptions: NextAuthOptions = {
         }
 
         return {
-          id: user.id,
-          role: user.role,
+          ...user,
+          password: undefined,
         }
       },
     }),
@@ -72,14 +70,31 @@ export const authOptions: NextAuthOptions = {
         user,
       }
     },
-    jwt: ({ token, user }) => {
+    jwt: async ({ token, user }) => {
       if (user) {
         return {
           ...token,
-          user: user,
+          user,
         }
       }
-      return token
+
+      const tokenUser = token.user as User
+
+      const userDb = await prisma.user.findFirst({
+        where: {
+          id: token.sub,
+          accessToken: tokenUser.accessToken,
+        },
+      })
+
+      if (!userDb) {
+        throw new Error('Unauthorized')
+      }
+
+      return {
+        ...token,
+        user: { ...userDb, password: undefined },
+      }
     },
   },
 }

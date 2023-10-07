@@ -1,41 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { signIn, useSession } from 'next-auth/react'
-import { permanentRedirect, useSearchParams } from 'next/navigation'
-import type { Role } from '@prisma/client'
+import { useState } from 'react'
+import { signIn } from 'next-auth/react'
 
 import styles from './LoginForm.module.scss'
 import Link from 'next/link'
-import isEmail from '~/utils/isEmail'
 import Button from '../Button'
+import FormInput from '../FormInput'
 
 export default function LoginForm() {
-  const { data: session } = useSession()
-
-  const redirectPath = useSearchParams().get('redirect')
-
-  useEffect(() => {
-    if (!session) return
-
-    if (redirectPath) permanentRedirect(redirectPath)
-
-    const role = session?.user.role as Role
-    switch (role) {
-      case 'COORDINATOR':
-        permanentRedirect('/coordinator/instructor')
-      case 'STUDENT':
-        permanentRedirect('/student')
-      case 'REP_INSTRUCTOR':
-      case 'INSTRUCTOR':
-        permanentRedirect('/instructor')
-      case 'MATERIAL':
-        permanentRedirect('/material')
-      default:
-        break
-    }
-  }, [session, redirectPath])
-
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string>()
@@ -59,24 +32,20 @@ export default function LoginForm() {
   return (
     <form className={styles.form}>
       <h2>Login</h2>
-      <label
-        className={email ? (isEmail(email) ? undefined : styles.danger) : ''}
-      >
-        Email:
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </label>
-      <label>
-        Password:
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </label>
+
+      <FormInput
+        label="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        type="email"
+      />
+
+      <FormInput
+        label="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        type="password"
+      />
 
       {error && <p className={styles.error}>{error}</p>}
 
@@ -87,8 +56,9 @@ export default function LoginForm() {
           e.preventDefault()
           await handleSubmit()
         }}
+        color="accent-pink"
       >
-        Login
+        Log In
       </Button>
       <Link href="/login/sign-up">
         Not yet registered? <span>Sign up here!</span>

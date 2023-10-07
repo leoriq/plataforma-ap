@@ -2,30 +2,30 @@ import type { User } from '@prisma/client'
 import { NextResponse, type NextRequest } from 'next/server'
 import { prisma } from '~/server/db'
 import { hash } from 'bcrypt'
+import { z } from 'zod'
+import {
+  UserSignUpRequest,
+  UserSignUpRequestZod,
+} from '~/schemas/UserSignUpRequest'
 
 export async function PATCH(request: NextRequest) {
   try {
-    const { fullName, email, password, profilePictureFileId } =
-      (await request.json()) as User
+    const rawData = (await request.json()) as UserSignUpRequest
 
-    if (!email || !password || !fullName)
-      return NextResponse.json(
-        { error: 'Missing name, email or password' },
-        { status: 400 }
-      )
+    const data = UserSignUpRequestZod.parse(rawData)
+
+    const { fullName, email, password, profilePictureFileId } = data
 
     const existingUser = await prisma.user.findUnique({ where: { email } })
     if (!existingUser)
-      return NextResponse.json(
-        { error: 'Email not found, contact your instructor' },
-        { status: 404 }
-      )
+      return NextResponse.json('Email not found, contact your instructor', {
+        status: 404,
+      })
 
     if (existingUser.password)
-      return NextResponse.json(
-        { error: 'Account already exists. Try logging in' },
-        { status: 409 }
-      )
+      return NextResponse.json('Account already exists. Try logging in', {
+        status: 409,
+      })
 
     const hashedPassword = await hash(password, 12)
 
@@ -38,9 +38,10 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json(userWithoutPassword, { status: 200 })
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    )
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(error.format(), { status: 400 })
+    }
+
+    return NextResponse.json('Internal Server Error', { status: 500 })
   }
 }
