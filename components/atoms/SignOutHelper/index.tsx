@@ -1,7 +1,7 @@
 'use client'
 
-import { signOut } from 'next-auth/react'
 import { useEffect } from 'react'
+import { signOut } from 'next-auth/react'
 
 export default function SignOutHelper() {
   function signOutAndRedirect() {

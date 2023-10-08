@@ -1,8 +1,8 @@
 import Image from 'next/image'
 
-import styles from './login-layout.module.scss'
-
 import LogoSVG from '~/public/logos/light-key.svg'
+
+import styles from './login-layout.module.scss'
 
 export default function Login({ children }: { children: React.ReactNode }) {
   return (

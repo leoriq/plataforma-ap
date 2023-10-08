@@ -2,12 +2,13 @@
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+
+import Button from '../../atoms/Button'
+import FormInput from '../../atoms/FormInput'
 
 import styles from './LoginForm.module.scss'
-import Link from 'next/link'
-import Button from '../Button'
-import FormInput from '../FormInput'
-import { useRouter } from 'next/navigation'
 
 export default function LoginForm() {
   const [email, setEmail] = useState('')

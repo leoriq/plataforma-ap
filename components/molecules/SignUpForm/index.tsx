@@ -1,16 +1,18 @@
 'use client'
 
+import { type ChangeEvent, useCallback, useState, useMemo } from 'react'
 import { signIn } from 'next-auth/react'
 import { redirect } from 'next/navigation'
-import { type ChangeEvent, useCallback, useState, useMemo } from 'react'
+import Link from 'next/link'
+import { AxiosError } from 'axios'
+
+import { UserSignUpRequestZod } from '~/schemas/UserSignUpRequest'
+
 import api from '~/utils/api'
-import Button from '../Button'
+import Button from '../../atoms/Button'
+import FormInput from '../../atoms/FormInput'
 
 import styles from './SignUpForm.module.scss'
-import { AxiosError } from 'axios'
-import { UserSignUpRequestZod } from '~/schemas/UserSignUpRequest'
-import FormInput from '../FormInput'
-import Link from 'next/link'
 
 export default function SignUpForm() {
   const [formData, setFormData] = useState({

@@ -6,8 +6,9 @@ import {
   type DetailedHTMLProps,
   useState,
 } from 'react'
-import styles from './Button.module.scss'
 import classnames from 'classnames'
+
+import styles from './Button.module.scss'
 
 type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U
 
