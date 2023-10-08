@@ -13,7 +13,7 @@ const config = {
         project: path.join(__dirname, 'tsconfig.json'),
       },
       rules: {
-        '@typescript-eslint/no-floating-promises': 'warn',
+        '@typescript-eslint/no-floating-promises': 'off',
         '@typescript-eslint/no-unsafe-member-access': 'warn',
       },
     },

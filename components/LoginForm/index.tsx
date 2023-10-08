@@ -7,11 +7,14 @@ import styles from './LoginForm.module.scss'
 import Link from 'next/link'
 import Button from '../Button'
 import FormInput from '../FormInput'
+import { useRouter } from 'next/navigation'
 
 export default function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string>()
+
+  const router = useRouter()
 
   const handleSubmit = async () => {
     try {
@@ -23,10 +26,13 @@ export default function LoginForm() {
 
       if (res?.error) {
         setError('Check your email or password')
+        return
       }
     } catch (e) {
       setError('Something went wrong')
+      return
     }
+    router.refresh()
   }
 
   return (

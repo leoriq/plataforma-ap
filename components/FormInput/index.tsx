@@ -1,6 +1,10 @@
 'use client'
 
-import { DetailedHTMLProps, InputHTMLAttributes, useState } from 'react'
+import {
+  type DetailedHTMLProps,
+  type InputHTMLAttributes,
+  useState,
+} from 'react'
 
 import styles from './FormInput.module.scss'
 

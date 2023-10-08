@@ -69,7 +69,7 @@ export default function SignUpForm() {
       })
     } catch (e) {}
     redirect('/login')
-  }, [formData])
+  }, [formData, errors])
 
   return (
     <form className={styles.form}>

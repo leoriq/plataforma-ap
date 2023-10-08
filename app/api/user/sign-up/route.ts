@@ -1,4 +1,3 @@
-import type { User } from '@prisma/client'
 import { NextResponse, type NextRequest } from 'next/server'
 import { prisma } from '~/server/db'
 import { hash } from 'bcrypt'
