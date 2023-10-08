@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { prisma } from '~/server/db'
-import isAuthorized from '~/utils/isAuthorized'
+import getAuthorizedUser from '~/utils/getAuthorizedUser'
 import EditClassForm from './components/EditClassForm'
 
 export default async function EditClassPage({
@@ -8,7 +8,7 @@ export default async function EditClassPage({
 }: {
   params: { classId: string }
 }) {
-  if (!(await isAuthorized('REP_INSTRUCTOR'))) {
+  if (!(await getAuthorizedUser('REP_INSTRUCTOR'))) {
     redirect('/login')
   }
 

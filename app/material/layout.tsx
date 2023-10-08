@@ -1,4 +1,4 @@
-import isAuthorized from '~/utils/isAuthorized'
+import getAuthorizedUser from '~/utils/getAuthorizedUser'
 import { redirect } from 'next/navigation'
 
 export default async function Login({
@@ -6,7 +6,7 @@ export default async function Login({
 }: {
   children: React.ReactNode
 }) {
-  if (!(await isAuthorized('MATERIAL'))) {
+  if (!(await getAuthorizedUser('MATERIAL'))) {
     redirect('/login')
   }
 

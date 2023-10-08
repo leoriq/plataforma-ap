@@ -1,15 +1,17 @@
-import isAuthorized from '~/utils/isAuthorized'
-import styles from './coordinator.module.scss'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+
+import getAuthorizedUser from '~/utils/getAuthorizedUser'
+
+import styles from './coordinator.module.scss'
 
 export default async function Login({
   children,
 }: {
   children: React.ReactNode
 }) {
-  if (!(await isAuthorized('COORDINATOR'))) {
-    redirect('/login')
+  if (!(await getAuthorizedUser('COORDINATOR'))) {
+    redirect('/sign-out')
   }
 
   return (

@@ -3,7 +3,7 @@ import { prisma } from '~/server/db'
 import { hash } from 'bcrypt'
 import { z } from 'zod'
 import {
-  UserSignUpRequest,
+  type UserSignUpRequest,
   UserSignUpRequestZod,
 } from '~/schemas/UserSignUpRequest'
 
