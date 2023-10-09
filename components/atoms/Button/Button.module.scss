@@ -23,12 +23,12 @@
   &.loading {
     background-image: linear-gradient(
       to right,
-      rgba(255, 255, 255, 0) calc(var(--loading) - 50%),
-      rgba(255, 255, 255, 0.3) var(--loading),
-      rgba(255, 255, 255, 0) calc(var(--loading) + 50%)
+      rgba(255, 255, 255, 0) calc(var(--l-percentage) - 50%),
+      rgba(255, 255, 255, 0.3) var(--l-percentage),
+      rgba(255, 255, 255, 0) calc(var(--l-percentage) + 50%)
     );
 
-    animation: linear 1s infinite running loading;
+    animation: linear 1s infinite running l-animation;
     box-shadow: none;
     cursor: wait;
   }
@@ -44,17 +44,17 @@
   --color-inverted: var(--light);
 }
 
-@property --loading {
+@property --l-percentage {
   syntax: '<percentage>';
-  initial-value: 0%;
+  initial-value: -50%;
   inherits: false;
 }
 
-@keyframes loading {
+@keyframes l-animation {
   from {
-    --loading: -50%;
+    --l-percentage: -50%;
   }
   to {
-    --loading: 150%;
+    --l-percentage: 150%;
   }
 }
