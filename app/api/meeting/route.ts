@@ -43,9 +43,9 @@ export async function POST(request: NextRequest) {
     )
 
     if (
-      requestingUser.role !== 'COORDINATOR' &&
-      requestingUser.role !== 'REP_INSTRUCTOR' &&
-      (requestingUser.role !== 'INSTRUCTOR' || !isInstructorOfClass)
+      !requestingUser.roles.includes('COORDINATOR') &&
+      !requestingUser.roles.includes('REP_INSTRUCTOR') &&
+      (!requestingUser.roles.includes('INSTRUCTOR') || !isInstructorOfClass)
     )
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
@@ -113,13 +113,13 @@ export async function PUT(request: NextRequest) {
       )
 
     if (
-      requestingUser.role !== 'COORDINATOR' &&
-      requestingUser.role !== 'REP_INSTRUCTOR' &&
-      requestingUser.role !== 'INSTRUCTOR'
+      !requestingUser.roles.includes('COORDINATOR') &&
+      !requestingUser.roles.includes('REP_INSTRUCTOR') &&
+      !requestingUser.roles.includes('INSTRUCTOR')
     )
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-    if (requestingUser.role === 'INSTRUCTOR') {
+    if (requestingUser.roles.includes('INSTRUCTOR')) {
       const meeting = await prisma.synchronousMeeting.findUnique({
         where: { id: meetingId },
         include: {

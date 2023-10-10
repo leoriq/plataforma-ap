@@ -36,9 +36,9 @@ export async function POST(request: NextRequest) {
     )
 
     if (
-      (requestingUser.role === 'INSTRUCTOR' && isInstructorOfClass) ||
-      requestingUser.role === 'REP_INSTRUCTOR' ||
-      requestingUser.role === 'COORDINATOR'
+      (requestingUser.roles.includes('INSTRUCTOR') && isInstructorOfClass) ||
+      requestingUser.roles.includes('REP_INSTRUCTOR') ||
+      requestingUser.roles.includes('COORDINATOR')
     ) {
       const updatedClass = await prisma.class.update({
         where: { id: classId },
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
           Students: {
             connectOrCreate: emailsArray.map((email) => ({
               where: { email },
-              create: { email, role: 'STUDENT' },
+              create: { email, roles: 'STUDENT' },
             })),
           },
         },

@@ -12,7 +12,7 @@ datasource db {
     shadowDatabaseUrl = env("DATABASE_URL_NON_POOLING") // used for migrations
 }
 
-enum Role {
+enum roles {
     COORDINATOR
     REP_INSTRUCTOR
     INSTRUCTOR
@@ -48,7 +48,7 @@ model User {
     password    String?
     accessToken String  @unique @default(uuid())
     fullName    String?
-    role        Role
+    roles       roles[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

@@ -27,8 +27,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
 
     if (
-      requestingUser.role !== 'COORDINATOR' &&
-      requestingUser.role !== 'REP_INSTRUCTOR'
+      !requestingUser.roles.includes('COORDINATOR') &&
+      !requestingUser.roles.includes('REP_INSTRUCTOR')
     )
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
@@ -72,9 +72,9 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
 
     if (
-      requestingUser.role !== 'COORDINATOR' &&
-      requestingUser.role !== 'REP_INSTRUCTOR' &&
-      requestingUser.role !== 'INSTRUCTOR'
+      !requestingUser.roles.includes('COORDINATOR') &&
+      !requestingUser.roles.includes('REP_INSTRUCTOR') &&
+      !requestingUser.roles.includes('INSTRUCTOR')
     )
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
@@ -132,8 +132,8 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
 
     if (
-      requestingUser.role !== 'COORDINATOR' &&
-      requestingUser.role !== 'REP_INSTRUCTOR'
+      !requestingUser.roles.includes('COORDINATOR') &&
+      !requestingUser.roles.includes('REP_INSTRUCTOR')
     )
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 

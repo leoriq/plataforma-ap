@@ -6,27 +6,22 @@ import LoginForm from '~/components/molecules/LoginForm'
 
 export default async function LoginPage() {
   const session = await getServerAuthSession()
+  const roles = session?.user.roles
 
-  if (session?.user.role) {
-    let destination = '/'
+  console.log('roles', roles)
 
-    switch (session.user.role) {
-      case 'COORDINATOR':
-        destination = '/coordinator'
-        break
-      case 'MATERIAL':
-        destination = '/material'
-        break
-      case 'REP_INSTRUCTOR':
-      case 'INSTRUCTOR':
-        destination = '/instructor'
-        break
-      case 'STUDENT':
-        destination = '/student'
-        break
+  if (roles) {
+    switch (true) {
+      case roles.includes('COORDINATOR'):
+        redirect('/auth/coordinator')
+      case roles.includes('MATERIAL'):
+        redirect('/auth/material')
+      case roles.includes('REP_INSTRUCTOR'):
+      case roles.includes('INSTRUCTOR'):
+        redirect('/auth/instructor')
+      case roles.includes('STUDENT'):
+        redirect('/auth/student')
     }
-
-    redirect(destination)
   }
 
   return <LoginForm />

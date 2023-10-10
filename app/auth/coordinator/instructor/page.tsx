@@ -1,0 +1,33 @@
+import { prisma } from '~/server/db'
+import DeleteUserButton from '../components/DeleteUserButton'
+import Link from 'next/link'
+
+export default async function InstructorManagement() {
+  const instructors = await prisma.user.findMany({
+    where: {
+      roles: {
+        hasSome: ['INSTRUCTOR', 'REP_INSTRUCTOR'],
+      },
+    },
+    select: {
+      id: true,
+      email: true,
+      roles: true,
+    },
+  })
+
+  return (
+    <>
+      <h1>Instrutor</h1>
+      <ul>
+        {instructors.map((instructor) => (
+          <li key={instructor.email}>
+            {instructor.email} - {instructor.roles}
+            <DeleteUserButton id={instructor.id} />
+          </li>
+        ))}
+      </ul>
+      <Link href="/coordinator/instructor/add">Adicionar Instrutor</Link>
+    </>
+  )
+}

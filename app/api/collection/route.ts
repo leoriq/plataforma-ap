@@ -15,8 +15,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
 
     if (
-      requestingUser.role !== 'COORDINATOR' &&
-      requestingUser.role !== 'MATERIAL'
+      !requestingUser.roles.includes('COORDINATOR') &&
+      !requestingUser.roles.includes('MATERIAL')
     )
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
@@ -52,8 +52,8 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
 
     if (
-      requestingUser.role !== 'COORDINATOR' &&
-      requestingUser.role !== 'MATERIAL'
+      !requestingUser.roles.includes('COORDINATOR') &&
+      !requestingUser.roles.includes('MATERIAL')
     )
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
@@ -90,8 +90,8 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
 
     if (
-      requestingUser.role !== 'COORDINATOR' &&
-      requestingUser.role !== 'MATERIAL'
+      !requestingUser.roles.includes('COORDINATOR') &&
+      !requestingUser.roles.includes('MATERIAL')
     )
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 

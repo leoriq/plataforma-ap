@@ -15,19 +15,19 @@ export async function POST(request: NextRequest) {
     if (!requestingUser)
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
 
-    const { email, role } = (await request.json()) as User
+    const { email, roles } = (await request.json()) as User
 
-    if (!email || !role)
+    if (!email || !roles)
       return NextResponse.json(
-        { error: 'Missing email or role' },
+        { error: 'Missing email or roles' },
         { status: 400 }
       )
 
     const emailsArray = email.split(',')
 
-    if (requestingUser.role === 'COORDINATOR') {
+    if (requestingUser.roles.includes('COORDINATOR')) {
       const users = await prisma.user.createMany({
-        data: emailsArray.map((email) => ({ email, role })),
+        data: emailsArray.map((email) => ({ email, roles })),
       })
       return NextResponse.json({ users })
     }
@@ -105,13 +105,13 @@ export async function DELETE(request: NextRequest) {
     if (!selectedUser)
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
-    if (requestingUser.role === 'COORDINATOR') {
+    if (requestingUser.roles.includes('COORDINATOR')) {
       await prisma.user.delete({ where: { id: selectedUserId } })
       return NextResponse.json({ success: true })
     }
 
-    if (requestingUser.role === 'INSTRUCTOR') {
-      if (selectedUser.role === 'STUDENT') {
+    if (requestingUser.roles.includes('INSTRUCTOR')) {
+      if (selectedUser.roles.includes('STUDENT')) {
         await prisma.user.delete({ where: { id: selectedUserId } })
         return NextResponse.json({ success: true })
       }
