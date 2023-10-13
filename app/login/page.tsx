@@ -8,8 +8,6 @@ export default async function LoginPage() {
   const session = await getServerAuthSession()
   const roles = session?.user.roles
 
-  console.log('roles', roles)
-
   if (roles) {
     switch (true) {
       case roles.includes('COORDINATOR'):

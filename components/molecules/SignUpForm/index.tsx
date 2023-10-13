@@ -48,8 +48,6 @@ export default function SignUpForm() {
     try {
       await api.patch('/api/user/sign-up', formData)
     } catch (error) {
-      console.log(error)
-
       if (error instanceof AxiosError) {
         if (error.response?.status === 500) {
           setGeneralError('Something went wrong. Try again later')
