@@ -1,13 +1,17 @@
 .grid {
+  position: relative;
+  height: 100dvh;
+  max-width: 100vw;
   display: grid;
   grid-template-columns: max-content 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    'header header'
+    'sidebar main';
 }
 
 .main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100dvh;
+  grid-area: main;
   background: #f5f5fa;
+  overflow: scroll;
 }

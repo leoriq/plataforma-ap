@@ -1,16 +1,19 @@
 import { Ref, useEffect } from 'react'
 
 export default function useOnClickOut(
-  ref: Ref<HTMLElement>,
+  refs: Ref<HTMLElement>[],
   callback: () => void
 ) {
   useEffect(() => {
-    const listener = (event: any) => {
+    const listener = (event: MouseEvent) => {
       if (
-        !ref ||
-        !('current' in ref) ||
-        !ref.current ||
-        ref.current.contains(event.target)
+        refs.some(
+          (ref) =>
+            !ref ||
+            !('current' in ref) ||
+            !ref.current ||
+            ref.current.contains(event.target as Node)
+        )
       ) {
         return
       }
@@ -18,10 +21,8 @@ export default function useOnClickOut(
     }
 
     document.addEventListener('mousedown', listener)
-    document.addEventListener('touchstart', listener)
     return () => {
       document.removeEventListener('mousedown', listener)
-      document.removeEventListener('touchstart', listener)
     }
-  }, [ref, callback])
+  }, [refs, callback])
 }

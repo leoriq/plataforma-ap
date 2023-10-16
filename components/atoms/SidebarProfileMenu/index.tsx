@@ -38,6 +38,7 @@ export default function SidebarProfileMenu({ user }: Props) {
               src={`/api/upload?id=${user.profilePictureFileId}`}
               alt="Profile Picture"
               fill
+              sizes="3rem"
               className={styles.profilePicture}
             />
           </div>
