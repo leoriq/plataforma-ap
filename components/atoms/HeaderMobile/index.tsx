@@ -7,7 +7,7 @@ import LogoSVG from '~/public/logos/light-key.svg'
 import styles from './HeaderMobile.module.scss'
 
 interface Props {
-  onClickMenu: MouseEventHandler<HTMLButtonElement>
+  onClickMenu: MouseEventHandler<HTMLElement>
   isOpen: boolean
 }
 
@@ -16,10 +16,10 @@ const HeaderMobile = forwardRef<HTMLDivElement, Props>(function HeaderMobile(
   ref
 ) {
   return (
-    <div ref={ref} className={styles.header}>
+    <div ref={ref} className={styles.header} onClick={onClickMenu}>
       <button
         className={isOpen ? styles.open : undefined}
-        onClick={onClickMenu}
+        aria-label="Toggle Navigation Menu"
       >
         <div />
         <div />
