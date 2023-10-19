@@ -1,6 +1,7 @@
 import { prisma } from '~/server/db'
 import DeleteUserButton from '../components/DeleteUserButton'
 import Link from 'next/link'
+import UserTable from '~/components/molecules/UserTable'
 
 export default async function InstructorManagement() {
   const instructors = await prisma.user.findMany({
@@ -11,23 +12,11 @@ export default async function InstructorManagement() {
     },
     select: {
       id: true,
+      fullName: true,
       email: true,
       roles: true,
     },
   })
 
-  return (
-    <>
-      <h1>Instrutor</h1>
-      <ul>
-        {instructors.map((instructor) => (
-          <li key={instructor.email}>
-            {instructor.email} - {instructor.roles}
-            <DeleteUserButton id={instructor.id} />
-          </li>
-        ))}
-      </ul>
-      <Link href="/coordinator/instructor/add">Adicionar Instrutor</Link>
-    </>
-  )
+  return <UserTable title="Instructors" users={instructors} />
 }

@@ -1,7 +1,7 @@
-import { roles } from '@prisma/client'
+import { Role } from '@prisma/client'
 import { getServerAuthSession } from '~/server/auth'
 
-export default async function getAuthorizedUser(roles?: roles) {
+export default async function getAuthorizedUser(role?: Role) {
   const session = await getServerAuthSession()
   const user = session?.user
 
@@ -9,15 +9,15 @@ export default async function getAuthorizedUser(roles?: roles) {
     return null
   }
 
-  if (!roles) {
+  if (!role) {
     return user
   }
 
-  if (user.roles.includes(roles)) {
+  if (user.roles.includes(role)) {
     return user
   }
 
-  if (user.roles.includes('REP_INSTRUCTOR') && roles.includes('INSTRUCTOR')) {
+  if (user.roles.includes('REP_INSTRUCTOR') && role === 'INSTRUCTOR') {
     return user
   }
 

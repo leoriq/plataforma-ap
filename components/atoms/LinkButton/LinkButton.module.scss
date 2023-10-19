@@ -19,19 +19,6 @@
   &:hover {
     box-shadow: inset 0 0 1000px 1000px rgba(255, 255, 255, 0.1);
   }
-
-  &.loading {
-    background-image: linear-gradient(
-      to right,
-      rgba(255, 255, 255, 0) calc(var(--l-percentage) - 50%),
-      rgba(255, 255, 255, 0.3) var(--l-percentage),
-      rgba(255, 255, 255, 0) calc(var(--l-percentage) + 50%)
-    );
-
-    animation: linear 1s infinite running l-animation;
-    box-shadow: none;
-    cursor: wait;
-  }
 }
 
 .accent-pink {
@@ -52,19 +39,4 @@
 .danger {
   --color: var(--danger);
   --color-inverted: var(--light);
-}
-
-@property --l-percentage {
-  syntax: '<percentage>';
-  initial-value: -50%;
-  inherits: false;
-}
-
-@keyframes l-animation {
-  from {
-    --l-percentage: -50%;
-  }
-  to {
-    --l-percentage: 150%;
-  }
 }

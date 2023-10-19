@@ -58,7 +58,6 @@ export default function LoginForm() {
 
       <Button
         type="submit"
-        className={styles.button}
         onClick={async (e) => {
           e.preventDefault()
           await handleSubmit()

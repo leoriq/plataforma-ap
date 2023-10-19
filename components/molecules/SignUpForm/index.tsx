@@ -123,7 +123,6 @@ export default function SignUpForm() {
 
       <Button
         type="submit"
-        className={styles.button}
         onClick={async (e) => {
           e.preventDefault()
           await handleSubmit()

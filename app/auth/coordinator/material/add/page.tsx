@@ -4,7 +4,7 @@ export default function AddMaterial() {
   return (
     <>
       <h1>Adicionar Material</h1>
-      <AddUserForm roles="MATERIAL" />
+      <AddUserForm role="MATERIAL" />
     </>
   )
 }

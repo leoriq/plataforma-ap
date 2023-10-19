@@ -1,23 +1,23 @@
 'use client'
 
-import type { roles } from '@prisma/client'
+import type { Role } from '@prisma/client'
 import { useCallback, useState } from 'react'
 import api from '~/utils/api'
 
 interface Props {
-  roles: roles
+  role: Role
 }
 
-export default function AddUserForm({ roles }: Props) {
+export default function AddUserForm({ role }: Props) {
   const [email, setEmail] = useState('')
   console.log(email.replaceAll('\n', ','))
 
   const handleSubmit = useCallback(() => {
     api.post('/api/user', {
       email: email.replaceAll('\n', ','),
-      roles,
+      role,
     })
-  }, [email, roles])
+  }, [email, role])
 
   return (
     <form>
