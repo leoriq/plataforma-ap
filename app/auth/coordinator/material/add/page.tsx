@@ -1,10 +1,7 @@
-import AddUserForm from '../../components/AddUserForm'
+import AddUserForm from '~/components/molecules/AddUserForm'
 
 export default function AddMaterial() {
   return (
-    <>
-      <h1>Adicionar Material</h1>
-      <AddUserForm role="MATERIAL" />
-    </>
+    <AddUserForm role="MATERIAL" redirectUrl="/auth/coordinator/material" />
   )
 }

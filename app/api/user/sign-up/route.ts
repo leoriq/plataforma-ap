@@ -1,29 +1,19 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { prisma } from '~/server/db'
 import { hash } from 'bcrypt'
-import { z } from 'zod'
-import {
-  type UserSignUpRequest,
-  UserSignUpRequestZod,
-} from '~/schemas/UserSignUpRequest'
+import { ZodError } from 'zod'
+import { UserSignUpRequestZod } from '~/schemas/UserSignUpRequest'
 
 export async function PATCH(request: NextRequest) {
   try {
-    const rawData = (await request.json()) as UserSignUpRequest
-
-    const data = UserSignUpRequestZod.parse(rawData)
+    const data = UserSignUpRequestZod.parse(await request.json())
 
     const { fullName, email, password, profilePictureFileId } = data
 
     const existingUser = await prisma.user.findUnique({ where: { email } })
-    if (!existingUser)
-      return NextResponse.json('Email not found, contact your instructor', {
-        status: 404,
-      })
-
-    if (existingUser.password)
-      return NextResponse.json('Account already exists. Try logging in', {
-        status: 409,
+    if (!existingUser || existingUser.password)
+      return NextResponse.json('Could not sign up, contact your instructor', {
+        status: 403,
       })
 
     const hashedPassword = await hash(password, 12)
@@ -37,7 +27,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json(userWithoutPassword, { status: 200 })
   } catch (error) {
-    if (error instanceof z.ZodError) {
+    if (error instanceof ZodError) {
       return NextResponse.json(error.format(), { status: 400 })
     }
 

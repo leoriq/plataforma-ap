@@ -1,10 +1,7 @@
-import AddUserForm from '../../components/AddUserForm'
+import AddUserForm from '~/components/molecules/AddUserForm'
 
 export default function AddInstructor() {
   return (
-    <>
-      <h1>Adicionar Instrutor</h1>
-      <AddUserForm role="INSTRUCTOR" />
-    </>
+    <AddUserForm role="INSTRUCTOR" redirectUrl="/auth/coordinator/instructor" />
   )
 }

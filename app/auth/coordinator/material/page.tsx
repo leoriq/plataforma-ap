@@ -1,6 +1,6 @@
 import { prisma } from '~/server/db'
-import DeleteUserButton from '../components/DeleteUserButton'
-import Link from 'next/link'
+
+import UserTable from '~/components/molecules/UserTable'
 
 export default async function MaterialManagement() {
   const materials = await prisma.user.findMany({
@@ -10,22 +10,15 @@ export default async function MaterialManagement() {
     select: {
       id: true,
       email: true,
-      roles: true,
+      fullName: true,
     },
   })
 
   return (
-    <>
-      <h1>Material</h1>
-      <ul>
-        {materials.map((material) => (
-          <li key={material.email}>
-            {material.email} - {material.roles}
-            <DeleteUserButton id={material.id} />
-          </li>
-        ))}
-      </ul>
-      <Link href="material/add">Add Material</Link>
-    </>
+    <UserTable
+      title="Material"
+      users={materials}
+      addUsersLink="/auth/coordinator/material/add"
+    />
   )
 }

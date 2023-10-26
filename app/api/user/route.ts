@@ -4,43 +4,6 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { getServerAuthSession } from '~/server/auth'
 import { prisma } from '~/server/db'
 
-export async function POST(request: NextRequest) {
-  try {
-    const session = await getServerAuthSession()
-    if (!session)
-      return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
-    const requestingUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
-    })
-    if (!requestingUser)
-      return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
-
-    const { email, roles } = (await request.json()) as User
-
-    if (!email || !roles)
-      return NextResponse.json(
-        { error: 'Missing email or roles' },
-        { status: 400 }
-      )
-
-    const emailsArray = email.split(',')
-
-    if (requestingUser.roles.includes('COORDINATOR')) {
-      const users = await prisma.user.createMany({
-        data: emailsArray.map((email) => ({ email, roles })),
-      })
-      return NextResponse.json({ users })
-    }
-
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    )
-  }
-}
-
 export async function PATCH(request: NextRequest) {
   try {
     const session = await getServerAuthSession()
