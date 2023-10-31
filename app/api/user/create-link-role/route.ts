@@ -9,7 +9,9 @@ export async function POST(request: NextRequest) {
     const session = await getServerAuthSession()
     if (!session)
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
-    const requestingUser = session.user
+    const requestingUser = await prisma.user.findUnique({
+      where: { accessToken: session.user.accessToken },
+    })
     if (!requestingUser)
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
 
@@ -31,9 +33,9 @@ export async function POST(request: NextRequest) {
     ])
     return NextResponse.json({ status: 200 })
   } catch (error) {
-    if (error instanceof ZodError) {
+    if (error instanceof ZodError)
       return NextResponse.json(error.format(), { status: 400 })
-    }
+
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 }

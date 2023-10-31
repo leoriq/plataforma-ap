@@ -6,9 +6,8 @@ import { UserSignUpRequestZod } from '~/schemas/UserSignUpRequest'
 
 export async function PATCH(request: NextRequest) {
   try {
-    const data = UserSignUpRequestZod.parse(await request.json())
-
-    const { fullName, email, password, profilePictureFileId } = data
+    const { fullName, email, password, profilePictureFileId } =
+      UserSignUpRequestZod.parse(await request.json())
 
     const existingUser = await prisma.user.findUnique({ where: { email } })
     if (!existingUser || existingUser.password)
@@ -17,7 +16,6 @@ export async function PATCH(request: NextRequest) {
       })
 
     const hashedPassword = await hash(password, 12)
-
     const user = await prisma.user.update({
       where: { email },
       data: { fullName, password: hashedPassword, profilePictureFileId },
@@ -27,9 +25,8 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json(userWithoutPassword, { status: 200 })
   } catch (error) {
-    if (error instanceof ZodError) {
+    if (error instanceof ZodError)
       return NextResponse.json(error.format(), { status: 400 })
-    }
 
     return NextResponse.json('Internal Server Error', { status: 500 })
   }

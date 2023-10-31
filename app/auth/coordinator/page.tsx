@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation'
+import { permanentRedirect } from 'next/navigation'
 
 export default function CoordinatorPage() {
-  redirect('/auth/coordinator/instructor')
+  permanentRedirect('/auth/coordinator/instructor')
 }

@@ -9,6 +9,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from 'server/db'
 import type { User as UserDB } from '@prisma/client'
 import { compare } from 'bcrypt'
+import { DefaultJWT } from 'next-auth/jwt'
 
 declare module 'next-auth' {
   interface User extends UserDB {
@@ -16,6 +17,13 @@ declare module 'next-auth' {
   }
   interface Session extends DefaultSession {
     user: User
+    validatedAt: string
+  }
+}
+declare module 'next-auth/jwt' {
+  interface JWT extends DefaultJWT {
+    user: User
+    validatedAt: string
   }
 }
 
@@ -74,16 +82,23 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         return {
           ...token,
+          validatedAt: new Date().toISOString(),
           user,
         }
       }
 
-      const tokenUser = token.user as User
+      if (
+        token.validatedAt &&
+        new Date(token.validatedAt) >
+          new Date(Date.now() - 1000 * 60 * 60 * 24 * 1)
+      ) {
+        return token
+      }
 
       const userDb = await prisma.user.findFirst({
         where: {
           id: token.sub,
-          accessToken: tokenUser.accessToken,
+          accessToken: token.user.accessToken,
         },
       })
 
@@ -93,6 +108,7 @@ export const authOptions: NextAuthOptions = {
 
       return {
         ...token,
+        validatedAt: new Date().toISOString(),
         user: { ...userDb, password: undefined },
       }
     },

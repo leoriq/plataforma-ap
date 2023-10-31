@@ -115,17 +115,14 @@ export default function Sidebar({ user }: Props) {
               isActive={currentSelected === 'material'}
               subItems={[
                 {
-                  title: 'Select a Collection',
-                  href: '/auth/coordinator/instructor',
+                  title: 'Collections',
+                  href: '/auth/material/collections',
                   selectable: true,
                 },
+
                 {
-                  title: 'Edit Collection',
-                  href: '/auth/coordinator/material',
-                },
-                {
-                  title: 'Add New Collection',
-                  href: '/auth/coordinator/material',
+                  title: 'Create New Collection',
+                  href: '/auth/material/collections/add',
                 },
               ]}
             />

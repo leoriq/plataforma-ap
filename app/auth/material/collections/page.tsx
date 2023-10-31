@@ -10,7 +10,7 @@ export default async function MaterialCollectionsPage() {
 
   return (
     <>
-      <h1>Material Collections</h1>
+      <h1>Collections</h1>
       <ul>
         {collections.map((collection) => (
           <li key={collection.id}>

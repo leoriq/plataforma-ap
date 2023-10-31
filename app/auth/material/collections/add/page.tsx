@@ -1,10 +1,5 @@
-import CreateCollectionForm from './components/CreateCollectionForm'
+import CollectionForm from '../../../../../components/molecules/CollectionForm'
 
 export default function CreateCollectionPage() {
-  return (
-    <>
-      <h1>Create Collection</h1>
-      <CreateCollectionForm />
-    </>
-  )
+  return <CollectionForm />
 }

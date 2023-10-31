@@ -1,5 +1,8 @@
 import type { LessonCollection } from '@prisma/client'
+import { redirect } from 'next/navigation'
 import { NextResponse, type NextRequest } from 'next/server'
+import { ZodError } from 'zod'
+import { CollectionRequestZod } from '~/schemas/CollectionRequest'
 import { getServerAuthSession } from '~/server/auth'
 import { prisma } from '~/server/db'
 
@@ -9,10 +12,9 @@ export async function POST(request: NextRequest) {
     if (!session)
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
     const requestingUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { accessToken: session.user.accessToken },
     })
-    if (!requestingUser)
-      return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
+    if (!requestingUser) redirect('/sign-out')
 
     if (
       !requestingUser.roles.includes('COORDINATOR') &&
@@ -20,10 +22,9 @@ export async function POST(request: NextRequest) {
     )
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-    const { name, description } = (await request.json()) as LessonCollection
-
-    if (!name)
-      return NextResponse.json({ error: 'Missing name' }, { status: 400 })
+    const { name, description } = CollectionRequestZod.parse(
+      await request.json()
+    )
 
     const lessonCollection = await prisma.lessonCollection.create({
       data: {
@@ -33,6 +34,9 @@ export async function POST(request: NextRequest) {
     })
     return NextResponse.json({ lessonCollection })
   } catch (error) {
+    if (error instanceof ZodError)
+      return NextResponse.json(error.format(), { status: 400 })
+
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 }
@@ -46,10 +50,9 @@ export async function PUT(request: NextRequest) {
     if (!session)
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
     const requestingUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { accessToken: session.user.accessToken },
     })
-    if (!requestingUser)
-      return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
+    if (!requestingUser) redirect('/sign-out')
 
     if (
       !requestingUser.roles.includes('COORDINATOR') &&
@@ -57,10 +60,11 @@ export async function PUT(request: NextRequest) {
     )
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-    const { id, name, description } = (await request.json()) as LessonCollection
+    const { id, name, description } = CollectionRequestZod.parse(
+      await request.json()
+    )
 
-    if (!id || !name)
-      return NextResponse.json({ error: 'Missing id or name' }, { status: 400 })
+    if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
 
     const lessonCollection = await prisma.lessonCollection.update({
       where: { id },
@@ -71,6 +75,9 @@ export async function PUT(request: NextRequest) {
     })
     return NextResponse.json({ lessonCollection })
   } catch (error) {
+    if (error instanceof ZodError)
+      return NextResponse.json(error.format(), { status: 400 })
+
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 }
@@ -84,7 +91,7 @@ export async function DELETE(request: NextRequest) {
     if (!session)
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
     const requestingUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { accessToken: session.user.accessToken },
     })
     if (!requestingUser)
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
@@ -104,6 +111,9 @@ export async function DELETE(request: NextRequest) {
     })
     return NextResponse.json({ lessonCollection })
   } catch (error) {
+    if (error instanceof ZodError)
+      return NextResponse.json(error.format(), { status: 400 })
+
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 }
