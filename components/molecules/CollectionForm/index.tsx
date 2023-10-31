@@ -8,7 +8,7 @@ import api from '~/utils/api'
 import styles from './CollectionForm.module.scss'
 import { useRouter } from 'next/navigation'
 import {
-  CollectionRequest,
+  type CollectionRequest,
   CollectionRequestZod,
 } from '~/schemas/CollectionRequest'
 
@@ -57,7 +57,7 @@ export default function CollectionForm({ startingData }: Props) {
     } catch (error) {
       setRequestError('Something went wrong. Try again later')
     }
-  }, [collection])
+  }, [collection, router])
 
   return (
     <div className={styles.container}>
