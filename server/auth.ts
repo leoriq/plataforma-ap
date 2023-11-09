@@ -1,4 +1,3 @@
-import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import {
   getServerSession,
   type NextAuthOptions,
@@ -32,7 +31,6 @@ export const authOptions: NextAuthOptions = {
     signIn: '/login',
     signOut: '/signout',
   },
-  adapter: PrismaAdapter(prisma),
   session: {
     strategy: 'jwt',
   },

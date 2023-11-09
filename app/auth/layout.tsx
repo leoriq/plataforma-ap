@@ -20,7 +20,9 @@ export default async function Login({
     <div className={styles.grid}>
       <Sidebar user={user} />
 
-      <main className={styles.main}>{children}</main>
+      <main className={styles.main}>
+        <div>{children}</div>
+      </main>
     </div>
   )
 }
