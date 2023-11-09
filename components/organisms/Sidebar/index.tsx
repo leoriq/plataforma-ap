@@ -19,6 +19,7 @@ import LogoSVG from '~/public/logos/light-key.svg'
 import styles from './Sidebar.module.scss'
 import HeaderMobile from '~/components/atoms/HeaderMobile'
 import useOnClickOut from '~/utils/useOnClickOut'
+import classNames from 'classnames'
 
 interface Props {
   user: User
@@ -38,8 +39,6 @@ export default function Sidebar({ user }: Props) {
   const isMaterial = user.roles.includes('MATERIAL')
   const isStudent = user.roles.includes('STUDENT')
 
-  const navClass = [styles.nav, isOpenMobile ? styles.openMobile : ''].join(' ')
-
   return (
     <>
       <HeaderMobile
@@ -48,7 +47,10 @@ export default function Sidebar({ user }: Props) {
         onClickMenu={() => setIsOpenMobile(!isOpenMobile)}
       />
 
-      <nav className={navClass} ref={navRef}>
+      <nav
+        className={classNames(styles.nav, isOpenMobile && styles.openMobile)}
+        ref={navRef}
+      >
         <Link href="/" className={styles.home}>
           <Image src={LogoSVG as string} alt="Logo" height={32} />
           <h1>ENG4U</h1>

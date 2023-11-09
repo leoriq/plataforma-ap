@@ -10,6 +10,9 @@
   overflow-y: auto;
   overflow-x: hidden;
 
+  position: absolute;
+  height: 100%;
+
   &:hover {
     --sub-items-max-height: 15rem;
     .categories,
