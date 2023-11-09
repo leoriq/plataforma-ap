@@ -22,6 +22,11 @@ export default function RootLayout({
 }) {
   return (
     <html className={`${montserrat.variable} ${roboto_slab.variable}`}>
+      <head>
+        <meta name="apple-mobile-web-app-capable" content="yes"></meta>
+
+        <meta name="mobile-web-app-capable" content="yes"></meta>
+      </head>
       <body>
         <Providers>{children}</Providers>
       </body>
