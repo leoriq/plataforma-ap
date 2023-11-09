@@ -1,6 +1,6 @@
 'use client'
 
-import { LessonCollection, Lesson } from '@prisma/client'
+import type { LessonCollection, Lesson } from '@prisma/client'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -20,7 +20,7 @@ interface Props {
 export default function CollectionItem({ collection }: Props) {
   const [expanded, setExpandedState] = useState(false)
   const expandRef = useRef<HTMLDivElement>(null)
-  const expandHeight = expandRef.current?.scrollHeight
+  const expandHeight = expandRef.current?.scrollHeight ?? 0
 
   function setExpanded(toExpand: boolean) {
     if (toExpand) {
