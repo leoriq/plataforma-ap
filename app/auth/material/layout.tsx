@@ -1,4 +1,4 @@
-import getAuthorizedUser from '~/utils/getAuthorizedUser'
+import getAuthorizedSessionUser from '~/utils/getAuthorizedSessionUser'
 import { redirect } from 'next/navigation'
 
 export default async function MaterialLayout({
@@ -6,7 +6,7 @@ export default async function MaterialLayout({
 }: {
   children: React.ReactNode
 }) {
-  if (!(await getAuthorizedUser('MATERIAL'))) {
+  if (!(await getAuthorizedSessionUser('MATERIAL'))) {
     redirect('/login')
   }
 

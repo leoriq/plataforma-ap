@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 
-import getAuthorizedUser from '~/utils/getAuthorizedUser'
+import getAuthorizedSessionUser from '~/utils/getAuthorizedSessionUser'
 
 import Sidebar from '~/components/organisms/Sidebar'
 
@@ -11,7 +11,7 @@ export default async function Login({
 }: {
   children: React.ReactNode
 }) {
-  const user = await getAuthorizedUser('COORDINATOR')
+  const user = await getAuthorizedSessionUser('COORDINATOR')
   if (!user) {
     redirect('/sign-out')
   }

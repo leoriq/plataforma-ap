@@ -1,4 +1,4 @@
-import getAuthorizedUser from '~/utils/getAuthorizedUser'
+import getAuthorizedSessionUser from '~/utils/getAuthorizedSessionUser'
 import { redirect } from 'next/navigation'
 
 export default async function CoordinatorLayout({
@@ -6,7 +6,7 @@ export default async function CoordinatorLayout({
 }: {
   children: React.ReactNode
 }) {
-  if (!(await getAuthorizedUser('COORDINATOR'))) {
+  if (!(await getAuthorizedSessionUser('COORDINATOR'))) {
     redirect('/login')
   }
 

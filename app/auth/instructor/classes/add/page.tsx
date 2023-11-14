@@ -1,10 +1,10 @@
 import { prisma } from '~/server/db'
 import CreateClassForm from './components/CreateClassForm'
-import getAuthorizedUser from '~/utils/getAuthorizedUser'
+import getAuthorizedSessionUser from '~/utils/getAuthorizedSessionUser'
 import { redirect } from 'next/navigation'
 
 export default async function AddClassPage() {
-  if (!(await getAuthorizedUser('REP_INSTRUCTOR'))) {
+  if (!(await getAuthorizedSessionUser('REP_INSTRUCTOR'))) {
     redirect('/login')
   }
 

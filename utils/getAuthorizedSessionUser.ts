@@ -1,7 +1,7 @@
 import { Role } from '@prisma/client'
 import { getServerAuthSession } from '~/server/auth'
 
-export default async function getAuthorizedUser(role?: Role) {
+export default async function getAuthorizedSessionUser(role?: Role) {
   const session = await getServerAuthSession()
   const user = session?.user
 
