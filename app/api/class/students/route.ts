@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
           Students: {
             connectOrCreate: emailsArray.map((email) => ({
               where: { email },
-              create: { email, roles: 'STUDENT' },
+              create: { email, roles: ['STUDENT'] },
             })),
           },
         },

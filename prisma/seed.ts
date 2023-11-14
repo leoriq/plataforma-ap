@@ -11,7 +11,7 @@ async function main() {
     create: {
       email: 'coord@admin.com',
       password,
-      roles: 'COORDINATOR',
+      roles: ['COORDINATOR'],
     },
   })
   await prisma.user.upsert({
@@ -20,7 +20,7 @@ async function main() {
     create: {
       email: 'repInst@admin.com',
       password,
-      roles: 'REP_INSTRUCTOR',
+      roles: ['REP_INSTRUCTOR'],
     },
   })
   await prisma.user.upsert({
@@ -29,7 +29,7 @@ async function main() {
     create: {
       email: 'inst@admin.com',
       password,
-      roles: 'INSTRUCTOR',
+      roles: ['INSTRUCTOR'],
     },
   })
   await prisma.user.upsert({
@@ -38,7 +38,7 @@ async function main() {
     create: {
       email: 'mat@admin.com',
       password,
-      roles: 'MATERIAL',
+      roles: ['MATERIAL'],
     },
   })
   await prisma.user.upsert({
@@ -47,7 +47,7 @@ async function main() {
     create: {
       email: 'student@admin.com',
       password,
-      roles: 'STUDENT',
+      roles: ['STUDENT'],
     },
   })
 }
