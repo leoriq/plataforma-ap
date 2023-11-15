@@ -9,7 +9,7 @@ export default async function CollectionsPage() {
     include: {
       Lessons: {
         orderBy: {
-          createdAt: 'asc',
+          publicationDate: 'asc',
         },
       },
     },

@@ -35,11 +35,13 @@ model File {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
+    lessonId String?
+
     ProfilePictureOf User?
     QuestionAudioOf  Question?           @relation("audio")
     QuestionImageOf  Question?           @relation("image")
     UserAnswerOf     UserQuestionAnswer?
-    LessonDocumentOf Lesson?
+    LessonDocumentOf Lesson?             @relation(fields: [lessonId], references: [id])
 }
 
 model User {
@@ -110,18 +112,18 @@ model LessonCollection {
 }
 
 model Lesson {
-    id       String   @id @default(cuid())
-    title    String
-    body     String
-    videoUrl String[]
+    id              String   @id @default(cuid())
+    title           String
+    body            String
+    videosIds       String[]
+    publicationDate DateTime
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    documentFileId     String? @unique
     lessonCollectionId String
 
-    Document       File?            @relation(fields: [documentFileId], references: [id], onDelete: Restrict)
+    Documents      File[]
     Collection     LessonCollection @relation(fields: [lessonCollectionId], references: [id], onDelete: Cascade)
     Questionnaires Questionnaire[]
 }

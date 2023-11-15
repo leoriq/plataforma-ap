@@ -48,7 +48,7 @@ export default function EditProfileForm({ user }: Props) {
     }
 
     await api.patch('/api/user', { ...formData, profilePictureFileId })
-    router.push('/profile')
+    router.push('/auth/profile')
   }, [formData, router, newImage])
 
   return (

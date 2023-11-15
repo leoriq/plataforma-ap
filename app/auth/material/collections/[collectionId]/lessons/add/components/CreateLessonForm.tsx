@@ -14,9 +14,9 @@ export default function CreateLessonForm({ collectionId }: Props) {
   const [lesson, setLesson] = useState<LessonFormData>({
     title: '',
     body: '',
-    videoUrl: [],
+    videosIds: [],
     lessonCollectionId: collectionId,
-    documentFileId: null,
+    publicationDate: new Date(),
   })
   const [fileTitle, setFileTitle] = useState('')
   const [file, setFile] = useState<File>()
@@ -35,18 +35,18 @@ export default function CreateLessonForm({ collectionId }: Props) {
   const handleAddVideoUrl = useCallback(() => {
     setLesson((prevFormData) => ({
       ...prevFormData,
-      videoUrl: [...prevFormData.videoUrl, ''],
+      videosIds: [...prevFormData.videosIds, ''],
     }))
   }, [setLesson])
 
   const handleRemoveVideoUrl = useCallback(
     (index: number) => {
       setLesson((prevFormData) => {
-        const newVideoUrl = [...prevFormData.videoUrl]
+        const newVideoUrl = [...prevFormData.videosIds]
         newVideoUrl.splice(index, 1)
         return {
           ...prevFormData,
-          videoUrl: newVideoUrl,
+          videosIds: newVideoUrl,
         }
       })
     },
@@ -58,11 +58,11 @@ export default function CreateLessonForm({ collectionId }: Props) {
       const { name, value } = event.target
       const index = Number(name)
       setLesson((prevFormData) => {
-        const newVideoUrl = [...prevFormData.videoUrl]
+        const newVideoUrl = [...prevFormData.videosIds]
         newVideoUrl[index] = value
         return {
           ...prevFormData,
-          videoUrl: newVideoUrl,
+          videosIds: newVideoUrl,
         }
       })
     },
@@ -74,14 +74,14 @@ export default function CreateLessonForm({ collectionId }: Props) {
       const formData = new FormData()
       formData.append('file', file)
       formData.append('title', fileTitle)
-      lesson.documentFileId = (
-        (await api.post('/api/upload', formData)).data as {
-          file: { id: string }
-        }
-      ).file.id
+      // lesson.documentFileId = (
+      //   (await api.post('/api/upload', formData)).data as {
+      //     file: { id: string }
+      //   }
+      // ).file.id
     }
 
-    api.post('/api/lesson', lesson)
+    await api.post('/api/lesson', lesson)
   }, [lesson, file, fileTitle])
 
   return (
@@ -95,7 +95,7 @@ export default function CreateLessonForm({ collectionId }: Props) {
         <textarea name="body" onChange={handleChange} />
       </label>
 
-      {lesson.videoUrl.map((url, index) => (
+      {lesson.videosIds.map((url, index) => (
         <label key={index}>
           ID do YouTube {index + 1}:
           <input

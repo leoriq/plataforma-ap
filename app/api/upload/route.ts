@@ -1,4 +1,8 @@
-import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+} from '@aws-sdk/client-s3'
 import { NextResponse, type NextRequest } from 'next/server'
 import { env } from '~/env.mjs'
 import { getServerAuthSession } from '~/server/auth'
@@ -10,7 +14,7 @@ export async function POST(request: NextRequest) {
   if (!session)
     return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
   const requestingUser = await prisma.user.findUnique({
-    where: { id: session.user.id },
+    where: { accessToken: session.user.accessToken },
   })
   if (!requestingUser)
     return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
@@ -46,7 +50,7 @@ export async function GET(request: NextRequest) {
   // if (!session)
   //   return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
   // const requestingUser = await prisma.user.findUnique({
-  //   where: { id: session.user.id },
+  //   where: { accessToken: session.user.accessToken },
   // })
   // if (!requestingUser)
   //   return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
@@ -78,4 +82,54 @@ export async function GET(request: NextRequest) {
     )
 
   return new NextResponse(fileR2.Body.transformToWebStream())
+}
+
+export async function DELETE(request: NextRequest) {
+  const session = await getServerAuthSession()
+  if (!session)
+    return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
+  const requestingUser = await prisma.user.findUnique({
+    where: { accessToken: session.user.accessToken },
+  })
+  if (!requestingUser)
+    return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
+
+  const id = request.nextUrl.searchParams.get('id')
+  if (!id)
+    return NextResponse.json({ error: 'No id provided' }, { status: 400 })
+
+  const fileDb = await prisma.file.findUnique({
+    where: { id },
+  })
+  if (!fileDb)
+    return NextResponse.json(
+      { error: 'File not found in database' },
+      { status: 404 }
+    )
+
+  if (fileDb.uploadedById !== requestingUser.id) {
+    if (
+      requestingUser.roles.length < 1 ||
+      (requestingUser.roles.length === 1 &&
+        requestingUser.roles.includes('STUDENT'))
+    ) {
+      return NextResponse.json(
+        { error: 'You do not have permission to delete this file' },
+        { status: 403 }
+      )
+    }
+  }
+
+  await prisma.file.delete({
+    where: { id },
+  })
+
+  await r2.send(
+    new DeleteObjectCommand({
+      Bucket: env.R2_BUCKET_NAME,
+      Key: id,
+    })
+  )
+
+  return NextResponse.json({ message: 'File deleted' })
 }

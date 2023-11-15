@@ -28,9 +28,11 @@ export default async function ProfilePage() {
         <Image
           src={`/api/upload?id=${user.profilePictureFileId}`}
           alt={user.fullName || user.email}
+          width={200}
+          height={200}
         />
       )}
-      <Link href="/profile/edit">Edit</Link>
+      <Link href="/auth/profile/edit">Edit</Link>
     </>
   )
 }

@@ -48,7 +48,7 @@ export default function SidebarProfileMenu({ user }: Props) {
       </button>
 
       <div className={styles.menu}>
-        <Link className={styles.menuItem} href="/profile">
+        <Link className={styles.menuItem} href="/auth/profile">
           My Profile
         </Link>
         <button className={styles.menuItem} onClick={handleLogout}>

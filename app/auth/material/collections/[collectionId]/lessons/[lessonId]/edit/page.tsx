@@ -12,7 +12,7 @@ export default async function EditLessonPage({
       id: lessonId,
     },
     include: {
-      Document: true,
+      Documents: true,
     },
   })
 
