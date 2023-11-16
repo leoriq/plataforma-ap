@@ -30,26 +30,26 @@ export default async function MaterialLessonPage({
     <div className={styles.container}>
       <h1 className={styles.title}>{lesson.title}</h1>
       <div className={styles.body}>
-        <p className={styles.text}>{lesson.body}</p>
+        <section>
+          <p className={styles.text}>{lesson.body}</p>
+        </section>
         {!!lesson.videosIds.length && (
-          <>
-            <div className={styles.videos}>
-              <h2>Videos</h2>
-              {lesson.videosIds.map((id, index) => (
-                <iframe
-                  key={index}
-                  src={`https://www.youtube.com/embed/${id}`}
-                  title="YouTube video player"
-                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                />
-              ))}
-            </div>
-          </>
+          <section className={styles.videos}>
+            <h2>Videos</h2>
+            {lesson.videosIds.map((id, index) => (
+              <iframe
+                key={index}
+                src={`https://www.youtube.com/embed/${id}`}
+                title="YouTube video player"
+                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            ))}
+          </section>
         )}
 
         {!!lesson.Documents.length && (
-          <div>
+          <section>
             <h2>Files</h2>
             <p>Download the files below to get started! 😉</p>
             <div className={styles.files}>
@@ -68,8 +68,9 @@ export default async function MaterialLessonPage({
                 </a>
               ))}
             </div>
-          </div>
+          </section>
         )}
+
         <LinkButton
           href={`/auth/material/collections/${collectionId}/lessons/${lessonId}/edit`}
           className={styles.editButton}
@@ -77,21 +78,28 @@ export default async function MaterialLessonPage({
           Edit Lesson
         </LinkButton>
 
-        <h2>Let&apos;s Practice!</h2>
-        {lesson.Questionnaires.map((questionnaire) => (
-          <Link
-            href={`/auth/material/collections/${collectionId}/lessons/${lessonId}/questionnaire/${questionnaire.id}`}
-            key={questionnaire.id}
-          >
-            {questionnaire.title}
-          </Link>
-        ))}
-        <LinkButton
-          href={`/auth/material/collections/${collectionId}/lessons/${lessonId}/questionnaire/add`}
-          color="success"
-        >
-          Create a Questionnaire
-        </LinkButton>
+        {!!lesson.Questionnaires.length && (
+          <section>
+            <h2>Let&apos;s Practice!</h2>
+            <div className={styles.questionnaires}>
+              {lesson.Questionnaires.map((questionnaire) => (
+                <Link
+                  className={styles.questionnaireLink}
+                  href={`/auth/material/collections/${collectionId}/lessons/${lessonId}/questionnaire/${questionnaire.id}`}
+                  key={questionnaire.id}
+                >
+                  <h3>{questionnaire.title}</h3>
+                </Link>
+              ))}
+            </div>
+            <LinkButton
+              href={`/auth/material/collections/${collectionId}/lessons/${lessonId}/questionnaire/add`}
+              color="success"
+            >
+              Create a Questionnaire
+            </LinkButton>
+          </section>
+        )}
       </div>
     </div>
   )
