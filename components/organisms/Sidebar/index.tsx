@@ -124,7 +124,7 @@ export default function Sidebar({ user }: Props) {
 
                 {
                   title: 'Create New Collection',
-                  href: '/auth/material/collections/add',
+                  href: '/auth/material/add-collection',
                 },
               ]}
             />

@@ -85,7 +85,7 @@ export default async function MaterialLessonPage({
               {lesson.Questionnaires.map((questionnaire) => (
                 <Link
                   className={styles.questionnaireLink}
-                  href={`/auth/material/collections/${collectionId}/lessons/${lessonId}/questionnaire/${questionnaire.id}`}
+                  href={`/auth/material/questionnaire/${questionnaire.id}`}
                   key={questionnaire.id}
                 >
                   <h3>{questionnaire.title}</h3>
@@ -93,7 +93,7 @@ export default async function MaterialLessonPage({
               ))}
             </div>
             <LinkButton
-              href={`/auth/material/collections/${collectionId}/lessons/${lessonId}/questionnaire/add`}
+              href={`/auth/material/lessons/${lessonId}/add-questionnaire`}
               color="success"
             >
               Create a Questionnaire

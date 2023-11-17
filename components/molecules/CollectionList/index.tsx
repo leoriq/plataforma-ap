@@ -71,7 +71,7 @@ export default function CollectionItem({ collection }: Props) {
         <div className={styles.lessons}>
           {collection.Lessons.map((lesson) => (
             <Link
-              href={`/auth/material/collections/${collection.id}/lessons/${lesson.id}`}
+              href={`/auth/material/lessons/${lesson.id}`}
               key={lesson.id}
               className={styles.lesson}
             >
@@ -80,7 +80,7 @@ export default function CollectionItem({ collection }: Props) {
           ))}
         </div>
         <LinkButton
-          href={`/auth/material/collections/${collection.id}/lessons/add`}
+          href={`/auth/material/collections/${collection.id}/add-lesson`}
           color="success"
           className={styles.addLesson}
         >

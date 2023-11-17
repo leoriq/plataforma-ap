@@ -64,9 +64,7 @@ export default async function MaterialLessonPage({
           </li>
         ))}
       </ul>
-      <Link
-        href={`/material/collections/${collectionId}/lessons/${lessonId}/questionnaire/${questionnaire.id}/edit`}
-      >
+      <Link href={`/material/questionnaire/${questionnaire.id}/edit`}>
         Editar
       </Link>
     </>
