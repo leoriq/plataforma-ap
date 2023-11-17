@@ -21,7 +21,9 @@
   display: flex;
 
   & > div {
-    margin: auto;
+    margin: auto 0;
     display: flex;
+    justify-content: center;
+    width: 100%;
   }
 }

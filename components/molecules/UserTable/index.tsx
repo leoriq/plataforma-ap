@@ -34,11 +34,7 @@ export default function UserTable({
           </Button>
         )}
         {!!addUsersLink && (
-          <LinkButton
-            color="success"
-            className={styles.button}
-            href={addUsersLink}
-          >
+          <LinkButton color="success" href={addUsersLink}>
             Add Users to {title}
           </LinkButton>
         )}
