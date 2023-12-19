@@ -51,7 +51,9 @@ export default async function MaterialLessonPage({
         {!!lesson.Documents.length && (
           <section>
             <h2>Files</h2>
-            <p>Download the files below to get started! 😉</p>
+            <p className={styles.text}>
+              Download the files below to get started! 😉
+            </p>
             <div className={styles.files}>
               {lesson.Documents.map((document) => (
                 <a
