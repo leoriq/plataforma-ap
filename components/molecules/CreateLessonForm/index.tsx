@@ -7,7 +7,7 @@ import api from '~/utils/api'
 import styles from './CreateLessonForm.module.scss'
 import Button from '~/components/atoms/Button'
 import FormInput from '~/components/atoms/FormInput'
-import { LessonCreateRequest } from '~/schemas/LessonRequest'
+import type { LessonCreateRequest } from '~/schemas/LessonRequest'
 import Dropzone from 'react-dropzone'
 import { z } from 'zod'
 import { useRouter } from 'next/navigation'
@@ -154,7 +154,7 @@ export default function CreateLessonForm({ collectionId }: Props) {
     } catch (error) {
       console.log(error)
     }
-  }, [lesson, documents])
+  }, [lesson, documents, router])
 
   return (
     <>
@@ -269,7 +269,7 @@ export default function CreateLessonForm({ collectionId }: Props) {
               {({ getRootProps, getInputProps }) => (
                 <div className={styles.drop} {...getRootProps()}>
                   <input {...getInputProps()} />
-                  <p>Drag 'n' drop some files here, or click to select files</p>
+                  <p>Drag and drop some files here, or click to select files</p>
                 </div>
               )}
             </Dropzone>
