@@ -1,4 +1,4 @@
-import CreateLessonForm from './components/CreateLessonForm'
+import CreateLessonForm from '~/components/molecules/CreateLessonForm'
 
 export default function CreateLessonPage({
   params,
@@ -10,10 +10,5 @@ export default function CreateLessonPage({
     return <h1>Lesson collection id is required</h1>
   }
 
-  return (
-    <>
-      <h1>Create Lesson</h1>
-      <CreateLessonForm collectionId={collectionId} />
-    </>
-  )
+  return <CreateLessonForm collectionId={collectionId} />
 }

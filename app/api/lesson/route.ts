@@ -25,15 +25,17 @@ export async function POST(request: NextRequest) {
     )
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-    const { connectQuestionnairesIds, ...data } = LessonCreateRequestZod.parse(
-      await request.json()
-    )
+    const { connectQuestionnairesIds, connectDocumentsIds, ...data } =
+      LessonCreateRequestZod.parse(await request.json())
 
     const lesson = await prisma.lesson.create({
       data: {
         ...data,
         Questionnaires: {
           connect: connectQuestionnairesIds?.map((id) => ({ id })),
+        },
+        Documents: {
+          connect: connectDocumentsIds?.map((id) => ({ id })),
         },
       },
     })
@@ -65,8 +67,13 @@ export async function PUT(request: NextRequest) {
     )
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-    const { connectQuestionnairesIds, disconnectQuestionnairesIds, ...data } =
-      LessonUpdateRequestZod.parse(await request.json())
+    const {
+      connectQuestionnairesIds,
+      disconnectQuestionnairesIds,
+      connectDocumentsIds,
+      disconnectDocumentsIds,
+      ...data
+    } = LessonUpdateRequestZod.parse(await request.json())
 
     const lesson = await prisma.lesson.update({
       where: { id: data.id },
@@ -75,6 +82,10 @@ export async function PUT(request: NextRequest) {
         Questionnaires: {
           connect: connectQuestionnairesIds?.map((id) => ({ id })),
           disconnect: disconnectQuestionnairesIds?.map((id) => ({ id })),
+        },
+        Documents: {
+          connect: connectDocumentsIds?.map((id) => ({ id })),
+          disconnect: disconnectDocumentsIds?.map((id) => ({ id })),
         },
       },
     })

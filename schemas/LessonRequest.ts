@@ -15,6 +15,7 @@ export const LessonCreateRequestZod = z.object({
   }),
   publicationDate: z.string({ required_error: 'Publication Date is required' }),
   connectQuestionnairesIds: z.array(z.string()).optional(),
+  connectDocumentsIds: z.array(z.string()).optional(),
 })
 
 export type LessonCreateRequest = z.infer<typeof LessonCreateRequestZod>
@@ -36,6 +37,8 @@ export const LessonUpdateRequestZod = z.object({
   publicationDate: z.string({ required_error: 'Publication Date is required' }),
   connectQuestionnairesIds: z.array(z.string()).optional(),
   disconnectQuestionnairesIds: z.array(z.string()).optional(),
+  connectDocumentsIds: z.array(z.string()).optional(),
+  disconnectDocumentsIds: z.array(z.string()).optional(),
 })
 
 export type LessonUpdateRequest = z.infer<typeof LessonUpdateRequestZod>
