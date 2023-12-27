@@ -1,16 +1,40 @@
-.container {
-  max-width: 60rem;
+.outerContainer {
   width: 100%;
-  margin: 6rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.formContainer {
+  flex: 1;
+  max-width: 60rem;
+  min-width: 25rem;
   background-color: var(--white);
   border-radius: 2px;
-  overflow: hidden;
-  box-shadow: 0 0 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  margin: 6rem 1rem 2rem 1rem;
 
   @media (max-width: 700px) {
-    border-radius: 2px;
-    margin: -2px 0 0 0;
+    margin: 0 0 2rem 0;
   }
+
+  h1 {
+    margin: 0;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.error {
+  color: var(--danger);
+  font-size: 0.875rem;
+  margin: 0;
+  padding: 0;
 }
 
 .title {
@@ -26,56 +50,17 @@
   color: var(--light);
 }
 
-.body {
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-
-  h2 {
-    font-size: 1.75rem;
-  }
-}
-
-.button {
-  margin: 1rem 0;
-}
-
-.text {
-  width: 100%;
-  resize: none;
-  height: auto;
-  font-family: var(--montserrat);
-  border-radius: 2px;
-
-  white-space: pre-wrap;
-
-  font-size: 1.125rem;
-  line-height: 1.5;
-  font-weight: 300;
-}
-
 .videos {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-
-  h2 {
-    align-self: start;
-  }
-
-  iframe {
-    aspect-ratio: 16 / 9;
-    width: 100%;
-    max-width: 750px;
-  }
+  flex-wrap: wrap;
+  gap: 3rem;
 }
 
 .videoControls {
   display: flex;
   align-items: center;
   gap: 1rem;
+  width: 15rem;
 }
 
 .files {
@@ -139,5 +124,14 @@
   padding: 1rem;
   display: flex;
   justify-content: center;
-  margin-top: 1rem;
+  margin: 1rem 0 3rem 0;
+}
+
+.lessonViewContainer {
+  flex: 1;
+  min-width: 32rem;
+
+  @media (max-width: 700px) {
+    min-width: unset;
+  }
 }

@@ -5,9 +5,9 @@ import Link from 'next/link'
 export default async function MaterialLessonPage({
   params,
 }: {
-  params: { collectionId: string; lessonId: string; questionnaireId: string }
+  params: { questionnaireId: string }
 }) {
-  const { questionnaireId, collectionId, lessonId } = params
+  const { questionnaireId } = params
   const questionnaire = await prisma.questionnaire.findUnique({
     where: {
       id: questionnaireId,
