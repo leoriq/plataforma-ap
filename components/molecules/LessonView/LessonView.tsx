@@ -74,7 +74,7 @@ export default function LessonView({ lesson, showControls }: Props) {
 
         {showControls && (
           <LinkButton
-            href={`/auth/material/collections/lessons/${lesson.id}/edit`}
+            href={`/auth/material/lessons/${lesson.id}/edit`}
             className={styles.editButton}
           >
             Edit Lesson
