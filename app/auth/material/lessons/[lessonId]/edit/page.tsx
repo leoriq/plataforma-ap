@@ -1,5 +1,5 @@
 import { prisma } from '~/server/db'
-import EditLessonForm from './components/EditLessonForm'
+import LessonForm from '~/components/molecules/LessonForm'
 
 export default async function EditLessonPage({
   params,
@@ -20,10 +20,5 @@ export default async function EditLessonPage({
     return <h1>Lesson not found</h1>
   }
 
-  return (
-    <>
-      <h1>Edit Lesson</h1>
-      <EditLessonForm lesson={lesson} />
-    </>
-  )
+  return <LessonForm lesson={lesson} />
 }

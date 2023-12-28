@@ -2,10 +2,12 @@
   width: 100%;
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 .formContainer {
   flex: 1;
+  flex-basis: 200px;
   max-width: 60rem;
   min-width: 25rem;
   background-color: var(--white);
@@ -15,7 +17,7 @@
   margin: 6rem 1rem 2rem 1rem;
 
   @media (max-width: 700px) {
-    margin: 0 0 2rem 0;
+    margin: 0;
   }
 
   h1 {
@@ -129,9 +131,11 @@
 
 .lessonViewContainer {
   flex: 1;
+  flex-basis: 200px;
   min-width: 32rem;
 
   @media (max-width: 700px) {
-    min-width: unset;
+    margin-top: 2rem;
+    min-width: 25rem;
   }
 }

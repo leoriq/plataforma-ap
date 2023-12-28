@@ -31,9 +31,7 @@ export const LessonUpdateRequestZod = z.object({
     .min(3, 'Body has to have at least 3 characters')
     .max(1000, 'Body can have at most 1000 characters'),
   videosIds: z.array(z.string()),
-  lessonCollectionId: z.string({
-    required_error: 'Lesson Collection Id is required',
-  }),
+  lessonCollectionId: z.string().optional(),
   publicationDate: z.string({ required_error: 'Publication Date is required' }),
   connectQuestionnairesIds: z.array(z.string()).optional(),
   disconnectQuestionnairesIds: z.array(z.string()).optional(),

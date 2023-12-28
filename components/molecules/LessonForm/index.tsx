@@ -4,12 +4,14 @@ import { type ChangeEvent, useCallback, useState, useMemo } from 'react'
 import DownloadFileIcon from '~/components/atoms/icons/DownloadFileIcon'
 import api from '~/utils/api'
 
-import styles from './CreateLessonForm.module.scss'
+import styles from './LessonForm.module.scss'
 import Button from '~/components/atoms/Button'
 import FormInput from '~/components/atoms/FormInput'
 import {
   LessonCreateRequestZod,
   type LessonCreateRequest,
+  type LessonUpdateRequest,
+  LessonUpdateRequestZod,
 } from '~/schemas/LessonRequest'
 import Dropzone from 'react-dropzone'
 import { z } from 'zod'
@@ -19,38 +21,74 @@ import LessonView from '../LessonView/LessonView'
 import FormTextArea from '~/components/atoms/FormTextArea'
 
 interface Props {
-  collectionId: string
+  collectionId?: string
+  lesson?: {
+    id: string
+    title: string
+    body: string
+    videosIds: string[]
+    publicationDate: Date
+    Documents: {
+      id: string
+      title: string | null
+      name: string
+    }[]
+  }
 }
 
 interface Document {
+  id?: string
   file: File
   title: string
   name: string
   error?: string
 }
 
-export default function CreateLessonForm({ collectionId }: Props) {
+export default function LessonForm({ collectionId, lesson: dbLesson }: Props) {
   const router = useRouter()
-  const [documents, setDocuments] = useState<Document[]>([])
-  const [lesson, setLesson] = useState<LessonCreateRequest>({
-    title: '',
-    body: '',
-    videosIds: [],
-    lessonCollectionId: collectionId,
-    connectDocumentsIds: [],
-    publicationDate: new Date().toISOString(),
+  const [newDocuments, setNewDocuments] = useState<Document[]>(() => {
+    if (!dbLesson) return []
+
+    return dbLesson.Documents.map((document) => ({
+      id: document.id,
+      file: new File([], ''),
+      title: document.title ?? '',
+      name: document.name,
+    }))
   })
+  const startingLesson = useMemo(() => {
+    if (!dbLesson)
+      return {
+        title: '',
+        body: '',
+        videosIds: [],
+        lessonCollectionId: collectionId ?? '',
+        publicationDate: new Date().toISOString(),
+      }
+    return {
+      id: dbLesson.id,
+      title: dbLesson.title,
+      body: dbLesson.body,
+      videosIds: dbLesson.videosIds,
+      publicationDate: dbLesson.publicationDate.toISOString(),
+      disconnectDocumentsIds: [],
+    }
+  }, [dbLesson, collectionId])
+
+  const [lesson, setLesson] = useState<
+    LessonCreateRequest | LessonUpdateRequest
+  >(startingLesson)
   const lessonPreview = useMemo(() => {
     return {
       id: 'preview',
       ...lesson,
-      Documents: documents.map((document) => ({
+      Documents: newDocuments.map((document) => ({
         id: 'preview',
         ...document,
       })),
       Questionnaires: [],
     }
-  }, [lesson, documents])
+  }, [lesson, newDocuments])
 
   const publicationDatetimeLocal = useMemo(() => {
     const date = new Date(lesson.publicationDate)
@@ -72,9 +110,11 @@ export default function CreateLessonForm({ collectionId }: Props) {
   )
 
   const errors = useMemo(() => {
-    const parse = LessonCreateRequestZod.safeParse(lesson)
+    const parse = !dbLesson
+      ? LessonCreateRequestZod.safeParse(lesson)
+      : LessonUpdateRequestZod.safeParse(lesson)
     return parse.success ? undefined : parse.error.format()
-  }, [lesson])
+  }, [lesson, dbLesson])
 
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -126,7 +166,7 @@ export default function CreateLessonForm({ collectionId }: Props) {
 
   const addFiles = useCallback(
     (files: File[]) => {
-      setDocuments((oldDocuments) => [
+      setNewDocuments((oldDocuments) => [
         ...oldDocuments,
         ...files.map((file) => ({
           file,
@@ -135,23 +175,37 @@ export default function CreateLessonForm({ collectionId }: Props) {
         })),
       ])
     },
-    [setDocuments]
+    [setNewDocuments]
   )
 
   const removeFile = useCallback(
     (index: number) => {
-      setDocuments((oldDocuments) => {
+      setNewDocuments((oldDocuments) => {
         const newDocuments = [...oldDocuments]
-        newDocuments.splice(index, 1)
+        const removed = newDocuments.splice(index, 1)
+        const id = removed[0]?.id
+        if (id) {
+          setLesson((prev) => {
+            if ('disconnectDocumentsIds' in prev)
+              return {
+                ...prev,
+                disconnectDocumentsIds: [
+                  ...(prev.disconnectDocumentsIds ?? []),
+                  id,
+                ],
+              }
+            return prev
+          })
+        }
         return newDocuments
       })
     },
-    [setDocuments]
+    [setNewDocuments]
   )
 
   const changeFileTitle = useCallback(
     (index: number, title: string) => {
-      setDocuments((oldDocuments) => {
+      setNewDocuments((oldDocuments) => {
         const newDocuments = [...oldDocuments]
         const document = newDocuments[index]
         if (document) {
@@ -160,7 +214,7 @@ export default function CreateLessonForm({ collectionId }: Props) {
         return newDocuments
       })
     },
-    [setDocuments]
+    [setNewDocuments]
   )
 
   const fileTitleSchema = z
@@ -172,6 +226,7 @@ export default function CreateLessonForm({ collectionId }: Props) {
 
   async function handleSubmit() {
     if (errors) {
+      console.log(errors)
       displayModal({
         title: 'Error',
         body: 'Please fill all the fields correctly.',
@@ -184,26 +239,33 @@ export default function CreateLessonForm({ collectionId }: Props) {
       })
       return
     }
+
     try {
-      const documentPromises = documents.map(async (document) => {
-        if (!document.title) throw new Error('No file title')
-        const formData = new FormData()
-        formData.append('file', document.file)
-        formData.append('title', document.title)
-        const promise = api.post('/api/upload', formData)
-        return promise
-      })
+      const documentPromises = newDocuments
+        .filter((document) => !document.id)
+        .map(async (document) => {
+          if (!document.title) throw new Error('No file title')
+          const formData = new FormData()
+          formData.append('file', document.file)
+          formData.append('title', document.title)
+          const promise = api.post('/api/upload', formData)
+          return promise
+        })
 
       const documentsIds = (await Promise.all(documentPromises)).map(
         (response) => response.data.file.id as string
       )
 
-      const lessonCreateRequest: LessonCreateRequest = {
+      const lessonRequest = {
         ...lesson,
         connectDocumentsIds: documentsIds,
       }
 
-      await api.post('/api/lesson', lessonCreateRequest)
+      if (dbLesson) {
+        await api.put('/api/lesson', lessonRequest)
+      } else {
+        await api.post('/api/lesson', lessonRequest)
+      }
 
       router.push('/auth/material/collections')
       router.refresh()
@@ -225,7 +287,7 @@ export default function CreateLessonForm({ collectionId }: Props) {
   return (
     <div className={styles.outerContainer}>
       <div className={styles.formContainer}>
-        <h1>Create a Lesson</h1>
+        <h1>{!dbLesson ? 'Create a' : 'Edit'} Lesson</h1>
         <form className={styles.form}>
           <h2>Info</h2>
           <FormInput
@@ -290,7 +352,7 @@ export default function CreateLessonForm({ collectionId }: Props) {
 
           <h2>Files</h2>
           <div className={styles.files}>
-            {documents.map((document, index) => {
+            {newDocuments.map((document, index) => {
               const parse = fileTitleSchema.safeParse(document.title)
               const errors = parse.success
                 ? undefined
@@ -303,8 +365,9 @@ export default function CreateLessonForm({ collectionId }: Props) {
                       label={`Title of file ${index + 1}:`}
                       type="text"
                       name={String(index)}
-                      value={document.title}
+                      value={document.title ?? ''}
                       onChange={(e) => changeFileTitle(index, e.target.value)}
+                      disabled={!!document.id}
                       eager
                       errors={errors}
                     />
@@ -345,7 +408,7 @@ export default function CreateLessonForm({ collectionId }: Props) {
               await handleSubmit()
             }}
           >
-            Create Lesson
+            {!dbLesson ? 'Create Lesson' : 'Save'}
           </Button>
         </form>
       </div>
