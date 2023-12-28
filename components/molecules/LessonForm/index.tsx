@@ -310,12 +310,6 @@ export default function LessonForm({ collectionId, lesson: dbLesson }: Props) {
             label="Body:"
             name="body"
             onChange={handleChange}
-            onInput={(e) => {
-              e.currentTarget.style.height = 'auto'
-              e.currentTarget.style.height = `${
-                e.currentTarget.scrollHeight + 2
-              }px`
-            }}
             value={lesson.body}
             placeholder="Type the lesson body here..."
             errors={errors?.body?._errors}

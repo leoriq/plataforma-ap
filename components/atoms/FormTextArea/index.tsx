@@ -4,6 +4,8 @@ import {
   type DetailedHTMLProps,
   type TextareaHTMLAttributes,
   useState,
+  useRef,
+  useLayoutEffect,
 } from 'react'
 
 import styles from './FormTextArea.module.scss'
@@ -20,11 +22,20 @@ export default function FormTextArea(
 
   const errorsToShow = dirty || eager ? errors : undefined
 
+  const ref = useRef<HTMLTextAreaElement>(null)
+
+  useLayoutEffect(() => {
+    if (!ref.current) return
+    ref.current.style.height = 'auto'
+    ref.current.style.height = `${ref.current.scrollHeight + 4}px`
+  })
+
   return (
     <div className={styles.container}>
       <label className={errorsToShow ? styles.danger : undefined}>
         {label}
         <textarea
+          ref={ref}
           {...props}
           onChange={(e) => {
             setDirty(true)
