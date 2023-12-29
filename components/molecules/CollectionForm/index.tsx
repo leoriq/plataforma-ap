@@ -11,12 +11,14 @@ import {
   type CollectionRequest,
   CollectionRequestZod,
 } from '~/schemas/CollectionRequest'
+import { useModal } from '~/contexts/ModalContext'
+import FormTextArea from '~/components/atoms/FormTextArea'
 
 interface Props {
-  startingData?: CollectionRequest
+  collection?: CollectionRequest
 }
 
-export default function CollectionForm({ startingData }: Props) {
+export default function CollectionForm({ collection: startingData }: Props) {
   const router = useRouter()
   const [collection, setCollection] = useState<CollectionRequest>(
     startingData ?? {
@@ -25,7 +27,8 @@ export default function CollectionForm({ startingData }: Props) {
     }
   )
 
-  const [requestError, setRequestError] = useState('')
+  const { displayModal, hideModal } = useModal()
+
   const errors = useMemo(() => {
     const result = CollectionRequestZod.safeParse(collection)
     if (result.success) return null
@@ -48,44 +51,58 @@ export default function CollectionForm({ startingData }: Props) {
     try {
       await new Promise((resolve) => setTimeout(resolve, 10000))
       if (collection.id) {
-        await api.patch('/api/collection', collection)
+        await api.put('/api/collection', collection)
       } else {
         await api.post('/api/collection', collection)
       }
       router.push('/auth/material/collections')
       router.refresh()
     } catch (error) {
-      setRequestError('Something went wrong. Try again later')
+      console.log(error)
+      displayModal({
+        title: 'Error',
+        body: 'Something went wrong. Please try again.',
+        buttons: [
+          {
+            text: 'OK',
+            onClick: () => {
+              hideModal()
+            },
+          },
+        ],
+      })
     }
-  }, [collection, router])
+  }, [collection, router, displayModal, hideModal])
 
   return (
     <div className={styles.container}>
-      <h1>Create Collection</h1>
+      <h1>{!collection.id ? 'Create' : 'Edit'} Collection</h1>
 
       <form className={styles.form}>
         <FormInput
           label="Name"
           name="name"
+          value={collection.name}
           onChange={handleChange}
           errors={errors?.name?._errors}
         />
-        <FormInput
+        <FormTextArea
           label="Description"
           name="description"
+          value={collection.description}
           onChange={handleChange}
           errors={errors?.description?._errors}
         />
-        {requestError && <p className={styles.error}>{requestError}</p>}
         {collection.id ? (
           <Button
             type="submit"
+            color="success"
             onClick={async (e) => {
               e.preventDefault()
               await handleSubmit()
             }}
           >
-            Save
+            {!collection.id ? 'Create' : 'Save'}
           </Button>
         ) : (
           <Button

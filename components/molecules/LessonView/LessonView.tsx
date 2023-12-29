@@ -1,9 +1,15 @@
+'use client'
+
 import Link from 'next/link'
 
 import styles from './LessonView.module.scss'
 import LinkButton from '~/components/atoms/LinkButton'
 
 import DownloadFileIcon from '~/components/atoms/icons/DownloadFileIcon'
+import Button from '~/components/atoms/Button'
+import { useModal } from '~/contexts/ModalContext'
+import api from '~/utils/api'
+import { useRouter } from 'next/navigation'
 
 interface Props {
   showControls?: boolean
@@ -25,6 +31,48 @@ interface Props {
 }
 
 export default function LessonView({ lesson, showControls }: Props) {
+  const { displayModal, hideModal } = useModal()
+  const router = useRouter()
+
+  async function deleteLesson() {
+    try {
+      await api.delete('/api/lesson', { data: { id: lesson.id } })
+      router.push('/auth/material/collections')
+      router.refresh()
+      hideModal()
+    } catch (error) {
+      console.log(error)
+      displayModal({
+        title: 'Error',
+        body: 'An error has occurred while deleting the lesson. Please try again.',
+        buttons: [
+          {
+            text: 'Close',
+            onClick: hideModal,
+          },
+        ],
+      })
+    }
+  }
+
+  function handleDelete() {
+    displayModal({
+      title: 'Delete Lesson',
+      body: 'This will also delete any questionnaires and grades associated with this lesson. Are you sure you want to delete this lesson?',
+      buttons: [
+        {
+          text: 'Cancel',
+          onClick: hideModal,
+        },
+        {
+          text: 'Delete',
+          color: 'danger',
+          onClick: deleteLesson,
+        },
+      ],
+    })
+  }
+
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>{lesson.title}</h1>
@@ -73,12 +121,17 @@ export default function LessonView({ lesson, showControls }: Props) {
         )}
 
         {showControls && (
-          <LinkButton
-            href={`/auth/material/lessons/${lesson.id}/edit`}
-            className={styles.editButton}
-          >
-            Edit Lesson
-          </LinkButton>
+          <>
+            <LinkButton
+              href={`/auth/material/lessons/${lesson.id}/edit`}
+              className={styles.editButton}
+            >
+              Edit Lesson
+            </LinkButton>
+            <Button color="danger" onClick={handleDelete}>
+              Delete Lesson
+            </Button>
+          </>
         )}
 
         {!!lesson.Questionnaires.length && (

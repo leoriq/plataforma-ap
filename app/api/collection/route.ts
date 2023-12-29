@@ -93,8 +93,7 @@ export async function DELETE(request: NextRequest) {
     const requestingUser = await prisma.user.findUnique({
       where: { accessToken: session.user.accessToken },
     })
-    if (!requestingUser)
-      return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
+    if (!requestingUser) if (!requestingUser) redirect('/sign-out')
 
     if (
       !requestingUser.roles.includes('COORDINATOR') &&

@@ -1,5 +1,5 @@
 import { prisma } from '~/server/db'
-import EditCollectionForm from './components/EditCollectionForm'
+import CollectionForm from '~/components/molecules/CollectionForm'
 
 export default async function EditCollectionPage({
   params,
@@ -16,10 +16,12 @@ export default async function EditCollectionPage({
     return <div>Collection not found</div>
   }
 
-  return (
-    <>
-      <h1>Edit Collection</h1>
-      <EditCollectionForm collection={collection} />
-    </>
-  )
+  const formattedCollection = {
+    ...collection,
+    description: collection.description ?? undefined,
+  }
+
+  console.log(formattedCollection)
+
+  return <CollectionForm collection={formattedCollection} />
 }

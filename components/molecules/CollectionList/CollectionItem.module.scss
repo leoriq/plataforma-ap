@@ -48,6 +48,8 @@
 .drawer {
   transition: max-height 0.3s ease-in-out, min-height 0s 0.3s;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .lessons {
@@ -80,5 +82,5 @@
 }
 
 .addLesson {
-  margin: 1rem;
+  margin: 0 1rem 1rem 1rem;
 }

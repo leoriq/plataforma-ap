@@ -1,3 +1,5 @@
+'use client'
+
 import { ReactNode, createContext, useContext, useState } from 'react'
 import Modal, { type ModalProps } from '~/components/molecules/Modal'
 
