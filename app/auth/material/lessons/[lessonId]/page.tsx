@@ -1,6 +1,6 @@
 import { prisma } from '~/server/db'
 
-import LessonView from '~/components/molecules/LessonView/LessonView'
+import LessonView from '~/components/molecules/LessonView'
 
 export default async function MaterialLessonPage({
   params,
