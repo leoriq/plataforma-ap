@@ -1,5 +1,5 @@
 import { prisma } from '~/server/db'
-import LessonForm from '~/components/molecules/LessonForm'
+import LessonForm from '~/components/organisms/LessonForm'
 
 export default async function EditLessonPage({
   params,

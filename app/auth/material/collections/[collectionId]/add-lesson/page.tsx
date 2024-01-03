@@ -1,4 +1,4 @@
-import LessonForm from '~/components/molecules/LessonForm'
+import LessonForm from '~/components/organisms/LessonForm'
 
 export default function CreateLessonPage({
   params,

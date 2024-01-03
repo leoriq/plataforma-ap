@@ -134,7 +134,7 @@ export default function LessonView({ lesson, showControls }: Props) {
           </>
         )}
 
-        {!!lesson.Questionnaires.length && (
+        {(!!lesson.Questionnaires.length || showControls) && (
           <section>
             <h2>Let&apos;s Practice!</h2>
             <div className={styles.questionnaires}>

@@ -17,7 +17,7 @@ import Dropzone from 'react-dropzone'
 import { z } from 'zod'
 import { useRouter } from 'next/navigation'
 import { useModal } from '~/contexts/ModalContext'
-import LessonView from '../LessonView/LessonView'
+import LessonView from '../../molecules/LessonView/LessonView'
 import FormTextArea from '~/components/atoms/FormTextArea'
 
 interface Props {
