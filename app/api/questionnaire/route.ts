@@ -1,4 +1,5 @@
 import { AnswerType, type Question, type Questionnaire } from '@prisma/client'
+import { redirect } from 'next/navigation'
 import { type NextRequest, NextResponse } from 'next/server'
 import { getServerAuthSession } from '~/server/auth'
 import { prisma } from '~/server/db'
@@ -9,10 +10,9 @@ export async function POST(request: NextRequest) {
     if (!session)
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
     const requestingUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { accessToken: session.user.accessToken },
     })
-    if (!requestingUser)
-      return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
+    if (!requestingUser) redirect('/sign-out')
 
     if (
       !requestingUser.roles.includes('COORDINATOR') &&
@@ -98,10 +98,9 @@ export async function PUT(request: NextRequest) {
     if (!session)
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
     const requestingUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { accessToken: session.user.accessToken },
     })
-    if (!requestingUser)
-      return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
+    if (!requestingUser) redirect('/sign-out')
 
     if (
       !requestingUser.roles.includes('COORDINATOR') &&
@@ -195,10 +194,9 @@ export async function DELETE(request: NextRequest) {
     if (!session)
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
     const requestingUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { accessToken: session.user.accessToken },
     })
-    if (!requestingUser)
-      return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
+    if (!requestingUser) redirect('/sign-out')
 
     if (
       !requestingUser.roles.includes('COORDINATOR') &&

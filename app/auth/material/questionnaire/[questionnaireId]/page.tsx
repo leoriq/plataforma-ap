@@ -2,7 +2,7 @@ import { prisma } from '~/server/db'
 import QuestionnaireView from '~/components/molecules/QuestionnaireView'
 import { shuffleArray } from '~/utils/shuffleArray'
 
-export default async function MaterialLessonPage({
+export default async function MaterialQuestionnairePage({
   params,
 }: {
   params: { questionnaireId: string }
@@ -27,5 +27,5 @@ export default async function MaterialLessonPage({
     }
   })
 
-  return <QuestionnaireView questionnaire={questionnaire} />
+  return <QuestionnaireView showControls questionnaire={questionnaire} />
 }

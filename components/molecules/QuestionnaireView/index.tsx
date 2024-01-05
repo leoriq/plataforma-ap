@@ -10,17 +10,29 @@ import { type UserAnswerCreateRequest } from '~/schemas/UserAnswerRequest'
 import FormTextArea from '~/components/atoms/FormTextArea'
 import AudioRecorder from '~/components/atoms/AudioRecorder'
 import Button from '~/components/atoms/Button'
+import LinkButton from '~/components/atoms/LinkButton'
+import { useModal } from '~/contexts/ModalContext'
+import api from '~/utils/api'
 
 interface Props {
   questionnaire: Questionnaire & { Questions: Question[] }
   disabled?: boolean
+  showSubmit?: boolean
+  showControls?: boolean
 }
 
 interface Recording {
   [questionId: string]: Blob
 }
 
-export default function QuestionnaireView({ questionnaire, disabled }: Props) {
+export default function QuestionnaireView({
+  questionnaire,
+  disabled,
+  showSubmit,
+  showControls,
+}: Props) {
+  const { displayModal, hideModal } = useModal()
+
   const [answersState, setAnswersState] = useState<UserAnswerCreateRequest>([])
   const answers = useMemo(
     () =>
@@ -58,6 +70,31 @@ export default function QuestionnaireView({ questionnaire, disabled }: Props) {
     },
     [setRecordings]
   )
+
+  const handleDelete = useCallback(() => {
+    function deleteQuestionnaire() {
+      return api.delete('/api/questionnaire/', {
+        data: { id: questionnaire.id },
+      })
+    }
+
+    displayModal({
+      title: 'Delete Questionnaire',
+      body: 'Are you sure you want to delete this questionnaire? This will also delete any questions and answers associated with it.',
+      buttons: [
+        {
+          text: 'Cancel',
+          color: 'primary',
+          onClick: hideModal,
+        },
+        {
+          text: 'Delete',
+          color: 'danger',
+          onClick: deleteQuestionnaire,
+        },
+      ],
+    })
+  }, [displayModal, hideModal])
 
   return (
     <form className={styles.container}>
@@ -143,9 +180,27 @@ export default function QuestionnaireView({ questionnaire, disabled }: Props) {
             )}
           </div>
         ))}
-        <div className={styles.endButtons}>
-          <Button color="success">Submit Questionnaire</Button>
-        </div>
+        {(showControls || showSubmit) && (
+          <div className={styles.endButtons}>
+            {showSubmit && (
+              <Button disabled={disabled} color="success">
+                Submit Questionnaire
+              </Button>
+            )}
+            {showControls && (
+              <>
+                <Button
+                  type="button"
+                  onClick={handleDelete}
+                  disabled={disabled}
+                  color="danger"
+                >
+                  Delete Questionnaire
+                </Button>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </form>
   )
