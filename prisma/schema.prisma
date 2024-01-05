@@ -165,7 +165,7 @@ model Question {
 
 model UserQuestionAnswer {
     id     String  @id @default(cuid())
-    grade  Int
+    grade  Int?
     answer String?
 
     createdAt DateTime @default(now())

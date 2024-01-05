@@ -1,0 +1,27 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.micButton {
+  background-color: var(--accent-yellow);
+  border: none;
+  border-radius: 99999px;
+  width: 10rem;
+  height: 10rem;
+  transition: all 0.2s ease-in-out;
+
+  svg {
+    width: 7rem;
+    height: 7rem;
+    fill: var(--light);
+  }
+}
+
+.stopButton {
+  background-color: var(--danger);
+  scale: 0.7;
+  transition: all 0.2s ease-in-out;
+}
