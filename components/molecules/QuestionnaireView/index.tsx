@@ -1,6 +1,6 @@
 'use client'
 
-import type { Question, Questionnaire } from '@prisma/client'
+import type { AnswerType } from '@prisma/client'
 import { useCallback, useMemo, useState } from 'react'
 
 import styles from './QuestionnaireView.module.scss'
@@ -10,15 +10,27 @@ import { type UserAnswerCreateRequest } from '~/schemas/UserAnswerRequest'
 import FormTextArea from '~/components/atoms/FormTextArea'
 import AudioRecorder from '~/components/atoms/AudioRecorder'
 import Button from '~/components/atoms/Button'
-import LinkButton from '~/components/atoms/LinkButton'
 import { useModal } from '~/contexts/ModalContext'
 import api from '~/utils/api'
 
 interface Props {
-  questionnaire: Questionnaire & { Questions: Question[] }
   disabled?: boolean
   showSubmit?: boolean
   showControls?: boolean
+  questionnaire: {
+    id: string
+    title: string
+    Questions: {
+      id: string
+      title: string
+      description?: string | null
+      videoUrl?: string | null
+      answerType: AnswerType
+      options?: string[]
+      imageFileId?: string | null
+      audioFileId?: string | null
+    }[]
+  }
 }
 
 interface Recording {
@@ -134,7 +146,7 @@ export default function QuestionnaireView({
             <h3>Answer:</h3>
             {question.answerType === 'OPTIONS' && (
               <div className={styles.optionsList}>
-                {question.options.map((option) => {
+                {question.options?.map((option) => {
                   const selected = answers.get(question.id)?.answer === option
 
                   return (

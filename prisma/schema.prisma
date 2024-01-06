@@ -147,7 +147,7 @@ model Question {
     description String?
     videoUrl    String?
     answerType  AnswerType
-    options     String[]
+    options     String[]   @default([])
     maxGrade    Int
 
     createdAt DateTime @default(now())
