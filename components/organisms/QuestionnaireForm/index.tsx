@@ -7,9 +7,9 @@ import FormInput from '~/components/atoms/FormInput'
 import Button from '~/components/atoms/Button'
 import Dropzone from 'react-dropzone'
 import { AnswerType } from '@prisma/client'
-import { ChangeEvent, useCallback, useMemo, useState } from 'react'
+import { type ChangeEvent, useCallback, useMemo, useState } from 'react'
 import {
-  QuestionnaireCreateRequest,
+  type QuestionnaireCreateRequest,
   QuestionnaireCreateRequestZod,
 } from '~/schemas/QuestionnaireRequest'
 import FormTextArea from '~/components/atoms/FormTextArea'
@@ -17,6 +17,7 @@ import Image from 'next/image'
 import { useModal } from '~/contexts/ModalContext'
 import api from '~/utils/api'
 import { useRouter } from 'next/navigation'
+import type { AxiosResponse } from 'axios'
 
 interface Props {
   lessonId: string
@@ -262,7 +263,7 @@ export default function QuestionnaireForm({ lessonId }: Props) {
             })
           }
           return acc
-        }, [] as { promise: Promise<any>; type: 'audio' | 'image'; questionIndex: number; id?: string }[])
+        }, [] as { promise: Promise<AxiosResponse>; type: 'audio' | 'image'; questionIndex: number; id?: string }[])
         const filesPromises = filesPromisesObj.map((obj) => obj.promise)
         const filesIds = (await Promise.all(filesPromises)).map(
           (response) => response.data.file.id as string
@@ -279,7 +280,7 @@ export default function QuestionnaireForm({ lessonId }: Props) {
 
         const questionnaireWithFiles = {
           ...questionnaire,
-          Questions: questionnaire.Questions.map((q, index) => {
+          Questions: questionnaire.Questions.map((q) => {
             return {
               ...q,
               imageFileId: filesMap.get(`${q.index}-image`),
@@ -324,7 +325,7 @@ export default function QuestionnaireForm({ lessonId }: Props) {
         },
       ],
     })
-  }, [questionnaire, files, displayModal, hideModal])
+  }, [questionnaire, files, displayModal, hideModal, router])
 
   const errors = useMemo(() => {
     const result = QuestionnaireCreateRequestZod.safeParse(questionnaire)

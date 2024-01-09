@@ -129,7 +129,7 @@ export default function QuestionnaireView({
         },
       ],
     })
-  }, [displayModal, hideModal])
+  }, [displayModal, hideModal, questionnaire, router])
 
   return (
     <form className={styles.container}>

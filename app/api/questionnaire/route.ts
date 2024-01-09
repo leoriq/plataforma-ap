@@ -1,4 +1,3 @@
-import { AnswerType, type Question, type Questionnaire } from '@prisma/client'
 import { redirect } from 'next/navigation'
 import { type NextRequest, NextResponse } from 'next/server'
 import { ZodError } from 'zod'
