@@ -98,6 +98,7 @@ export default function QuestionnaireView({
             : '/auth/material/collections'
         )
         router.refresh()
+        hideModal()
       } catch (err) {
         displayModal({
           title: 'Error',
