@@ -26,6 +26,9 @@ export async function POST(request: NextRequest) {
   const bytes = await file.arrayBuffer()
   const buffer = Buffer.from(bytes)
 
+  const contentType = file.type
+  console.log(contentType)
+
   const dbFile = await prisma.file.create({
     data: {
       name: file.name,
@@ -39,6 +42,7 @@ export async function POST(request: NextRequest) {
       Bucket: env.R2_BUCKET_NAME,
       Key: dbFile.id,
       Body: buffer,
+      ContentType: contentType,
     })
   )
 
@@ -81,7 +85,13 @@ export async function GET(request: NextRequest) {
       { status: 404 }
     )
 
-  return new NextResponse(fileR2.Body.transformToWebStream())
+  const response = new NextResponse(fileR2.Body.transformToWebStream())
+  response.headers.set('Content-Type', fileR2.ContentType || '')
+  response.headers.set(
+    'Content-Length',
+    fileR2.ContentLength?.toString() || '0'
+  )
+  return response
 }
 
 export async function DELETE(request: NextRequest) {

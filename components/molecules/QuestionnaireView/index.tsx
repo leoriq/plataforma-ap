@@ -12,6 +12,7 @@ import AudioRecorder from '~/components/atoms/AudioRecorder'
 import Button from '~/components/atoms/Button'
 import { useModal } from '~/contexts/ModalContext'
 import api from '~/utils/api'
+import { useRouter } from 'next/navigation'
 
 interface Props {
   disabled?: boolean
@@ -20,15 +21,16 @@ interface Props {
   questionnaire: {
     id: string
     title: string
+    lessonId?: string
     Questions: {
       id: string
       title: string
       description?: string | null
-      videoUrl?: string | null
+      videoId?: string | null
       answerType: AnswerType
       options?: string[]
-      imageFileId?: string | null
-      audioFileId?: string | null
+      imageFileUrl?: string | null
+      audioFileUrl?: string | null
     }[]
   }
 }
@@ -44,6 +46,7 @@ export default function QuestionnaireView({
   showControls,
 }: Props) {
   const { displayModal, hideModal } = useModal()
+  const router = useRouter()
 
   const [answersState, setAnswersState] = useState<UserAnswerCreateRequest>([])
   const answers = useMemo(
@@ -84,10 +87,30 @@ export default function QuestionnaireView({
   )
 
   const handleDelete = useCallback(() => {
-    function deleteQuestionnaire() {
-      return api.delete('/api/questionnaire/', {
-        data: { id: questionnaire.id },
-      })
+    async function deleteQuestionnaire() {
+      try {
+        await api.delete('/api/questionnaire/', {
+          data: { id: questionnaire.id },
+        })
+        router.push(
+          questionnaire.lessonId
+            ? `/auth/material/lessons/${questionnaire.lessonId}`
+            : '/auth/material/collections'
+        )
+        router.refresh()
+      } catch (err) {
+        displayModal({
+          title: 'Error',
+          body: 'There was an error deleting the questionnaire.',
+          buttons: [
+            {
+              text: 'Close',
+              color: 'primary',
+              onClick: hideModal,
+            },
+          ],
+        })
+      }
     }
 
     displayModal({
@@ -119,34 +142,35 @@ export default function QuestionnaireView({
             </h2>
             {!!question.description && <p>{question.description}</p>}
             <div className={styles.mediaContainer}>
-              {!!question.videoUrl && (
+              {!!question.videoId && (
                 <iframe
-                  src={`https://www.youtube.com/embed/${question.videoUrl}`}
+                  src={`https://www.youtube.com/embed/${question.videoId}`}
                   title="YouTube video player"
                   allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
                 />
               )}
-              {!!question.imageFileId && (
+              {!!question.imageFileUrl && (
                 <div className={styles.imageContainer}>
                   <Image
                     fill
-                    src={`/api/upload?id=${question.imageFileId}`}
+                    src={question.imageFileUrl}
                     alt={question.title}
                   />
                 </div>
               )}
-              {!!question.audioFileId && (
+              {!!question.audioFileUrl && (
                 <audio
                   controls
-                  src={`/api/upload?id=${question.audioFileId}`}
+                  className={styles.audio}
+                  src={question.audioFileUrl}
                 />
               )}
             </div>
             <h3>Answer:</h3>
             {question.answerType === 'OPTIONS' && (
               <div className={styles.optionsList}>
-                {question.options?.map((option) => {
+                {question.options?.map((option, index) => {
                   const selected = answers.get(question.id)?.answer === option
 
                   return (
@@ -155,7 +179,7 @@ export default function QuestionnaireView({
                         styles.option,
                         selected && styles.selected
                       )}
-                      key={option}
+                      key={`${index}-${option}`}
                     >
                       {option}
                       <input

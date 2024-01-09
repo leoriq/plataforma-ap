@@ -8,20 +8,29 @@ export default async function MaterialQuestionnairePage({
   params: { questionnaireId: string }
 }) {
   const { questionnaireId } = params
-  const questionnaire = await prisma.questionnaire.findUnique({
+  const dbQuestionnaire = await prisma.questionnaire.findUnique({
     where: {
       id: questionnaireId,
     },
     include: {
-      Questions: true,
+      Questions: { orderBy: { index: 'asc' } },
     },
   })
 
-  if (!questionnaire) {
+  if (!dbQuestionnaire) {
     return <h1>Questionnaire not found</h1>
   }
 
-  questionnaire.Questions.map((question) => {
+  const questionnaire = {
+    ...dbQuestionnaire,
+    Questions: dbQuestionnaire.Questions.map((q) => ({
+      ...q,
+      imageFileUrl: q.imageFileId && `/api/upload?id=${q.imageFileId}`,
+      audioFileUrl: q.audioFileId && `/api/upload?id=${q.audioFileId}`,
+    })),
+  }
+
+  questionnaire.Questions.forEach((question) => {
     if (question.answerType === 'OPTIONS') {
       shuffleArray(question.options)
     }

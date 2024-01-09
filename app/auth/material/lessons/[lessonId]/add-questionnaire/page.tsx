@@ -1,4 +1,4 @@
-import CreateQuestionnaireForm from './components/CreateQuestionnaireForm'
+import QuestionnaireForm from '~/components/organisms/QuestionnaireForm'
 
 export default function CreateQuestionnairePage({
   params,
@@ -12,8 +12,7 @@ export default function CreateQuestionnairePage({
 
   return (
     <>
-      <h1>Create Questionnaire</h1>
-      <CreateQuestionnaireForm lessonId={lessonId} />
+      <QuestionnaireForm lessonId={lessonId} />
     </>
   )
 }
