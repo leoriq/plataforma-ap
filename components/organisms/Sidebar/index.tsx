@@ -104,7 +104,7 @@ export default function Sidebar({ user }: Props) {
                 },
                 {
                   title: 'Add New Class',
-                  href: '/auth/coordinator/material',
+                  href: '/auth/instructor/classes/add',
                 },
               ]}
             />

@@ -49,7 +49,6 @@ export default function CollectionForm({ collection: startingData }: Props) {
 
   const handleSubmit = useCallback(async () => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 10000))
       if (collection.id) {
         await api.put('/api/collection', collection)
       } else {

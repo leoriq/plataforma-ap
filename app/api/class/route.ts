@@ -1,19 +1,12 @@
+import { redirect } from 'next/navigation'
 import { NextResponse, type NextRequest } from 'next/server'
+import { ZodError } from 'zod'
+import {
+  ClassCreateRequestZod,
+  ClassUpdateRequestZod,
+} from '~/schemas/ClassRequest'
 import { getServerAuthSession } from '~/server/auth'
 import { prisma } from '~/server/db'
-
-export interface ClassRequestBody {
-  id?: string
-  name: string
-  description?: string
-  lessonCollectionId: string
-
-  instructorsIds?: string[]
-  studentsIds?: string[]
-
-  disconnectInstructorsIds?: string[]
-  disconnectStudentsIds?: string[]
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,10 +14,9 @@ export async function POST(request: NextRequest) {
     if (!session)
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
     const requestingUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { accessToken: session.user.accessToken },
     })
-    if (!requestingUser)
-      return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
+    if (!requestingUser) redirect('/login')
 
     if (
       !requestingUser.roles.includes('COORDINATOR') &&
@@ -32,27 +24,29 @@ export async function POST(request: NextRequest) {
     )
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-    const { name, description, lessonCollectionId, instructorsIds } =
-      (await request.json()) as ClassRequestBody
-
-    if (!name || !lessonCollectionId)
-      return NextResponse.json(
-        { error: 'Missing name or lessonCollectionId' },
-        { status: 400 }
-      )
+    const { connectInstructorsIds, connectStudentsEmails, ...data } =
+      ClassCreateRequestZod.parse(await request.json())
 
     const c = await prisma.class.create({
       data: {
-        name,
-        description,
-        lessonCollectionId,
+        ...data,
         Instructors: {
-          connect: instructorsIds?.map((id) => ({ id })) ?? [],
+          connect: connectInstructorsIds?.map((id) => ({ id })) ?? [],
+        },
+        Students: {
+          connectOrCreate:
+            connectStudentsEmails?.map((email) => ({
+              where: { email },
+              create: { email },
+            })) ?? [],
         },
       },
     })
     return NextResponse.json({ class: c })
   } catch (error) {
+    if (error instanceof ZodError)
+      return NextResponse.json(error.format(), { status: 400 })
+
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 }
@@ -66,10 +60,9 @@ export async function PUT(request: NextRequest) {
     if (!session)
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
     const requestingUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { accessToken: session.user.accessToken },
     })
-    if (!requestingUser)
-      return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
+    if (!requestingUser) redirect('/login')
 
     if (
       !requestingUser.roles.includes('COORDINATOR') &&
@@ -80,39 +73,36 @@ export async function PUT(request: NextRequest) {
 
     const {
       id,
-      name,
-      description,
-      lessonCollectionId,
-      instructorsIds,
-      studentsIds,
+      connectInstructorsIds,
+      connectStudentsEmails,
       disconnectInstructorsIds,
       disconnectStudentsIds,
-    } = (await request.json()) as ClassRequestBody
-
-    if (!id || !name || !lessonCollectionId)
-      return NextResponse.json(
-        { error: 'Missing id, name or lessonCollectionId' },
-        { status: 400 }
-      )
+      ...data
+    } = ClassUpdateRequestZod.parse(await request.json())
 
     const c = await prisma.class.update({
       where: { id },
       data: {
-        name,
-        description,
-        lessonCollectionId,
+        ...data,
         Instructors: {
-          connect: instructorsIds?.map((id) => ({ id })) ?? [],
+          connect: connectInstructorsIds?.map((id) => ({ id })) ?? [],
           disconnect: disconnectInstructorsIds?.map((id) => ({ id })) ?? [],
         },
         Students: {
-          connect: studentsIds?.map((id) => ({ id })) ?? [],
+          connectOrCreate:
+            connectStudentsEmails?.map((email) => ({
+              where: { email },
+              create: { email },
+            })) ?? [],
           disconnect: disconnectStudentsIds?.map((id) => ({ id })) ?? [],
         },
       },
     })
     return NextResponse.json({ class: c })
   } catch (error) {
+    if (error instanceof ZodError)
+      return NextResponse.json(error.format(), { status: 400 })
+
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 }
@@ -126,10 +116,9 @@ export async function DELETE(request: NextRequest) {
     if (!session)
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
     const requestingUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { accessToken: session.user.accessToken },
     })
-    if (!requestingUser)
-      return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
+    if (!requestingUser) redirect('/login')
 
     if (
       !requestingUser.roles.includes('COORDINATOR') &&

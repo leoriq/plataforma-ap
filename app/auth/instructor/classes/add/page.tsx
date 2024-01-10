@@ -1,7 +1,7 @@
 import { prisma } from '~/server/db'
-import CreateClassForm from './components/CreateClassForm'
 import getAuthorizedSessionUser from '~/utils/getAuthorizedSessionUser'
 import { redirect } from 'next/navigation'
+import ClassForm from '~/components/molecules/ClassForm'
 
 export default async function AddClassPage() {
   if (!(await getAuthorizedSessionUser('REP_INSTRUCTOR'))) {
@@ -22,10 +22,5 @@ export default async function AddClassPage() {
     collectionsPromise,
   ])
 
-  return (
-    <>
-      <h1>Create Class</h1>
-      <CreateClassForm instructors={instructors} collections={collections} />
-    </>
-  )
+  return <ClassForm instructors={instructors} collections={collections} />
 }

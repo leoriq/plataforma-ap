@@ -10,9 +10,5 @@ export default async function Login({
     redirect('/login')
   }
 
-  return (
-    <>
-      <main>{children}</main>
-    </>
-  )
+  return <>{children}</>
 }

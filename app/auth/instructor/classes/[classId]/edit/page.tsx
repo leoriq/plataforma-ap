@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation'
 import { prisma } from '~/server/db'
 import getAuthorizedSessionUser from '~/utils/getAuthorizedSessionUser'
-import EditClassForm from './components/EditClassForm'
 
 export default async function EditClassPage({
   params,
@@ -55,11 +54,11 @@ export default async function EditClassPage({
   return (
     <>
       <h1>Create Class</h1>
-      <EditClassForm
+      {/* <EditClassForm
         selectedClass={selectedClass}
         instructors={instructors}
         collections={collections}
-      />
+      /> */}
     </>
   )
 }
