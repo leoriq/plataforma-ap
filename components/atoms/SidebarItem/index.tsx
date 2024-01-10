@@ -10,7 +10,6 @@ interface Props {
   subItems?: {
     title: string
     href: string
-    selectable?: boolean
   }[]
 }
 

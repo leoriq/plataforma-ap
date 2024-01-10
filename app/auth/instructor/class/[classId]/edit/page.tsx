@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import ClassForm from '~/components/molecules/ClassForm'
 import { prisma } from '~/server/db'
 import getAuthorizedSessionUser from '~/utils/getAuthorizedSessionUser'
 
@@ -12,6 +13,9 @@ export default async function EditClassPage({
   }
 
   const { classId } = params
+  if (!classId || classId === 'redirect') {
+    redirect('/auth/instructor/classes?redirect=edit')
+  }
 
   const classPromise = prisma.class.findUnique({
     where: {
@@ -33,17 +37,7 @@ export default async function EditClassPage({
 
   const responseClass = await classPromise
   if (!responseClass) {
-    return <h1>Class not found</h1>
-  }
-
-  const selectedClass = {
-    id: responseClass.id,
-    name: responseClass.name,
-    description: responseClass.description || undefined,
-    lessonCollectionId: responseClass.lessonCollectionId,
-    instructorsIds: responseClass.Instructors.map(
-      (instructor) => instructor.id
-    ),
+    redirect('/auth/instructor/classes')
   }
 
   const [instructors, collections] = await Promise.all([
@@ -52,13 +46,10 @@ export default async function EditClassPage({
   ])
 
   return (
-    <>
-      <h1>Create Class</h1>
-      {/* <EditClassForm
-        selectedClass={selectedClass}
-        instructors={instructors}
-        collections={collections}
-      /> */}
-    </>
+    <ClassForm
+      instructors={instructors}
+      collections={collections}
+      class={responseClass}
+    />
   )
 }

@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useSelectedLayoutSegment } from 'next/navigation'
+import { useParams, useSelectedLayoutSegment } from 'next/navigation'
 import type { User } from 'next-auth'
 
 import SidebarProfileMenu from '../../atoms/SidebarProfileMenu'
@@ -32,6 +32,9 @@ export default function Sidebar({ user }: Props) {
   useOnClickOut([navRef, headerRef], () => setIsOpenMobile(false))
 
   const currentSelected = useSelectedLayoutSegment()
+  const params = useParams<{ classId?: string }>()
+  const classId =
+    (currentSelected === 'instructor' && params.classId) || 'redirect'
 
   const isCoordinator = user.roles.includes('COORDINATOR')
   const isRepInstructor = user.roles.includes('REP_INSTRUCTOR')
@@ -83,28 +86,23 @@ export default function Sidebar({ user }: Props) {
               subItems={[
                 {
                   title: 'Select a Class',
-                  href: '/auth/coordinator/instructor',
-                  selectable: true,
+                  href: '/auth/instructor/classes',
                 },
                 {
                   title: 'Dashboard',
-                  href: '/auth/coordinator/material',
+                  href: `/auth/instructor/class/${classId}/dashboard`,
                 },
                 {
                   title: 'Attendance',
-                  href: '/auth/coordinator/material',
+                  href: `/auth/instructor/class/${classId}/attendance`,
                 },
                 {
                   title: 'Students',
-                  href: '/auth/coordinator/material',
+                  href: `/auth/instructor/class/${classId}/students`,
                 },
                 {
                   title: 'Edit Class',
-                  href: '/auth/coordinator/material',
-                },
-                {
-                  title: 'Add New Class',
-                  href: '/auth/instructor/classes/add',
+                  href: `/auth/instructor/class/${classId}/edit`,
                 },
               ]}
             />
@@ -119,9 +117,7 @@ export default function Sidebar({ user }: Props) {
                 {
                   title: 'Collections',
                   href: '/auth/material/collections',
-                  selectable: true,
                 },
-
                 {
                   title: 'Create New Collection',
                   href: '/auth/material/add-collection',
@@ -139,7 +135,6 @@ export default function Sidebar({ user }: Props) {
                 {
                   title: 'Select a Class',
                   href: '/auth/coordinator/instructor',
-                  selectable: true,
                 },
                 {
                   title: 'Lessons',

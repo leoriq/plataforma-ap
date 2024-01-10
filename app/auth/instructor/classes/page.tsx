@@ -2,16 +2,17 @@ import Link from 'next/link'
 import { getServerAuthSession } from '~/server/auth'
 import { prisma } from '~/server/db'
 
-export default async function InstructorClassesPage() {
+import styles from './ClassesPage.module.scss'
+import LinkButton from '~/components/atoms/LinkButton'
+
+export default async function InstructorClassesPage({
+  searchParams,
+}: {
+  searchParams?: { [key: string]: string | undefined }
+}) {
   const session = await getServerAuthSession()
   if (!session) return null
-
-  const user = await prisma.user.findUnique({
-    where: {
-      id: session.user.id,
-    },
-  })
-  if (!user) return null
+  const { user } = session
   const isRep = user.roles.includes('REP_INSTRUCTOR')
 
   const classes = isRep
@@ -31,20 +32,35 @@ export default async function InstructorClassesPage() {
         },
       })
 
+  const redirectPage = searchParams?.redirect ?? 'dashboard'
+
   return (
-    <>
+    <div className={styles.container}>
       <h1>Classes</h1>
       <ul>
         {classes.map((c) => (
-          <li key={c.id}>
-            <Link href={`/instructor/classes/${c.id}/dashboard`}>{c.name}</Link>
-            {isRep && (
-              <Link href={`/instructor/classes/${c.id}/edit`}>Edit</Link>
-            )}
+          <li className={styles.item} key={c.id}>
+            <Link
+              className={styles.itemLink}
+              href={`/auth/instructor/class/${c.id}/${redirectPage}`}
+            >
+              <div className={styles.info}>
+                <h2>{c.name}</h2>
+                <p>{c.description}</p>
+              </div>
+            </Link>
           </li>
         ))}
       </ul>
-      {isRep && <Link href="/instructor/classes/add">Create</Link>}
-    </>
+      {isRep && (
+        <LinkButton
+          className={styles.createButton}
+          color="success"
+          href="/auth/instructor/classes/add"
+        >
+          Create New Class
+        </LinkButton>
+      )}
+    </div>
   )
 }

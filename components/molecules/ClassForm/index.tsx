@@ -43,6 +43,8 @@ export default function ClassForm({
     lessonCollectionId: dbClass?.lessonCollectionId ?? collections[0]?.id ?? '',
     connectInstructorsIds: dbClass?.Instructors.map((i) => i.id) ?? [],
     connectStudentsEmails: dbClass?.Students.map((s) => s.email) ?? [],
+    disconnectStudentsIds: [],
+    disconnectInstructorsIds: [],
   }
   const [classData, setClassData] = useState<
     ClassCreateRequest | ClassUpdateRequest
@@ -104,6 +106,7 @@ export default function ClassForm({
 
   const handleSubmit = useCallback(async () => {
     if (errors) {
+      console.log(errors)
       displayModal({
         title: 'Fix the Errors',
         body: 'Please fix the errors before submitting.',
@@ -122,17 +125,19 @@ export default function ClassForm({
 
     try {
       if (dbClass) {
-        const deleteInstructorsIds = dbClass.Instructors.reduce(
+        const disconnectInstructorsIds = dbClass.Instructors.reduce(
           (acc, i) =>
             classData.connectInstructorsIds.includes(i.id)
               ? acc
               : [...acc, i.id],
           [] as string[]
         )
+
         const payload = {
           ...classData,
-          deleteInstructorsIds,
+          disconnectInstructorsIds,
         }
+
         await api.put('/api/class', payload)
       } else {
         await api.post('/api/class', classData)
