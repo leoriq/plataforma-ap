@@ -1,15 +1,18 @@
 'use client'
 
 import type { Role } from '@prisma/client'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import api from '~/utils/api'
 
 import styles from './AddUserForm.module.scss'
 import FormInput from '~/components/atoms/FormInput'
-import { z } from 'zod'
 import Button from '~/components/atoms/Button'
-import type { UserCreateLinkRole } from '~/schemas/UserCreateLinkRole'
+import {
+  UserCreateLinkRoleZod,
+  type UserCreateLinkRole,
+} from '~/schemas/UserCreateLinkRole'
 import { useRouter } from 'next/navigation'
+import { useModal } from '~/contexts/ModalContext'
 
 interface Props {
   role: Role
@@ -17,11 +20,9 @@ interface Props {
 }
 
 export default function AddUserForm({ role, redirectUrl }: Props) {
-  const [emails, setEmails] = useState([''])
-  const [errors, setErrors] = useState<(string[] | undefined)[]>([])
-  const [requestError, setRequestError] = useState<string>('')
-  const emailSchema = z.string().email({ message: 'Invalid email address' })
+  const { displayModal, hideModal } = useModal()
   const router = useRouter()
+  const [emails, setEmails] = useState([''])
 
   useEffect(() => {
     if (emails[emails.length - 1]) {
@@ -37,40 +38,38 @@ export default function AddUserForm({ role, redirectUrl }: Props) {
         newEmails.splice(index, 1, ...emails)
         return newEmails
       })
-      setErrors((oldErrors) => {
-        const newErrors = [...oldErrors]
-
-        if (!value) {
-          newErrors[index] = undefined
-          return newErrors
-        }
-        const result = emailSchema.safeParse(value)
-
-        if (result.success) {
-          newErrors[index] = undefined
-          return newErrors
-        }
-
-        newErrors[index] = result.error.issues.map((issue) => issue.message)
-
-        return newErrors
-      })
     },
-    [setEmails, setErrors, emailSchema]
+    [setEmails]
   )
 
   const handleSubmit = useCallback(async () => {
     try {
-      setRequestError('')
       const filteredEmails = emails.filter((email) => email)
       const payload = { emails: filteredEmails, role } as UserCreateLinkRole
       await api.post('/api/user/create-link-role', payload)
+      router.push(redirectUrl)
+      router.refresh()
     } catch (err) {
-      setRequestError('Something went wrong. Please try again')
+      console.log(err)
+      displayModal({
+        title: 'Error',
+        body: 'There was an error creating the users. Please try again.',
+        buttons: [
+          {
+            text: 'Ok',
+            onClick: () => hideModal(),
+          },
+        ],
+      })
     }
-    router.push(redirectUrl)
-    router.refresh()
-  }, [emails, role, redirectUrl, router])
+  }, [emails, role, redirectUrl, router, displayModal, hideModal])
+
+  const errors = useMemo(() => {
+    const result = UserCreateLinkRoleZod.safeParse({ emails, role })
+    if (result.success) return null
+
+    return result.error.format()
+  }, [emails, role])
 
   return (
     <div className={styles.container}>
@@ -80,15 +79,14 @@ export default function AddUserForm({ role, redirectUrl }: Props) {
       <form className={styles.form}>
         {emails.map((email, index) => (
           <FormInput
-            label={`Email ${index + 1}`}
+            label={`Email ${index + 1}:`}
             type="email"
             key={index}
             value={email}
             onChange={(e) => handleEmailChange(index, e.target.value)}
-            errors={errors[index]}
+            errors={errors?.emails?.[index]?._errors}
           />
         ))}
-        {requestError && <p className={styles.error}>{requestError}</p>}
         <Button
           color="success"
           type="submit"

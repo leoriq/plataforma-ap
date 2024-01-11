@@ -5,8 +5,8 @@ export const UserCreateLinkRoleZod = z.object({
   emails: z
     .string()
     .email({ message: 'Invalid email' })
-    .array()
-    .nonempty({ message: 'Emails cannot be empty' }),
+    .or(z.literal(''))
+    .array(),
   role: z.nativeEnum(Role),
 })
 

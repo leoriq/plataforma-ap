@@ -89,6 +89,11 @@ export default function UserTable({
               <td>{user.fullName || user.email}</td>
             </tr>
           ))}
+          {users.length === 0 && (
+            <tr>
+              <td colSpan={2}>No {title.toLowerCase()} found.</td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

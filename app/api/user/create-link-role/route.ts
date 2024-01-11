@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation'
 import { type NextRequest, NextResponse } from 'next/server'
 import { ZodError } from 'zod'
 import { UserCreateLinkRoleZod } from '~/schemas/UserCreateLinkRole'
@@ -12,8 +13,7 @@ export async function POST(request: NextRequest) {
     const requestingUser = await prisma.user.findUnique({
       where: { accessToken: session.user.accessToken },
     })
-    if (!requestingUser)
-      return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
+    if (!requestingUser) redirect('/login')
 
     const data = UserCreateLinkRoleZod.parse(await request.json())
     const { emails, role } = data
