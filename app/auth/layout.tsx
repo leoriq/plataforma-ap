@@ -11,7 +11,7 @@ export default async function Login({
 }: {
   children: React.ReactNode
 }) {
-  const user = await getAuthorizedSessionUser('COORDINATOR')
+  const user = await getAuthorizedSessionUser()
   if (!user) {
     redirect('/sign-out')
   }

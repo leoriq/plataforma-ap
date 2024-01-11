@@ -2,7 +2,7 @@
 
 import { type ChangeEvent, useCallback, useState, useMemo } from 'react'
 import { signIn } from 'next-auth/react'
-import { redirect } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { AxiosError } from 'axios'
 
@@ -15,6 +15,7 @@ import FormInput from '../../atoms/FormInput'
 import styles from './SignUpForm.module.scss'
 
 export default function SignUpForm() {
+  const router = useRouter()
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -42,9 +43,9 @@ export default function SignUpForm() {
 
   const handleSubmit = useCallback(async () => {
     setForceShowErrors(true)
-    if (errors) return
-    if (formData.password !== formData.passwordConfirmation) return
-
+    if (errors || formData.password !== formData.passwordConfirmation) {
+      setGeneralError('Please fix the errors above and try again')
+    }
     try {
       await api.patch('/api/user/sign-up', formData)
     } catch (error) {
@@ -58,18 +59,21 @@ export default function SignUpForm() {
             'Something went wrong. Try again later'
         )
       }
-
       return
     }
+
     try {
       await signIn('credentials', {
         redirect: false,
         email: formData.email,
         password: formData.password,
       })
-    } catch (e) {}
-    redirect('/login')
-  }, [formData, errors])
+    } catch (e) {
+      console.log(e)
+    }
+    router.push('/login')
+    router.refresh()
+  }, [formData, errors, router])
 
   return (
     <form className={styles.form}>
@@ -86,7 +90,7 @@ export default function SignUpForm() {
       />
 
       <FormInput
-        type="text"
+        type="email"
         name="email"
         value={formData.email}
         onChange={handleChange}
