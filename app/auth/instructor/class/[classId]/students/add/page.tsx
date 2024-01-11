@@ -1,16 +1,5 @@
-import AddStudentForm from './components/AddStudentForm'
+import AddStudentForm from '~/components/molecules/AddStudentsForm'
 
-export default function AddStudentsPage({
-  params,
-}: {
-  params: { classId: string }
-}) {
-  const { classId } = params
-
-  return (
-    <>
-      <h1>Add Student</h1>
-      <AddStudentForm classId={classId} />
-    </>
-  )
+export default function AddStudentsPage() {
+  return <AddStudentForm />
 }

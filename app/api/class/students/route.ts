@@ -1,4 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
+import { ZodError } from 'zod'
+import { StudentCreateRequestZod } from '~/schemas/StudentCreateRequest'
 import { getServerAuthSession } from '~/server/auth'
 import { prisma } from '~/server/db'
 
@@ -13,7 +15,7 @@ export async function POST(request: NextRequest) {
     if (!session)
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
     const requestingUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { accessToken: session.user.accessToken },
       include: {
         InstructorClasses: true,
       },
@@ -21,15 +23,9 @@ export async function POST(request: NextRequest) {
     if (!requestingUser)
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
 
-    const { emails, classId } = (await request.json()) as AddStudentRequestBody
-
-    if (!emails || !classId)
-      return NextResponse.json(
-        { error: 'Missing emails or classId' },
-        { status: 400 }
-      )
-
-    const emailsArray = emails.split(',')
+    const { emails, classId } = StudentCreateRequestZod.parse(
+      await request.json()
+    )
 
     const isInstructorOfClass = requestingUser.InstructorClasses.some(
       (classObj) => classObj.id === classId
@@ -44,7 +40,7 @@ export async function POST(request: NextRequest) {
         where: { id: classId },
         data: {
           Students: {
-            connectOrCreate: emailsArray.map((email) => ({
+            connectOrCreate: emails.map((email) => ({
               where: { email },
               create: { email, roles: ['STUDENT'] },
             })),
@@ -56,6 +52,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   } catch (error) {
+    if (error instanceof ZodError)
+      return NextResponse.json(error.format(), { status: 400 })
+
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 }
