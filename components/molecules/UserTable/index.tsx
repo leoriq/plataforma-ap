@@ -14,6 +14,7 @@ interface Props {
   }[]
   removeUsers?: (ids: string[]) => Promise<void>
   addUsersLink?: string
+  onClickUser?: (id: string) => void
 }
 
 export default function UserTable({
@@ -21,6 +22,7 @@ export default function UserTable({
   users,
   removeUsers,
   addUsersLink,
+  onClickUser,
 }: Props) {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
 
@@ -86,7 +88,19 @@ export default function UserTable({
                   />
                 </td>
               )}
-              <td>{user.fullName || user.email}</td>
+              <td>
+                {!onClickUser ? (
+                  <p className={styles.name}>{user.fullName || user.email}</p>
+                ) : (
+                  <button
+                    className={styles.onClickButton}
+                    type="button"
+                    onClick={() => onClickUser(user.id)}
+                  >
+                    {user.fullName || user.email}
+                  </button>
+                )}
+              </td>
             </tr>
           ))}
           {users.length === 0 && (

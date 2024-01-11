@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { prisma } from '~/server/db'
 import getAuthorizedSessionUser from '~/utils/getAuthorizedSessionUser'
-import UserTable from '~/components/molecules/UserTable'
+import StudentsTable from '~/components/organisms/StudentsTable'
 
 export default async function ClassStudentsPage({
   params,
@@ -24,11 +24,11 @@ export default async function ClassStudentsPage({
   if (!classObj.Instructors.find((instructor) => instructor.id === user.id))
     redirect('/auth/instructor/classes?redirect=students')
 
-  return (
-    <UserTable
-      title="Students"
-      users={classObj.Students}
-      addUsersLink={`/auth/instructor/class/${classId}/students/add`}
-    />
-  )
+  const safeStudents = classObj.Students.map((student) => ({
+    id: student.id,
+    fullName: student.fullName,
+    email: student.email,
+  }))
+
+  return <StudentsTable students={safeStudents} classId={classId} />
 }
