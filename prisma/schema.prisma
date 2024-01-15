@@ -130,8 +130,9 @@ model Lesson {
 }
 
 model Questionnaire {
-    id    String @id @default(cuid())
-    title String
+    id     String @id @default(cuid())
+    title  String
+    weight Int
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

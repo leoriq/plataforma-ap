@@ -3,6 +3,11 @@ import { z } from 'zod'
 export const QuestionnaireCreateRequestZod = z.object({
   title: z.string(),
   lessonId: z.string().cuid(),
+  weight: z
+    .number()
+    .int()
+    .min(0, 'Weight must be at least 0')
+    .max(100, 'Weight must be at most 100'),
   Questions: z.array(
     z
       .object({
@@ -10,13 +15,10 @@ export const QuestionnaireCreateRequestZod = z.object({
         description: z.string().optional(),
         videoId: z.string().optional(),
         weight: z
-          .number({
-            required_error: 'weight is required',
-            invalid_type_error: 'Weight must be a number',
-          })
+          .number()
           .int()
           .min(0, 'Weight must be at least 0')
-          .max(10, 'Weight must be at most 10'),
+          .max(100, 'Weight must be at most 100'),
         imageFileId: z.string().optional(),
         audioFileId: z.string().optional(),
         index: z.number().int().nonnegative(),

@@ -39,6 +39,7 @@ export default function QuestionnaireForm({ lessonId }: Props) {
     useState<QuestionnaireCreateRequest>({
       lessonId,
       title: '',
+      weight: 1,
       Questions: [],
     })
 
@@ -346,6 +347,15 @@ export default function QuestionnaireForm({ lessonId }: Props) {
             onChange={handleChange}
             value={questionnaire.title}
             errors={errors?.title?._errors}
+          />
+          <FormInput
+            label="Weight:"
+            name="weight"
+            type="number"
+            inputMode="numeric"
+            onChange={handleChange}
+            value={questionnaire.weight}
+            errors={errors?.weight?._errors}
           />
 
           <h2>Questions</h2>
