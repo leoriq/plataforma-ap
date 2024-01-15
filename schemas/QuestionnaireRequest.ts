@@ -9,14 +9,14 @@ export const QuestionnaireCreateRequestZod = z.object({
         title: z.string().min(1, 'Title is required'),
         description: z.string().optional(),
         videoId: z.string().optional(),
-        maxGrade: z
+        weight: z
           .number({
-            required_error: 'maxGrade is required',
-            invalid_type_error: 'Max Grade must be a number',
+            required_error: 'weight is required',
+            invalid_type_error: 'Weight must be a number',
           })
           .int()
-          .nonnegative()
-          .max(100),
+          .min(0, 'Weight must be at least 0')
+          .max(10, 'Weight must be at most 10'),
         imageFileId: z.string().optional(),
         audioFileId: z.string().optional(),
         index: z.number().int().nonnegative(),

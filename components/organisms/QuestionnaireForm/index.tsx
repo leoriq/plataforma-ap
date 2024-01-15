@@ -75,7 +75,7 @@ export default function QuestionnaireForm({ lessonId }: Props) {
   const handleChangeQuestion = useCallback(
     (e: { target: { name: string; value: string } }, index: number) => {
       const { name, value } = e.target
-      if (name === 'maxGrade') {
+      if (name === 'weight') {
         setQuestionnaire((prev) => ({
           ...prev,
           Questions: prev.Questions.map((q, i) =>
@@ -118,7 +118,7 @@ export default function QuestionnaireForm({ lessonId }: Props) {
         ...prev.Questions,
         {
           title: '',
-          maxGrade: 1,
+          weight: 1,
           answerType: AnswerType.TEXT,
           options: [],
           index: prev.Questions.length,
@@ -353,17 +353,17 @@ export default function QuestionnaireForm({ lessonId }: Props) {
             <div key={index} className={styles.questionContainer}>
               <h3 className={styles.questionIndex}>Question {index + 1}</h3>
               <FormInput
-                label="Max Grade:"
-                name={`maxGrade`}
+                label="Weight:"
+                name="weight"
                 type="number"
                 inputMode="numeric"
                 onChange={(e) => handleChangeQuestion(e, index)}
-                value={question.maxGrade}
-                errors={errors?.Questions?.[index]?.maxGrade?._errors}
+                value={question.weight}
+                errors={errors?.Questions?.[index]?.weight?._errors}
               />
               <FormInput
                 label="Title:"
-                name={`title`}
+                name="title"
                 onChange={(e) => handleChangeQuestion(e, index)}
                 value={question.title}
                 errors={errors?.Questions?.[index]?.title?._errors}

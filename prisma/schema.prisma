@@ -149,7 +149,7 @@ model Question {
     videoId     String?
     answerType  AnswerType
     options     String[]   @default([])
-    maxGrade    Int
+    weight      Int
     index       Int
 
     createdAt DateTime @default(now())

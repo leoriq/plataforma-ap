@@ -1,7 +1,7 @@
 import { prisma } from '~/server/db'
 
 import styles from './InstructorStudentPage.module.scss'
-import type { Questionnaire } from '@prisma/client'
+import type { Question, Questionnaire } from '@prisma/client'
 
 export default async function InstructorStudentPage({
   params,
@@ -18,7 +18,11 @@ export default async function InstructorStudentPage({
             include: {
               Lessons: {
                 include: {
-                  Questionnaires: true,
+                  Questionnaires: {
+                    include: {
+                      Questions: true,
+                    },
+                  },
                 },
               },
             },
@@ -66,25 +70,34 @@ export default async function InstructorStudentPage({
 
   const questionnaires = studentClass.Collection.Lessons.reduce(
     (acc, lesson) => [...acc, ...lesson.Questionnaires],
-    [] as Questionnaire[]
+    [] as (Questionnaire & { Questions: Question[] })[]
   )
   const questionnairesIds = questionnaires.map((q) => q.id)
   const unansweredQuestionnairesSet = new Set(questionnairesIds)
   const ungradedQuestionnairesSet = new Set(questionnairesIds)
   const questionnaireGradeMap = new Map(
-    questionnaires.map((questionnaire) => [
-      questionnaire.id,
-      student.Answers.reduce((acc, answer) => {
-        if (answer.Question.questionnaireId === questionnaire.id) {
-          unansweredQuestionnairesSet.delete(questionnaire.id)
-          if (answer.grade !== null) {
-            ungradedQuestionnairesSet.delete(questionnaire.id)
-            return acc + answer.grade
+    questionnaires.map((questionnaire) => {
+      const questionsWeightSum = questionnaire.Questions.reduce(
+        (acc, question) => acc + question.weight,
+        0
+      )
+      return [
+        questionnaire.id,
+        student.Answers.reduce((acc, answer) => {
+          if (answer.Question.questionnaireId === questionnaire.id) {
+            unansweredQuestionnairesSet.delete(questionnaire.id)
+            if (answer.grade !== null) {
+              ungradedQuestionnairesSet.delete(questionnaire.id)
+              return (
+                acc +
+                (answer.grade * answer.Question.weight) / questionsWeightSum
+              )
+            }
           }
-        }
-        return acc
-      }, 0),
-    ])
+          return acc
+        }, 0).toFixed(2),
+      ]
+    })
   )
 
   const meetings = [
