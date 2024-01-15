@@ -1,0 +1,108 @@
+.outerContainer {
+  max-width: 60rem;
+  flex: 1;
+  margin: 6rem 1rem;
+}
+
+.container {
+  background-color: var(--white);
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.3);
+  padding: 1rem;
+  margin: 2rem 0;
+}
+
+.info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  column-gap: 2rem;
+
+  p {
+    width: max-content;
+  }
+}
+
+.gradeTable {
+  border-collapse: collapse;
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
+  width: 100%;
+
+  thead {
+    background-color: var(--dark);
+
+    th {
+      color: var(--light);
+      height: 3rem;
+
+      &:first-child {
+        border-top-left-radius: 2px;
+      }
+
+      &:last-child {
+        border-top-right-radius: 2px;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      &:nth-child(even) {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.2);
+      }
+
+      td {
+        padding: 1rem;
+      }
+
+      td:last-child {
+        width: 10rem;
+        text-align: center;
+      }
+    }
+  }
+}
+
+.attendanceTable {
+  border-collapse: collapse;
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  text-align: center;
+
+  thead {
+    background-color: var(--dark);
+
+    th {
+      color: var(--light);
+      height: 3rem;
+
+      &:first-child {
+        border-top-left-radius: 2px;
+      }
+
+      &:last-child {
+        border-top-right-radius: 2px;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      &:nth-child(even) {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.2);
+      }
+
+      td {
+        padding: 1rem;
+      }
+    }
+  }
+}

@@ -63,6 +63,7 @@ model User {
     MeetingsAttended  SynchronousMeeting[] @relation("attended")
     MeetingsExcused   SynchronousMeeting[] @relation("excusedAbsence")
     MeetingsAbsent    SynchronousMeeting[] @relation("absence")
+    Answers           UserQuestionAnswer[]
 }
 
 model SynchronousMeeting {
@@ -172,9 +173,11 @@ model UserQuestionAnswer {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    questionId  String
-    audioFileId String? @unique
+    questionId    String
+    audioFileId   String? @unique
+    studentUserId String
 
     Question Question @relation(fields: [questionId], references: [id])
     Audio    File?    @relation(fields: [audioFileId], references: [id])
+    Student  User     @relation(fields: [studentUserId], references: [id])
 }

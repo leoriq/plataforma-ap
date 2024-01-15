@@ -21,7 +21,10 @@ export async function POST(request: NextRequest) {
     const data = UserAnswerCreateRequestZod.parse(await request.json())
 
     const userAnswer = await prisma.userQuestionAnswer.createMany({
-      data,
+      data: data.map((answer) => ({
+        ...answer,
+        studentUserId: requestingUser.id,
+      })),
     })
 
     return NextResponse.json({ userAnswer })
