@@ -180,7 +180,12 @@ export default async function InstructorStudentPage({
               {meetings.map((meeting, index) => (
                 <tr key={meeting.id} className={styles[`row${meeting.status}`]}>
                   <td>{index + 1}</td>
-                  <td>{meeting.date.toLocaleDateString()}</td>
+                  <td>
+                    {Intl.DateTimeFormat('en-US', {
+                      timeZone: 'UTC',
+                      dateStyle: 'medium',
+                    }).format(meeting.date)}
+                  </td>
                   <td>{meeting.status}</td>
                 </tr>
               ))}

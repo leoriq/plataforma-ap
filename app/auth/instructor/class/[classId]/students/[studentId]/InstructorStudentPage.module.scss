@@ -27,6 +27,8 @@
   border-collapse: collapse;
   box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
   width: 100%;
+  border-radius: 2px;
+  overflow: hidden;
 
   thead {
     background-color: var(--dark);
@@ -75,10 +77,13 @@
 }
 
 .attendanceTable {
+  min-width: max-content;
   border-collapse: collapse;
   box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
   text-align: center;
   flex: 1;
+  border-radius: 2px;
+  overflow: hidden;
 
   thead {
     background-color: var(--dark);
@@ -147,5 +152,5 @@
   flex-direction: column;
   margin: -2rem -1rem;
   aspect-ratio: 1;
-  min-width: 10rem;
+  min-width: 15rem;
 }
