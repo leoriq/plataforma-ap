@@ -99,12 +99,38 @@
 
   tbody {
     tr {
-      &:nth-child(even) {
-        background-color: rgba(0, 0, 0, 0.05);
-      }
+      &.rowPresent {
+        background-color: lighten(#79cdb3, 30%);
 
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.2);
+        &:nth-child(even) {
+          background-color: lighten(#79cdb3, 20%);
+        }
+
+        &:hover {
+          background-color: lighten(#79cdb3, 10%);
+        }
+      }
+      &.rowAbsent {
+        background-color: lighten(#d5403d, 30%);
+
+        &:nth-child(even) {
+          background-color: lighten(#d5403d, 20%);
+        }
+
+        &:hover {
+          background-color: lighten(#d5403d, 10%);
+        }
+      }
+      &.rowExcused {
+        background-color: lighten(#404266, 30%);
+
+        &:nth-child(even) {
+          background-color: lighten(#404266, 20%);
+        }
+
+        &:hover {
+          background-color: lighten(#404266, 10%);
+        }
       }
 
       td {
@@ -117,4 +143,9 @@
 .chartWrapper {
   flex: 1;
   display: flex;
+  width: 50%;
+  flex-direction: column;
+  margin: -2rem -1rem;
+  aspect-ratio: 1;
+  min-width: 10rem;
 }

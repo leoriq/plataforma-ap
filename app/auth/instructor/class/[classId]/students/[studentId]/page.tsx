@@ -178,7 +178,7 @@ export default async function InstructorStudentPage({
             </thead>
             <tbody>
               {meetings.map((meeting, index) => (
-                <tr key={meeting.id}>
+                <tr key={meeting.id} className={styles[`row${meeting.status}`]}>
                   <td>{index + 1}</td>
                   <td>{meeting.date.toLocaleDateString()}</td>
                   <td>{meeting.status}</td>
@@ -194,12 +194,13 @@ export default async function InstructorStudentPage({
               options={{
                 colors: ['#79cdb3', '#404266', '#d5403d'],
                 is3D: true,
-                legend: {
-                  position: 'bottom',
-                },
+                legend: 'none',
+                backgroundColor: 'transparent',
               }}
-              height={'100%'}
-              width={'100%'}
+              className={styles.chart}
+              style={{
+                height: '100%',
+              }}
             />
           </div>
         </div>
