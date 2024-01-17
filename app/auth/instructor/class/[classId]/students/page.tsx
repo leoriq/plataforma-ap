@@ -6,7 +6,7 @@ import StudentsTable from '~/components/organisms/StudentsTable'
 export default async function ClassStudentsPage({
   params,
 }: {
-  params: { classId: string }
+  params: { classId?: string }
 }) {
   const { classId } = params
   if (!classId) redirect('/auth/instructor/classes?redirect=students')
