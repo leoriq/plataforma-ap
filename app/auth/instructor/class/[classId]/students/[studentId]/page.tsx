@@ -2,6 +2,7 @@ import { prisma } from '~/server/db'
 
 import styles from './InstructorStudentPage.module.scss'
 import type { Question, Questionnaire } from '@prisma/client'
+import ChartClient from '~/components/atoms/ChartClient'
 
 export default async function InstructorStudentPage({
   params,
@@ -107,13 +108,20 @@ export default async function InstructorStudentPage({
     })),
     ...student.MeetingsAttended.map((meeting) => ({
       ...meeting,
-      status: 'Attended',
+      status: 'Present',
     })),
     ...student.MeetingsExcused.map((meeting) => ({
       ...meeting,
       status: 'Excused',
     })),
   ].sort((a, b) => a.date.getTime() - b.date.getTime())
+
+  const pieChartData = [
+    ['Status', 'Count'],
+    ['Present', student.MeetingsAttended.length],
+    ['Excused', student.MeetingsExcused.length],
+    ['Absent', student.MeetingsAbsent.length],
+  ]
 
   return (
     <div className={styles.outerContainer}>
@@ -159,24 +167,42 @@ export default async function InstructorStudentPage({
 
       <section className={styles.container}>
         <h2>Attendance</h2>
-        <table className={styles.attendanceTable}>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Date</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {meetings.map((meeting, index) => (
-              <tr key={meeting.id}>
-                <td>{index + 1}</td>
-                <td>{meeting.date.toLocaleDateString()}</td>
-                <td>{meeting.status}</td>
+        <div className={styles.attendanceContentWrapper}>
+          <table className={styles.attendanceTable}>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {meetings.map((meeting, index) => (
+                <tr key={meeting.id}>
+                  <td>{index + 1}</td>
+                  <td>{meeting.date.toLocaleDateString()}</td>
+                  <td>{meeting.status}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div className={styles.chartWrapper}>
+            <ChartClient
+              chartType="PieChart"
+              data={pieChartData}
+              options={{
+                colors: ['#79cdb3', '#404266', '#d5403d'],
+                is3D: true,
+                legend: {
+                  position: 'bottom',
+                },
+              }}
+              height={'100%'}
+              width={'100%'}
+            />
+          </div>
+        </div>
       </section>
     </div>
   )

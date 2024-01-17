@@ -26,6 +26,7 @@
     "react-audio-voice-recorder": "^2.2.0",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
+    "react-google-charts": "^4.0.1",
     "react-select": "^5.8.0",
     "sass": "^1.69.5",
     "zod": "^3.22.4"
