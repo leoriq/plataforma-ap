@@ -36,6 +36,7 @@ export default async function ClassDashboard({
       Collection: {
         include: {
           Lessons: {
+            where: { publicationDate: { lte: new Date() } },
             include: {
               Questionnaires: {
                 include: {

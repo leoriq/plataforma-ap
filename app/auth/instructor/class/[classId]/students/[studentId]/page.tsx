@@ -18,6 +18,7 @@ export default async function InstructorStudentPage({
           Collection: {
             include: {
               Lessons: {
+                where: { publicationDate: { lte: new Date() } },
                 include: {
                   Questionnaires: {
                     include: {
