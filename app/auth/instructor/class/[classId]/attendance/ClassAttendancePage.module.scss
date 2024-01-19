@@ -1,0 +1,14 @@
+.outerContainer {
+  max-width: 100%;
+  margin: 6rem 0;
+  padding: 0 1rem;
+}
+
+.container {
+  background-color: var(--white);
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.3);
+  padding: 1rem;
+  margin: 2rem 0;
+}

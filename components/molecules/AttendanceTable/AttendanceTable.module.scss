@@ -1,0 +1,75 @@
+.buttonsContainer {
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 1rem;
+
+  button {
+    width: 9rem;
+  }
+}
+
+.container {
+  display: flex;
+  overflow: auto;
+}
+
+.table {
+  border-collapse: collapse;
+  width: max-content;
+
+  thead {
+    background-color: var(--dark);
+
+    th {
+      padding: 1rem 0.5rem;
+      color: var(--light);
+      height: 3rem;
+
+      &:first-child {
+        border-top-left-radius: 2px;
+        position: sticky;
+        left: 0;
+        background-color: var(--dark);
+      }
+
+      &:last-child {
+        border-top-right-radius: 2px;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      background-color: var(--white);
+      &:nth-child(even) {
+        background-color: rgba(242, 242, 242);
+      }
+
+      &:hover {
+        background-color: rgb(204, 204, 204);
+      }
+
+      td {
+        padding: 1rem 0.5rem;
+      }
+
+      td:first-child {
+        position: sticky;
+        left: 0;
+        background-color: inherit;
+      }
+    }
+  }
+}
+
+.attended {
+  background-color: rgba(#79cdb3, 0.3);
+}
+
+.excused {
+  background-color: rgba(#404266, 0.3);
+}
+
+.absent {
+  background-color: rgba(#d5403d, 0.3);
+}
