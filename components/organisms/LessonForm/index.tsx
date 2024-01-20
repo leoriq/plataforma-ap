@@ -99,15 +99,12 @@ export default function LessonForm({ collectionId, lesson: dbLesson }: Props) {
     const minutes = String(date.getMinutes()).padStart(2, '0')
     return `${year}-${month}-${day}T${hours}:${minutes}`
   }, [lesson.publicationDate])
-  const setPublicationDate = useCallback(
-    (date: string) => {
-      setLesson((prevFormData) => ({
-        ...prevFormData,
-        publicationDate: new Date(date).toISOString(),
-      }))
-    },
-    [setLesson]
-  )
+  const setPublicationDate = useCallback((date: string) => {
+    setLesson((prevFormData) => ({
+      ...prevFormData,
+      publicationDate: new Date(date).toISOString(),
+    }))
+  }, [])
 
   const errors = useMemo(() => {
     const parse = !dbLesson
@@ -124,7 +121,7 @@ export default function LessonForm({ collectionId, lesson: dbLesson }: Props) {
         [name]: value,
       }))
     },
-    [setLesson]
+    []
   )
 
   const handleAddVideo = useCallback(() => {
@@ -132,21 +129,18 @@ export default function LessonForm({ collectionId, lesson: dbLesson }: Props) {
       ...prevFormData,
       videosIds: [...prevFormData.videosIds, ''],
     }))
-  }, [setLesson])
+  }, [])
 
-  const handleRemoveVideo = useCallback(
-    (index: number) => {
-      setLesson((prevFormData) => {
-        const newVideoUrl = [...prevFormData.videosIds]
-        newVideoUrl.splice(index, 1)
-        return {
-          ...prevFormData,
-          videosIds: newVideoUrl,
-        }
-      })
-    },
-    [setLesson]
-  )
+  const handleRemoveVideo = useCallback((index: number) => {
+    setLesson((prevFormData) => {
+      const newVideoUrl = [...prevFormData.videosIds]
+      newVideoUrl.splice(index, 1)
+      return {
+        ...prevFormData,
+        videosIds: newVideoUrl,
+      }
+    })
+  }, [])
 
   const handleChangeVideo = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -161,61 +155,52 @@ export default function LessonForm({ collectionId, lesson: dbLesson }: Props) {
         }
       })
     },
-    [setLesson]
+    []
   )
 
-  const addFiles = useCallback(
-    (files: File[]) => {
-      setNewDocuments((oldDocuments) => [
-        ...oldDocuments,
-        ...files.map((file) => ({
-          file,
-          title: '',
-          name: file.name,
-        })),
-      ])
-    },
-    [setNewDocuments]
-  )
+  const addFiles = useCallback((files: File[]) => {
+    setNewDocuments((oldDocuments) => [
+      ...oldDocuments,
+      ...files.map((file) => ({
+        file,
+        title: '',
+        name: file.name,
+      })),
+    ])
+  }, [])
 
-  const removeFile = useCallback(
-    (index: number) => {
-      setNewDocuments((oldDocuments) => {
-        const newDocuments = [...oldDocuments]
-        const removed = newDocuments.splice(index, 1)
-        const id = removed[0]?.id
-        if (id) {
-          setLesson((prev) => {
-            if ('disconnectDocumentsIds' in prev)
-              return {
-                ...prev,
-                disconnectDocumentsIds: [
-                  ...(prev.disconnectDocumentsIds ?? []),
-                  id,
-                ],
-              }
-            return prev
-          })
-        }
-        return newDocuments
-      })
-    },
-    [setNewDocuments]
-  )
+  const removeFile = useCallback((index: number) => {
+    setNewDocuments((oldDocuments) => {
+      const newDocuments = [...oldDocuments]
+      const removed = newDocuments.splice(index, 1)
+      const id = removed[0]?.id
+      if (id) {
+        setLesson((prev) => {
+          if ('disconnectDocumentsIds' in prev)
+            return {
+              ...prev,
+              disconnectDocumentsIds: [
+                ...(prev.disconnectDocumentsIds ?? []),
+                id,
+              ],
+            }
+          return prev
+        })
+      }
+      return newDocuments
+    })
+  }, [])
 
-  const changeFileTitle = useCallback(
-    (index: number, title: string) => {
-      setNewDocuments((oldDocuments) => {
-        const newDocuments = [...oldDocuments]
-        const document = newDocuments[index]
-        if (document) {
-          document.title = title
-        }
-        return newDocuments
-      })
-    },
-    [setNewDocuments]
-  )
+  const changeFileTitle = useCallback((index: number, title: string) => {
+    setNewDocuments((oldDocuments) => {
+      const newDocuments = [...oldDocuments]
+      const document = newDocuments[index]
+      if (document) {
+        document.title = title
+      }
+      return newDocuments
+    })
+  }, [])
 
   const fileTitleSchema = z
     .string()
@@ -253,7 +238,7 @@ export default function LessonForm({ collectionId, lesson: dbLesson }: Props) {
         })
 
       const documentsIds = (await Promise.all(documentPromises)).map(
-        (response) => response.data.file.id as string
+        (response: { data: { file: { id: string } } }) => response.data.file.id
       )
 
       const lessonRequest = {

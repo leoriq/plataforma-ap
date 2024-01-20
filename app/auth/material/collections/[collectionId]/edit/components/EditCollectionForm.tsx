@@ -21,7 +21,7 @@ export default function EditCollectionForm({
         [name]: value,
       }))
     },
-    [setCollection]
+    []
   )
 
   const handleSubmit = useCallback(() => {

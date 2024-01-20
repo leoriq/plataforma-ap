@@ -38,9 +38,6 @@ export default function AttendanceTable({ class: classObj }: Props) {
   const [synchronousMeetings, setSynchronousMeetings] = useState(
     classObj.SynchronousMeeting
   )
-  useEffect(() => {
-    setSynchronousMeetings(classObj.SynchronousMeeting)
-  }, [classObj.SynchronousMeeting])
 
   const attendedMeetingsByStudentMap = useMemo(
     () =>
@@ -96,84 +93,84 @@ export default function AttendanceTable({ class: classObj }: Props) {
     [classObj.Students, synchronousMeetings]
   )
 
-  const addAttended = useCallback((studentId: string, meetingId: string) => {
-    setSynchronousMeetings((prev) =>
-      prev.map((meeting) =>
-        meeting.id === meetingId
-          ? {
-              ...meeting,
-              AttendingStudents: [
-                ...meeting.AttendingStudents,
-                { id: studentId },
-              ],
-              ExcusedStudents: meeting.ExcusedStudents.filter(
-                (student) => student.id !== studentId
-              ),
-              AbsentStudents: meeting.AbsentStudents.filter(
-                (student) => student.id !== studentId
-              ),
-            }
-          : meeting
+  const handleChange = useCallback((studentId: string, meetingId: string) => {
+    function addAbsent(studentId: string, meetingId: string) {
+      setSynchronousMeetings((prev) =>
+        prev.map((meeting) =>
+          meeting.id === meetingId
+            ? {
+                ...meeting,
+                AbsentStudents: [...meeting.AbsentStudents, { id: studentId }],
+                AttendingStudents: meeting.AttendingStudents.filter(
+                  (student) => student.id !== studentId
+                ),
+                ExcusedStudents: meeting.ExcusedStudents.filter(
+                  (student) => student.id !== studentId
+                ),
+              }
+            : meeting
+        )
       )
-    )
-  }, [])
+    }
 
-  const addExcused = useCallback((studentId: string, meetingId: string) => {
-    setSynchronousMeetings((prev) =>
-      prev.map((meeting) =>
-        meeting.id === meetingId
-          ? {
-              ...meeting,
-              ExcusedStudents: [...meeting.ExcusedStudents, { id: studentId }],
-              AttendingStudents: meeting.AttendingStudents.filter(
-                (student) => student.id !== studentId
-              ),
-              AbsentStudents: meeting.AbsentStudents.filter(
-                (student) => student.id !== studentId
-              ),
-            }
-          : meeting
+    function addExcused(studentId: string, meetingId: string) {
+      setSynchronousMeetings((prev) =>
+        prev.map((meeting) =>
+          meeting.id === meetingId
+            ? {
+                ...meeting,
+                ExcusedStudents: [
+                  ...meeting.ExcusedStudents,
+                  { id: studentId },
+                ],
+                AttendingStudents: meeting.AttendingStudents.filter(
+                  (student) => student.id !== studentId
+                ),
+                AbsentStudents: meeting.AbsentStudents.filter(
+                  (student) => student.id !== studentId
+                ),
+              }
+            : meeting
+        )
       )
-    )
-  }, [])
+    }
 
-  const addAbsent = useCallback((studentId: string, meetingId: string) => {
-    setSynchronousMeetings((prev) =>
-      prev.map((meeting) =>
-        meeting.id === meetingId
-          ? {
-              ...meeting,
-              AbsentStudents: [...meeting.AbsentStudents, { id: studentId }],
-              AttendingStudents: meeting.AttendingStudents.filter(
-                (student) => student.id !== studentId
-              ),
-              ExcusedStudents: meeting.ExcusedStudents.filter(
-                (student) => student.id !== studentId
-              ),
-            }
-          : meeting
+    function addAttended(studentId: string, meetingId: string) {
+      setSynchronousMeetings((prev) =>
+        prev.map((meeting) =>
+          meeting.id === meetingId
+            ? {
+                ...meeting,
+                AttendingStudents: [
+                  ...meeting.AttendingStudents,
+                  { id: studentId },
+                ],
+                ExcusedStudents: meeting.ExcusedStudents.filter(
+                  (student) => student.id !== studentId
+                ),
+                AbsentStudents: meeting.AbsentStudents.filter(
+                  (student) => student.id !== studentId
+                ),
+              }
+            : meeting
+        )
       )
-    )
-  }, [])
+    }
 
-  const handleChange = useCallback(
-    (studentId: string, meetingId: string) => {
-      return (e: React.ChangeEvent<HTMLSelectElement>) => {
-        switch (e.target.value) {
-          case 'attended':
-            addAttended(studentId, meetingId)
-            break
-          case 'excused':
-            addExcused(studentId, meetingId)
-            break
-          case 'absent':
-            addAbsent(studentId, meetingId)
-            break
-        }
+    return (e: React.ChangeEvent<HTMLSelectElement>) => {
+      switch (e.target.value) {
+        case 'attended':
+          addAttended(studentId, meetingId)
+          break
+        case 'excused':
+          addExcused(studentId, meetingId)
+          break
+        case 'absent':
+          addAbsent(studentId, meetingId)
+          break
       }
-    },
-    [addAbsent, addAttended, addExcused]
-  )
+    }
+  }, [])
 
   const handleDelete = useCallback(
     (meetingId: string) => {
@@ -200,6 +197,7 @@ export default function AttendanceTable({ class: classObj }: Props) {
           })
         }
       }
+
       displayModal({
         title: 'Are you sure you want to delete this meeting?',
         body: 'It will be deleted right away. This action cannot be undone.',
@@ -254,14 +252,11 @@ export default function AttendanceTable({ class: classObj }: Props) {
     }
   }, [added])
 
-  const handleDeleteNewMeeting = useCallback(
-    (index: number) => {
-      return () => {
-        setNewMeetings((prev) => prev.filter((_, i) => i !== index))
-      }
-    },
-    [setNewMeetings]
-  )
+  const handleDeleteNewMeeting = useCallback((index: number) => {
+    return () => {
+      setNewMeetings((prev) => prev.filter((_, i) => i !== index))
+    }
+  }, [])
   const handleChangeNewMeeting = useCallback(
     (index: number, studentId: string) => {
       return (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -273,6 +268,12 @@ export default function AttendanceTable({ class: classObj }: Props) {
                   ? {
                       ...meeting,
                       attendedIds: [...meeting.attendedIds, studentId],
+                      excusedIds: meeting.excusedIds.filter(
+                        (id) => id !== studentId
+                      ),
+                      absentIds: meeting.absentIds.filter(
+                        (id) => id !== studentId
+                      ),
                     }
                   : meeting
               )
@@ -285,6 +286,12 @@ export default function AttendanceTable({ class: classObj }: Props) {
                   ? {
                       ...meeting,
                       excusedIds: [...meeting.excusedIds, studentId],
+                      attendedIds: meeting.attendedIds.filter(
+                        (id) => id !== studentId
+                      ),
+                      absentIds: meeting.absentIds.filter(
+                        (id) => id !== studentId
+                      ),
                     }
                   : meeting
               )
@@ -297,6 +304,12 @@ export default function AttendanceTable({ class: classObj }: Props) {
                   ? {
                       ...meeting,
                       absentIds: [...meeting.absentIds, studentId],
+                      excusedIds: meeting.excusedIds.filter(
+                        (id) => id !== studentId
+                      ),
+                      attendedIds: meeting.attendedIds.filter(
+                        (id) => id !== studentId
+                      ),
                     }
                   : meeting
               )
@@ -305,22 +318,17 @@ export default function AttendanceTable({ class: classObj }: Props) {
         }
       }
     },
-    [setNewMeetings]
+    []
   )
-  const handleChangeNewMeetingDate = useCallback(
-    (index: number) => {
-      return (e: React.ChangeEvent<HTMLInputElement>) => {
-        setNewMeetings((prev) =>
-          prev.map((meeting, i) =>
-            i === index
-              ? { ...meeting, date: new Date(e.target.value) }
-              : meeting
-          )
+  const handleChangeNewMeetingDate = useCallback((index: number) => {
+    return (e: React.ChangeEvent<HTMLInputElement>) => {
+      setNewMeetings((prev) =>
+        prev.map((meeting, i) =>
+          i === index ? { ...meeting, date: new Date(e.target.value) } : meeting
         )
-      }
-    },
-    [setNewMeetings]
-  )
+      )
+    }
+  }, [])
 
   const handleSave = useCallback(async () => {
     const dates = new Set<string>()

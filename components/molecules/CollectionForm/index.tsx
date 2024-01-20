@@ -44,7 +44,7 @@ export default function CollectionForm({ collection: startingData }: Props) {
         [name]: value,
       }))
     },
-    [setCollection]
+    []
   )
 
   const handleSubmit = useCallback(async () => {

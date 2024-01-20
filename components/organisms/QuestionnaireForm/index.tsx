@@ -65,13 +65,10 @@ export default function QuestionnaireForm({ lessonId }: Props) {
     }
   }, [questionnaire, filesMap])
 
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { name, value } = e.target
-      setQuestionnaire((prev) => ({ ...prev, [name]: value }))
-    },
-    [setQuestionnaire]
-  )
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setQuestionnaire((prev) => ({ ...prev, [name]: value }))
+  }, [])
 
   const handleChangeQuestion = useCallback(
     (e: { target: { name: string; value: string } }, index: number) => {
@@ -109,7 +106,7 @@ export default function QuestionnaireForm({ lessonId }: Props) {
         ),
       }))
     },
-    [setQuestionnaire]
+    []
   )
 
   const handleAddQuestion = useCallback(() => {
@@ -126,54 +123,45 @@ export default function QuestionnaireForm({ lessonId }: Props) {
         },
       ],
     }))
-  }, [setQuestionnaire])
+  }, [])
 
-  const handleRemoveQuestion = useCallback(
-    (index: number) => {
-      setQuestionnaire((prev) => ({
-        ...prev,
-        Questions: prev.Questions.filter((_, i) => i !== index),
-      }))
-      setFiles((prev) => prev.filter((f) => f.questionIndex !== index))
-    },
-    [setQuestionnaire, setFiles]
-  )
+  const handleRemoveQuestion = useCallback((index: number) => {
+    setQuestionnaire((prev) => ({
+      ...prev,
+      Questions: prev.Questions.filter((_, i) => i !== index),
+    }))
+    setFiles((prev) => prev.filter((f) => f.questionIndex !== index))
+  }, [])
 
-  const addImageFile = useCallback(
-    (questionIndex: number, file?: File) => {
-      setFiles((prev) => {
-        const prevFile = prev.find((f) => f.questionIndex === questionIndex)
-        return [
-          ...prev.filter((f) => f.questionIndex !== questionIndex),
-          {
-            questionIndex,
-            ...prevFile,
-            image: file,
-            imageUrl: file ? URL.createObjectURL(file) : undefined,
-          },
-        ]
-      })
-    },
-    [setFiles]
-  )
+  const addImageFile = useCallback((questionIndex: number, file?: File) => {
+    setFiles((prev) => {
+      const prevFile = prev.find((f) => f.questionIndex === questionIndex)
+      return [
+        ...prev.filter((f) => f.questionIndex !== questionIndex),
+        {
+          questionIndex,
+          ...prevFile,
+          image: file,
+          imageUrl: file ? URL.createObjectURL(file) : undefined,
+        },
+      ]
+    })
+  }, [])
 
-  const addAudioFile = useCallback(
-    (questionIndex: number, file?: File) => {
-      setFiles((prev) => {
-        const prevFile = prev.find((f) => f.questionIndex === questionIndex)
-        return [
-          ...prev.filter((f) => f.questionIndex !== questionIndex),
-          {
-            questionIndex,
-            ...prevFile,
-            audio: file,
-            audioUrl: file ? URL.createObjectURL(file) : undefined,
-          },
-        ]
-      })
-    },
-    [setFiles]
-  )
+  const addAudioFile = useCallback((questionIndex: number, file?: File) => {
+    setFiles((prev) => {
+      const prevFile = prev.find((f) => f.questionIndex === questionIndex)
+      return [
+        ...prev.filter((f) => f.questionIndex !== questionIndex),
+        {
+          questionIndex,
+          ...prevFile,
+          audio: file,
+          audioUrl: file ? URL.createObjectURL(file) : undefined,
+        },
+      ]
+    })
+  }, [])
 
   const handleRemoveOptionFromQuestion = useCallback(
     (questionIndex: number, optionIndex: number) => {
@@ -191,27 +179,24 @@ export default function QuestionnaireForm({ lessonId }: Props) {
         }
       })
     },
-    [setQuestionnaire]
+    []
   )
 
-  const handleAddOptionToQuestion = useCallback(
-    (questionIndex: number) => {
-      setQuestionnaire((prev) => {
-        return {
-          ...prev,
-          Questions: prev.Questions.map((q, i) =>
-            i === questionIndex
-              ? {
-                  ...q,
-                  options: [...(q.options ?? []), ''],
-                }
-              : q
-          ),
-        }
-      })
-    },
-    [setQuestionnaire]
-  )
+  const handleAddOptionToQuestion = useCallback((questionIndex: number) => {
+    setQuestionnaire((prev) => {
+      return {
+        ...prev,
+        Questions: prev.Questions.map((q, i) =>
+          i === questionIndex
+            ? {
+                ...q,
+                options: [...(q.options ?? []), ''],
+              }
+            : q
+        ),
+      }
+    })
+  }, [])
 
   const handleChangeOption = useCallback(
     (
@@ -236,7 +221,7 @@ export default function QuestionnaireForm({ lessonId }: Props) {
         }
       })
     },
-    [setQuestionnaire]
+    []
   )
 
   const handleSubmit = useCallback(() => {
@@ -267,7 +252,8 @@ export default function QuestionnaireForm({ lessonId }: Props) {
         }, [] as { promise: Promise<AxiosResponse>; type: 'audio' | 'image'; questionIndex: number; id?: string }[])
         const filesPromises = filesPromisesObj.map((obj) => obj.promise)
         const filesIds = (await Promise.all(filesPromises)).map(
-          (response) => response.data.file.id as string
+          (response: { data: { file: { id: string } } }) =>
+            response.data.file.id
         )
         filesPromisesObj.forEach((obj, index) => {
           obj.id = filesIds[index]
@@ -290,11 +276,9 @@ export default function QuestionnaireForm({ lessonId }: Props) {
           }),
         }
 
-        const response = await api.post(
-          '/api/questionnaire',
-          questionnaireWithFiles
-        )
-        const id = response.data.questionnaire.id as string
+        const response: { data: { questionnaire: { id: string } } } =
+          await api.post('/api/questionnaire', questionnaireWithFiles)
+        const { id } = response.data.questionnaire
         router.push(`/auth/material/questionnaire/${id}`)
         hideModal()
       } catch (error) {

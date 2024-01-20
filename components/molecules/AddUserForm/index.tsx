@@ -30,17 +30,14 @@ export default function AddUserForm({ role, redirectUrl }: Props) {
     }
   }, [emails])
 
-  const handleEmailChange = useCallback(
-    (index: number, value: string) => {
-      const emails = value.split(' ')
-      setEmails((oldEmails) => {
-        const newEmails = [...oldEmails]
-        newEmails.splice(index, 1, ...emails)
-        return newEmails
-      })
-    },
-    [setEmails]
-  )
+  const handleEmailChange = useCallback((index: number, value: string) => {
+    const emails = value.split(' ')
+    setEmails((oldEmails) => {
+      const newEmails = [...oldEmails]
+      newEmails.splice(index, 1, ...emails)
+      return newEmails
+    })
+  }, [])
 
   const handleSubmit = useCallback(async () => {
     try {

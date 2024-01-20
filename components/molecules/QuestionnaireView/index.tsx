@@ -71,20 +71,17 @@ export default function QuestionnaireView({
   )
 
   const [recordings, setRecordings] = useState<Recording[]>([])
-  const addRecording = useCallback(
-    (questionId: string, blob: Blob) => {
-      setRecordings((recordings) => {
-        const recording = recordings.find((r) => r[questionId])
-        if (recording) {
-          recording[questionId] = blob
-          return [...recordings]
-        } else {
-          return [...recordings, { [questionId]: blob }]
-        }
-      })
-    },
-    [setRecordings]
-  )
+  const addRecording = useCallback((questionId: string, blob: Blob) => {
+    setRecordings((recordings) => {
+      const recording = recordings.find((r) => r[questionId])
+      if (recording) {
+        recording[questionId] = blob
+        return [...recordings]
+      } else {
+        return [...recordings, { [questionId]: blob }]
+      }
+    })
+  }, [])
 
   const handleDelete = useCallback(() => {
     async function deleteQuestionnaire() {

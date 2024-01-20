@@ -72,18 +72,15 @@ export default function ClassForm({
         [name]: value,
       }))
     },
-    [setClassData]
+    []
   )
 
-  const handleChangeInstructors = useCallback(
-    (values: string[]) => {
-      setClassData((prev) => ({
-        ...prev,
-        connectInstructorsIds: values,
-      }))
-    },
-    [setClassData]
-  )
+  const handleChangeInstructors = useCallback((values: string[]) => {
+    setClassData((prev) => ({
+      ...prev,
+      connectInstructorsIds: values,
+    }))
+  }, [])
 
   const instructorOptions = useMemo(
     () =>
