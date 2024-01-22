@@ -73,13 +73,34 @@ export async function POST(request: NextRequest) {
                 connect: { id: classId },
               },
               AttendingStudents: {
-                connect: meeting.attendingStudentsIds?.map((id) => ({ id })),
+                connect: meeting.attendingStudentsIds?.reduce((acc, id) => {
+                  if (
+                    !meeting.absentStudentsIds?.includes(id) &&
+                    !meeting.excusedStudentsIds?.includes(id)
+                  )
+                    return [...acc, { id }]
+                  return acc
+                }, [] as { id: string }[]),
               },
               ExcusedStudents: {
-                connect: meeting.excusedStudentsIds?.map((id) => ({ id })),
+                connect: meeting.excusedStudentsIds?.reduce((acc, id) => {
+                  if (
+                    !meeting.absentStudentsIds?.includes(id) &&
+                    !meeting.attendingStudentsIds?.includes(id)
+                  )
+                    return [...acc, { id }]
+                  return acc
+                }, [] as { id: string }[]),
               },
               AbsentStudents: {
-                connect: meeting.absentStudentsIds?.map((id) => ({ id })),
+                connect: meeting.absentStudentsIds?.reduce((acc, id) => {
+                  if (
+                    !meeting.attendingStudentsIds?.includes(id) &&
+                    !meeting.excusedStudentsIds?.includes(id)
+                  )
+                    return [...acc, { id }]
+                  return acc
+                }, [] as { id: string }[]),
               },
             },
             include: {
