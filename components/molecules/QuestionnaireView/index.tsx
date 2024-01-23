@@ -285,7 +285,7 @@ export default function QuestionnaireView({
         },
       ],
     })
-  }, [displayModal, hideModal, gradesState, router])
+  }, [displayModal, hideModal, gradesState, router, questionnaire.Questions])
 
   return (
     <form className={styles.container}>

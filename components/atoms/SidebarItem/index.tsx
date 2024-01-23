@@ -43,7 +43,12 @@ export default function SidebarItem({
       <div className={styles.categoryItems}>
         {!!subItems &&
           subItems.map((item, index) => (
-            <Link key={index} href={item.href} className={styles.categoryItem}>
+            <Link
+              key={index}
+              href={item.href}
+              className={styles.categoryItem}
+              shallow={false}
+            >
               {item.title}
             </Link>
           ))}

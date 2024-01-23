@@ -101,6 +101,10 @@ export default function Sidebar({ user }: Props) {
                   href: `/auth/instructor/class/${classId}/students`,
                 },
                 {
+                  title: 'Grade',
+                  href: `/auth/instructor/class/${classId}/grade`,
+                },
+                {
                   title: 'Edit Class',
                   href: `/auth/instructor/class/${classId}/edit`,
                 },
