@@ -231,6 +231,20 @@ export default function QuestionnaireView({
   }, [displayModal, hideModal, questionnaire, router])
 
   const handleSubmitGrade = useCallback(() => {
+    if (!questionnaire.Questions.every((q) => q.UserAnswer?.[0]?.id)) {
+      displayModal({
+        title: 'Error',
+        body: 'Cannot submit grades for questionnaires with unanswered questions.',
+        buttons: [
+          {
+            text: 'Close',
+            onClick: hideModal,
+          },
+        ],
+      })
+      return
+    }
+
     async function submitGrade() {
       try {
         await api.post(
