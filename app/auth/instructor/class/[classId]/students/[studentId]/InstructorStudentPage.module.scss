@@ -55,10 +55,14 @@
 
       &:hover {
         background-color: rgba(0, 0, 0, 0.2);
+        text-decoration: underline;
       }
 
-      td {
+      td a {
+        display: block;
         padding: 1rem;
+        text-decoration: unset;
+        color: unset;
       }
 
       td:last-child {

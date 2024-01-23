@@ -3,6 +3,7 @@ import { prisma } from '~/server/db'
 import styles from './InstructorStudentPage.module.scss'
 import type { Question, Questionnaire } from '@prisma/client'
 import ChartClient from '~/components/atoms/ChartClient'
+import Link from 'next/link'
 
 export default async function InstructorStudentPage({
   params,
@@ -152,13 +153,23 @@ export default async function InstructorStudentPage({
           <tbody>
             {questionnaires.map((questionnaire) => (
               <tr key={questionnaire.id}>
-                <td>{questionnaire.title}</td>
                 <td>
-                  {unansweredQuestionnairesSet.has(questionnaire.id)
-                    ? 'Unanswered'
-                    : ungradedQuestionnairesSet.has(questionnaire.id)
-                    ? 'Ungraded'
-                    : questionnaireGradeMap.get(questionnaire.id)}
+                  <Link
+                    href={`/auth/instructor/class/${classId}/students/${studentId}/${questionnaire.id}`}
+                  >
+                    {questionnaire.title}
+                  </Link>
+                </td>
+                <td>
+                  <Link
+                    href={`/auth/instructor/class/${classId}/students/${studentId}/${questionnaire.id}`}
+                  >
+                    {unansweredQuestionnairesSet.has(questionnaire.id)
+                      ? 'Unanswered'
+                      : ungradedQuestionnairesSet.has(questionnaire.id)
+                      ? 'Ungraded'
+                      : questionnaireGradeMap.get(questionnaire.id)}
+                  </Link>
                 </td>
               </tr>
             ))}

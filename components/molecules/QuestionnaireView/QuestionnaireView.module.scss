@@ -89,6 +89,12 @@
   display: none;
 }
 
+.gradeFields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .endButtons {
   display: flex;
   flex-direction: column;

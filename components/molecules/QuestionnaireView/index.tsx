@@ -13,11 +13,14 @@ import Button from '~/components/atoms/Button'
 import { useModal } from '~/contexts/ModalContext'
 import api from '~/utils/api'
 import { useRouter } from 'next/navigation'
+import FormInput from '~/components/atoms/FormInput'
+import { type GradeRequest, GradeRequestZod } from '~/schemas/GradeRequest'
 
 interface Props {
   disabled?: boolean
   showSubmit?: boolean
-  showControls?: boolean
+  showMaterialControls?: boolean
+  showInstructorControls?: boolean
   questionnaire: {
     id: string
     title: string
@@ -31,6 +34,13 @@ interface Props {
       options?: string[]
       imageFileUrl?: string | null
       audioFileUrl?: string | null
+      UserAnswer?: {
+        id: string
+        answer?: string | null
+        grade?: number | null
+        audioFileId?: string | null
+        instructorComment?: string | null
+      }[]
     }[]
   }
 }
@@ -41,14 +51,32 @@ interface Recording {
 
 export default function QuestionnaireView({
   questionnaire,
-  disabled,
+  disabled: disabledProp,
   showSubmit,
-  showControls,
+  showMaterialControls,
+  showInstructorControls,
 }: Props) {
+  const disabled = disabledProp || showInstructorControls
   const { displayModal, hideModal } = useModal()
   const router = useRouter()
 
-  const [answersState, setAnswersState] = useState<UserAnswerCreateRequest>([])
+  const answersDb = useMemo(
+    () =>
+      questionnaire.Questions.reduce((acc, question) => {
+        if (question.UserAnswer) {
+          acc.push({
+            questionId: question.id,
+            answer: question.UserAnswer[0]?.answer ?? undefined,
+            audioFileId: question.UserAnswer[0]?.audioFileId ?? undefined,
+          })
+        }
+        return acc
+      }, [] as UserAnswerCreateRequest),
+    [questionnaire.Questions]
+  )
+
+  const [answersState, setAnswersState] =
+    useState<UserAnswerCreateRequest>(answersDb)
   const answers = useMemo(
     () =>
       new Map<string, UserAnswerCreateRequest[1]>(
@@ -70,6 +98,69 @@ export default function QuestionnaireView({
     [answers]
   )
 
+  const gradesDb = useMemo(
+    () =>
+      questionnaire.Questions.reduce((acc, question) => {
+        if (question.UserAnswer) {
+          acc.push({
+            questionId: question.id,
+            grade: {
+              answerId: question.UserAnswer[0]?.id ?? '',
+              grade: question.UserAnswer[0]?.grade || 0,
+              instructorComment:
+                question.UserAnswer[0]?.instructorComment ?? '',
+            },
+          })
+        }
+        return acc
+      }, [] as { questionId: string; grade: GradeRequest[1] }[]),
+    [questionnaire.Questions]
+  )
+  const [gradesState, setGradesState] = useState(gradesDb)
+  const grades = useMemo(
+    () => new Map(gradesState.map((g) => [g.questionId, g.grade])),
+    [gradesState]
+  )
+  const setGrades = useCallback(
+    (questionId: string) =>
+      (e: { target: { name: string; value: string } }) => {
+        const { name, value } = e.target
+        let parsedValue: string | number = value
+        if (name === 'grade') {
+          parsedValue = parseInt(value)
+
+          if (isNaN(parsedValue)) parsedValue = ''
+          else if (parsedValue.toString() !== value) parsedValue = ''
+          else if (parsedValue < 0) parsedValue = 0
+          else if (parsedValue > 10) parsedValue = 10
+        }
+        console.log(parsedValue)
+
+        setGradesState((grades) =>
+          grades.map((g) => {
+            if (g.questionId === questionId) {
+              return {
+                ...g,
+                grade: {
+                  ...g.grade,
+                  [name]: parsedValue,
+                },
+              }
+            } else {
+              return g
+            }
+          })
+        )
+      },
+    []
+  )
+  const gradesErrors = useMemo(() => {
+    const result = GradeRequestZod.safeParse(gradesState.map((g) => g.grade))
+
+    if (result.success) return null
+    return result.error.format()
+  }, [gradesState])
+
   const [recordings, setRecordings] = useState<Recording[]>([])
   const addRecording = useCallback((questionId: string, blob: Blob) => {
     setRecordings((recordings) => {
@@ -82,6 +173,16 @@ export default function QuestionnaireView({
       }
     })
   }, [])
+  const recordingsUrlsMap = useMemo(
+    () =>
+      recordings.reduce((acc, recording) => {
+        Object.entries(recording).forEach(([questionId, blob]) => {
+          acc.set(questionId, URL.createObjectURL(blob))
+        })
+        return acc
+      }, new Map<string, string>()),
+    [recordings]
+  )
 
   const handleDelete = useCallback(() => {
     async function deleteQuestionnaire() {
@@ -128,6 +229,49 @@ export default function QuestionnaireView({
       ],
     })
   }, [displayModal, hideModal, questionnaire, router])
+
+  const handleSubmitGrade = useCallback(() => {
+    async function submitGrade() {
+      try {
+        await api.post(
+          '/api/grade',
+          gradesState.map((g) => g.grade)
+        )
+
+        router.refresh()
+        hideModal()
+      } catch (err) {
+        displayModal({
+          title: 'Error',
+          body: 'There was an error submitting the grades.',
+          buttons: [
+            {
+              text: 'Close',
+              color: 'primary',
+              onClick: hideModal,
+            },
+          ],
+        })
+      }
+    }
+
+    displayModal({
+      title: 'Submit Grades',
+      body: 'Are you sure you want to submit these grades?',
+      buttons: [
+        {
+          text: 'Cancel',
+          color: 'primary',
+          onClick: hideModal,
+        },
+        {
+          text: 'Submit',
+          color: 'success',
+          onClick: submitGrade,
+        },
+      ],
+    })
+  }, [displayModal, hideModal, gradesState, router])
 
   return (
     <form className={styles.container}>
@@ -189,6 +333,7 @@ export default function QuestionnaireView({
                           setAnswers(question.id, { answer: option })
                         }
                         checked={selected}
+                        disabled={disabled}
                       />
                     </label>
                   )
@@ -203,6 +348,7 @@ export default function QuestionnaireView({
                 onChange={(e) =>
                   setAnswers(question.id, { answer: e.target.value })
                 }
+                disabled={disabled}
               />
             )}
 
@@ -210,31 +356,65 @@ export default function QuestionnaireView({
               <AudioRecorder
                 disabled={disabled}
                 onRecordingComplete={(blob) => addRecording(question.id, blob)}
+                recordingUrl={
+                  recordingsUrlsMap.get(question.id) ||
+                  (answers.get(question.id)?.audioFileId &&
+                    `/api/upload?id=${
+                      answers.get(question.id)?.audioFileId ?? ''
+                    }`)
+                }
               />
             )}
-          </div>
-        ))}
-        {(showControls || showSubmit) && (
-          <div className={styles.endButtons}>
-            {showSubmit && (
-              <Button disabled={disabled} color="success">
-                Submit Questionnaire
-              </Button>
-            )}
-            {showControls && (
+
+            {showInstructorControls && (
               <>
-                <Button
-                  type="button"
-                  onClick={handleDelete}
-                  disabled={disabled}
-                  color="danger"
-                >
-                  Delete Questionnaire
-                </Button>
+                <h3>Grade:</h3>
+                <div className={styles.gradeFields}>
+                  <FormInput
+                    label="Points 0-10:"
+                    inputMode="numeric"
+                    min="0"
+                    max="10"
+                    value={grades.get(question.id)?.grade ?? ''}
+                    name="grade"
+                    onChange={setGrades(question.id)}
+                    errors={gradesErrors?.[index]?.grade?._errors}
+                  />
+                  <FormTextArea
+                    label="Comments:"
+                    value={grades.get(question.id)?.instructorComment}
+                    name="instructorComment"
+                    onChange={setGrades(question.id)}
+                    errors={gradesErrors?.[index]?.instructorComment?._errors}
+                  />
+                </div>
               </>
             )}
           </div>
-        )}
+        ))}
+
+        <div className={styles.endButtons}>
+          {showSubmit && (
+            <Button disabled={disabled} color="success">
+              Submit Questionnaire
+            </Button>
+          )}
+          {showMaterialControls && (
+            <Button
+              type="button"
+              onClick={handleDelete}
+              disabled={disabled}
+              color="danger"
+            >
+              Delete Questionnaire
+            </Button>
+          )}
+          {showInstructorControls && (
+            <Button type="button" color="success" onClick={handleSubmitGrade}>
+              Submit Grades
+            </Button>
+          )}
+        </div>
       </div>
     </form>
   )

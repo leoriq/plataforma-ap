@@ -167,9 +167,10 @@ model Question {
 }
 
 model UserQuestionAnswer {
-    id     String  @id @default(cuid())
-    grade  Int?
-    answer String?
+    id                String  @id @default(cuid())
+    grade             Int?
+    answer            String?
+    instructorComment String?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -181,4 +182,6 @@ model UserQuestionAnswer {
     Question Question @relation(fields: [questionId], references: [id])
     Audio    File?    @relation(fields: [audioFileId], references: [id])
     Student  User     @relation(fields: [studentUserId], references: [id])
+
+    @@unique([questionId, studentUserId])
 }

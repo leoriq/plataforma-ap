@@ -6,39 +6,37 @@ import MicrophoneIcon from '../icons/MicrophoneIcon'
 import styles from './AudioRecorder.module.scss'
 import StopIcon from '../icons/StopIcon'
 import classNames from 'classnames'
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect } from 'react'
 
 interface Props {
   disabled?: boolean
   onRecordingComplete: (blob: Blob) => void
+  recordingUrl?: string
 }
 
 export default function AudioRecorder({
   disabled,
   onRecordingComplete,
+  recordingUrl,
 }: Props) {
-  const { startRecording, stopRecording, recordingBlob, isRecording } =
+  const { startRecording, stopRecording, isRecording, mediaRecorder } =
     useAudioRecorder()
 
   useEffect(() => {
-    if (recordingBlob) {
-      onRecordingComplete(recordingBlob)
-    }
-  }, [recordingBlob, onRecordingComplete])
+    if (mediaRecorder)
+      mediaRecorder.ondataavailable = (e) => {
+        onRecordingComplete(e.data)
+      }
+  }, [mediaRecorder, onRecordingComplete])
 
-  function handleButton() {
+  const handleButton = useCallback(() => {
     if (disabled) return
     if (isRecording) {
       stopRecording()
     } else {
       startRecording()
     }
-  }
-
-  const url = useMemo(() => {
-    if (!recordingBlob) return undefined
-    return URL.createObjectURL(recordingBlob)
-  }, [recordingBlob])
+  }, [disabled, isRecording, startRecording, stopRecording])
 
   return (
     <div className={styles.container}>
@@ -54,7 +52,7 @@ export default function AudioRecorder({
         {!isRecording && <MicrophoneIcon />}
         {isRecording && <StopIcon />}
       </button>
-      {!!url && <audio src={url} controls />}
+      {!!recordingUrl && <audio src={recordingUrl} controls />}
     </div>
   )
 }

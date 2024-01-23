@@ -36,5 +36,7 @@ export default async function MaterialQuestionnairePage({
     }
   })
 
-  return <QuestionnaireView showControls questionnaire={questionnaire} />
+  return (
+    <QuestionnaireView showMaterialControls questionnaire={questionnaire} />
+  )
 }
