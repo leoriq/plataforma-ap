@@ -1,7 +1,6 @@
 import { prisma } from '~/server/db'
 
 import styles from './InstructorStudentPage.module.scss'
-import type { Question, Questionnaire } from '@prisma/client'
 import ChartClient from '~/components/atoms/ChartClient'
 import Link from 'next/link'
 
@@ -19,11 +18,22 @@ export default async function InstructorStudentPage({
           Collection: {
             include: {
               Lessons: {
-                where: { publicationDate: { lte: new Date() } },
+                where: {
+                  publicationDate: { lte: new Date() },
+                  Collection: { Classes: { some: { id: classId } } },
+                },
                 include: {
                   Questionnaires: {
                     include: {
-                      Questions: true,
+                      Questions: {
+                        include: {
+                          UserAnswer: {
+                            where: {
+                              studentUserId: studentId,
+                            },
+                          },
+                        },
+                      },
                     },
                   },
                 },
@@ -32,7 +42,6 @@ export default async function InstructorStudentPage({
           },
         },
       },
-      Answers: { include: { Question: true } },
       MeetingsAbsent: {
         where: {
           classId,
@@ -71,35 +80,44 @@ export default async function InstructorStudentPage({
     return <div>Student not found in class</div>
   }
 
-  const questionnaires = studentClass.Collection.Lessons.reduce(
-    (acc, lesson) => [...acc, ...lesson.Questionnaires],
-    [] as (Questionnaire & { Questions: Question[] })[]
+  const questionnaires = studentClass.Collection.Lessons.flatMap(
+    (lesson) => lesson.Questionnaires
   )
-  const questionnairesIds = questionnaires.map((q) => q.id)
-  const unansweredQuestionnairesSet = new Set(questionnairesIds)
-  const ungradedQuestionnairesSet = new Set(questionnairesIds)
+
+  const unansweredQuestionnairesIdsSet = new Set(
+    questionnaires
+      .filter((questionnaire) =>
+        questionnaire.Questions.every((question) => !question.UserAnswer[0])
+      )
+      .map((questionnaire) => questionnaire.id)
+  )
+  const ungradedQuestionnairesIdsSet = new Set(
+    questionnaires
+      .filter((questionnaire) =>
+        questionnaire.Questions.every(
+          (question) =>
+            question.UserAnswer[0] && question.UserAnswer[0].grade === null
+        )
+      )
+      .map((questionnaire) => questionnaire.id)
+  )
+
   const questionnaireGradeMap = new Map(
     questionnaires.map((questionnaire) => {
       const questionsWeightSum = questionnaire.Questions.reduce(
         (acc, question) => acc + question.weight,
         0
       )
-      return [
-        questionnaire.id,
-        student.Answers.reduce((acc, answer) => {
-          if (answer.Question.questionnaireId === questionnaire.id) {
-            unansweredQuestionnairesSet.delete(questionnaire.id)
-            if (answer.grade !== null) {
-              ungradedQuestionnairesSet.delete(questionnaire.id)
-              return (
-                acc +
-                (answer.grade * answer.Question.weight) / questionsWeightSum
-              )
-            }
-          }
-          return acc
-        }, 0).toFixed(2),
-      ]
+
+      const grade = questionnaire.Questions.reduce(
+        (acc, question) =>
+          acc +
+          (question.UserAnswer[0]?.grade ?? 0) *
+            (question.weight / questionsWeightSum),
+        0
+      )
+
+      return [questionnaire.id, grade]
     })
   )
 
@@ -164,9 +182,9 @@ export default async function InstructorStudentPage({
                   <Link
                     href={`/auth/instructor/class/${classId}/students/${studentId}/${questionnaire.id}`}
                   >
-                    {unansweredQuestionnairesSet.has(questionnaire.id)
+                    {unansweredQuestionnairesIdsSet.has(questionnaire.id)
                       ? 'Unanswered'
-                      : ungradedQuestionnairesSet.has(questionnaire.id)
+                      : ungradedQuestionnairesIdsSet.has(questionnaire.id)
                       ? 'Ungraded'
                       : questionnaireGradeMap.get(questionnaire.id)}
                   </Link>
