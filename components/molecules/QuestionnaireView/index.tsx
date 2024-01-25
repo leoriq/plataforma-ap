@@ -98,6 +98,126 @@ export default function QuestionnaireView({
     [answers]
   )
 
+  const [recordings, setRecordings] = useState<Recording[]>([])
+  const addRecording = useCallback((questionId: string, blob: Blob) => {
+    setRecordings((recordings) => {
+      const recording = recordings.find((r) => r[questionId])
+      if (recording) {
+        recording[questionId] = blob
+        return [...recordings]
+      } else {
+        return [...recordings, { [questionId]: blob }]
+      }
+    })
+  }, [])
+  const recordingsUrlsMap = useMemo(
+    () =>
+      recordings.reduce((acc, recording) => {
+        Object.entries(recording).forEach(([questionId, blob]) => {
+          acc.set(questionId, URL.createObjectURL(blob))
+        })
+        return acc
+      }, new Map<string, string>()),
+    [recordings]
+  )
+
+  const handleSubmitAnswers = useCallback(() => {
+    if (
+      !questionnaire.Questions.every(
+        (q) =>
+          answers.get(q.id)?.answer ||
+          answers.get(q.id)?.audioFileId ||
+          recordingsUrlsMap.get(q.id)
+      )
+    ) {
+      displayModal({
+        title: 'Error',
+        body: 'Cannot submit questionnaire with unanswered questions.',
+        buttons: [
+          {
+            text: 'Close',
+            onClick: hideModal,
+          },
+        ],
+      })
+      return
+    }
+
+    async function submitAnswers() {
+      try {
+        const recordingsPromisesObj = recordings.map((recording) => {
+          const questionId = Object.keys(recording)[0] as string
+          const blob = recording[questionId] as Blob
+
+          const formData = new FormData()
+          formData.append('file', blob)
+          const promise = api.post('/api/upload', formData)
+
+          return {
+            promise,
+            questionId,
+            id: '',
+          }
+        })
+
+        const recordingPromises = recordingsPromisesObj.map(
+          (obj) => obj.promise
+        )
+        const recordingsIds = (await Promise.all(recordingPromises)).map(
+          (response: { data: { file: { id: string } } }) =>
+            response.data.file.id
+        )
+
+        recordingsPromisesObj.forEach((obj, index) => {
+          obj.id = recordingsIds[index] as string
+        })
+
+        const recordingsMap = new Map(
+          recordingsPromisesObj.map((obj) => [obj.questionId, obj.id])
+        )
+
+        const answersWithFiles = answersState.map((answer) => {
+          const audioFileId = recordingsMap.get(answer.questionId)
+          return { ...answer, audioFileId }
+        })
+
+        await api.post('/api/answer', answersWithFiles)
+
+        location.reload()
+        hideModal()
+      } catch (err) {
+        displayModal({
+          title: 'Error',
+          body: 'There was an error submitting the answers.',
+          buttons: [
+            {
+              text: 'Close',
+              color: 'primary',
+              onClick: hideModal,
+            },
+          ],
+        })
+      }
+    }
+
+    displayModal({
+      title: 'Submit Answers',
+      body: 'Are you sure you want to submit these answers? You will not be able to change them later',
+      buttons: [
+        {
+          text: 'Cancel',
+          color: 'primary',
+          onClick: hideModal,
+        },
+        {
+          text: 'Submit',
+          color: 'success',
+          onClick: submitAnswers,
+        },
+      ],
+    })
+  }, [answersState, displayModal, hideModal, recordings, router])
+
   const gradesDb = useMemo(
     () =>
       questionnaire.Questions.reduce((acc, question) => {
@@ -161,30 +281,63 @@ export default function QuestionnaireView({
     return result.error.format()
   }, [gradesState])
 
-  const [recordings, setRecordings] = useState<Recording[]>([])
-  const addRecording = useCallback((questionId: string, blob: Blob) => {
-    setRecordings((recordings) => {
-      const recording = recordings.find((r) => r[questionId])
-      if (recording) {
-        recording[questionId] = blob
-        return [...recordings]
-      } else {
-        return [...recordings, { [questionId]: blob }]
-      }
-    })
-  }, [])
-  const recordingsUrlsMap = useMemo(
-    () =>
-      recordings.reduce((acc, recording) => {
-        Object.entries(recording).forEach(([questionId, blob]) => {
-          acc.set(questionId, URL.createObjectURL(blob))
-        })
-        return acc
-      }, new Map<string, string>()),
-    [recordings]
-  )
+  const handleSubmitGrade = useCallback(() => {
+    if (!questionnaire.Questions.every((q) => q.UserAnswer?.[0]?.id)) {
+      displayModal({
+        title: 'Error',
+        body: 'Cannot submit grades for questionnaires with unanswered questions.',
+        buttons: [
+          {
+            text: 'Close',
+            onClick: hideModal,
+          },
+        ],
+      })
+      return
+    }
 
-  const handleDelete = useCallback(() => {
+    async function submitGrade() {
+      try {
+        await api.post(
+          '/api/grade',
+          gradesState.map((g) => g.grade)
+        )
+
+        location.reload()
+      } catch (err) {
+        displayModal({
+          title: 'Error',
+          body: 'There was an error submitting the grades.',
+          buttons: [
+            {
+              text: 'Close',
+              color: 'primary',
+              onClick: hideModal,
+            },
+          ],
+        })
+      }
+    }
+
+    displayModal({
+      title: 'Submit Grades',
+      body: 'Are you sure you want to submit these grades?',
+      buttons: [
+        {
+          text: 'Cancel',
+          color: 'primary',
+          onClick: hideModal,
+        },
+        {
+          text: 'Submit',
+          color: 'success',
+          onClick: submitGrade,
+        },
+      ],
+    })
+  }, [displayModal, hideModal, gradesState, router, questionnaire.Questions])
+
+  const handleDeleteQuestionnaire = useCallback(() => {
     async function deleteQuestionnaire() {
       try {
         await api.delete('/api/questionnaire/', {
@@ -229,63 +382,6 @@ export default function QuestionnaireView({
       ],
     })
   }, [displayModal, hideModal, questionnaire, router])
-
-  const handleSubmitGrade = useCallback(() => {
-    if (!questionnaire.Questions.every((q) => q.UserAnswer?.[0]?.id)) {
-      displayModal({
-        title: 'Error',
-        body: 'Cannot submit grades for questionnaires with unanswered questions.',
-        buttons: [
-          {
-            text: 'Close',
-            onClick: hideModal,
-          },
-        ],
-      })
-      return
-    }
-
-    async function submitGrade() {
-      try {
-        await api.post(
-          '/api/grade',
-          gradesState.map((g) => g.grade)
-        )
-
-        router.refresh()
-        hideModal()
-      } catch (err) {
-        displayModal({
-          title: 'Error',
-          body: 'There was an error submitting the grades.',
-          buttons: [
-            {
-              text: 'Close',
-              color: 'primary',
-              onClick: hideModal,
-            },
-          ],
-        })
-      }
-    }
-
-    displayModal({
-      title: 'Submit Grades',
-      body: 'Are you sure you want to submit these grades?',
-      buttons: [
-        {
-          text: 'Cancel',
-          color: 'primary',
-          onClick: hideModal,
-        },
-        {
-          text: 'Submit',
-          color: 'success',
-          onClick: submitGrade,
-        },
-      ],
-    })
-  }, [displayModal, hideModal, gradesState, router, questionnaire.Questions])
 
   return (
     <form className={styles.container}>
@@ -409,14 +505,19 @@ export default function QuestionnaireView({
 
         <div className={styles.endButtons}>
           {showSubmit && (
-            <Button disabled={disabled} color="success">
-              Submit Questionnaire
+            <Button
+              type="button"
+              disabled={disabled}
+              color="success"
+              onClick={handleSubmitAnswers}
+            >
+              Submit
             </Button>
           )}
           {showMaterialControls && (
             <Button
               type="button"
-              onClick={handleDelete}
+              onClick={handleDeleteQuestionnaire}
               disabled={disabled}
               color="danger"
             >

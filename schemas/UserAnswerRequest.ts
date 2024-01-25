@@ -6,14 +6,11 @@ export const UserAnswerCreateRequestZod = z
     answer: z.string().optional(),
     audioFileId: z.string().optional(),
   })
-  .refine((data) => {
-    if (data.answer && data.audioFileId) {
-      return 'You can only provide answer or audioFileId, not both'
-    }
-    if (!data.answer && !data.audioFileId) {
-      return 'You must provide answer or audioFileId'
-    }
-    return true
+  .refine((data) => !(data.answer && data.audioFileId), {
+    message: 'You can only provide answer or audioFileId, not both',
+  })
+  .refine((data) => !(!data.answer && !data.audioFileId), {
+    message: 'You must provide answer or audioFileId',
   })
   .array()
 

@@ -11,37 +11,49 @@ export default async function GradePage({
   if (!classId || classId === 'redirect')
     redirect('/auth/instructor/classes?redirect=grade')
 
-  const questionnairesUngraded = await prisma.questionnaire.findMany({
+  const classObj = await prisma.class.findUnique({
     where: {
-      Lesson: {
-        Collection: {
-          Classes: {
-            some: {
-              id: classId,
-            },
-          },
-        },
-      },
-
-      Questions: {
-        some: {
-          UserAnswer: {
-            some: {
-              grade: null,
-            },
-          },
-        },
-      },
+      id: classId,
     },
 
     include: {
-      Questions: {
+      Collection: {
         include: {
-          UserAnswer: true,
+          Lessons: {
+            include: {
+              Questionnaires: {
+                where: {
+                  Questions: {
+                    some: {
+                      UserAnswer: {
+                        some: {
+                          grade: null,
+                        },
+                      },
+                    },
+                  },
+                },
+
+                include: {
+                  Questions: {
+                    include: {
+                      UserAnswer: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
       },
     },
   })
+
+  if (!classObj) redirect('/auth/instructor/classes?redirect=grade')
+
+  const questionnairesUngraded = classObj.Collection.Lessons.flatMap(
+    (lesson) => lesson.Questionnaires
+  )
 
   if (!questionnairesUngraded.length) {
     return <h1>No activities to be graded in this class</h1>

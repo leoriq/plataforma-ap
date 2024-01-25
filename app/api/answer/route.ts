@@ -20,6 +20,32 @@ export async function POST(request: NextRequest) {
 
     const data = UserAnswerCreateRequestZod.parse(await request.json())
 
+    const questions = await prisma.question.findMany({
+      where: {
+        id: {
+          in: data.map((answer) => answer.questionId),
+        },
+        Questionnaire: {
+          Lesson: {
+            Collection: {
+              Classes: {
+                some: {
+                  Students: {
+                    some: {
+                      id: requestingUser.id,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    })
+
+    if (questions.length !== data.length)
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
     const userAnswer = await prisma.userQuestionAnswer.createMany({
       data: data.map((answer) => ({
         ...answer,

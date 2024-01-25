@@ -14,15 +14,13 @@ export default async function ClassStudentsPage({
   if (!user) return null
 
   const classObj = await prisma.class.findUnique({
-    where: { id: classId },
+    where: { id: classId, Instructors: { some: { id: user.id } } },
     include: {
       Students: true,
       Instructors: true,
     },
   })
   if (!classObj) redirect('/auth/instructor/classes?redirect=students')
-  if (!classObj.Instructors.find((instructor) => instructor.id === user.id))
-    redirect('/auth/instructor/classes?redirect=students')
 
   const safeStudents = classObj.Students.map((student) => ({
     id: student.id,
