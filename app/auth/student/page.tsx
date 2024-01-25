@@ -71,7 +71,7 @@ export default async function StudentClassesPage({
         ))}
       </ul>
       <p>
-        Don't see your class? Please ask your instructor to add you to the
+        Don&apos;t see your class? Please ask your instructor to add you to the
         class.
       </p>
     </div>
