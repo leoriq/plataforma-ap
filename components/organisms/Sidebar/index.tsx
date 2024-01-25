@@ -33,8 +33,11 @@ export default function Sidebar({ user }: Props) {
 
   const currentSelected = useSelectedLayoutSegment()
   const params = useParams<{ classId?: string }>()
-  const classId =
+  const classIdInstructor =
     (currentSelected === 'instructor' && params.classId) || 'redirect'
+
+  const classIdStudent =
+    (currentSelected === 'student' && params.classId) || 'redirect'
 
   const isCoordinator = user.roles.includes('COORDINATOR')
   const isRepInstructor = user.roles.includes('REP_INSTRUCTOR')
@@ -90,23 +93,23 @@ export default function Sidebar({ user }: Props) {
                 },
                 {
                   title: 'Dashboard',
-                  href: `/auth/instructor/class/${classId}/dashboard`,
+                  href: `/auth/instructor/class/${classIdInstructor}/dashboard`,
                 },
                 {
                   title: 'Attendance',
-                  href: `/auth/instructor/class/${classId}/attendance`,
+                  href: `/auth/instructor/class/${classIdInstructor}/attendance`,
                 },
                 {
                   title: 'Students',
-                  href: `/auth/instructor/class/${classId}/students`,
+                  href: `/auth/instructor/class/${classIdInstructor}/students`,
                 },
                 {
                   title: 'Grade',
-                  href: `/auth/instructor/class/${classId}/grade`,
+                  href: `/auth/instructor/class/${classIdInstructor}/grade`,
                 },
                 {
                   title: 'Edit Class',
-                  href: `/auth/instructor/class/${classId}/edit`,
+                  href: `/auth/instructor/class/${classIdInstructor}/edit`,
                 },
               ]}
             />
@@ -138,15 +141,15 @@ export default function Sidebar({ user }: Props) {
               subItems={[
                 {
                   title: 'Select a Class',
-                  href: '/auth/coordinator/instructor',
+                  href: '/auth/student',
                 },
                 {
-                  title: 'Lessons',
-                  href: '/auth/coordinator/instructor',
+                  title: 'Dashboard',
+                  href: `/auth/student/class/${classIdStudent}/dashboard`,
                 },
                 {
-                  title: 'Available Activities',
-                  href: '/auth/coordinator/material',
+                  title: "Let's Practice!",
+                  href: `/auth/student/class/${classIdStudent}/practice`,
                 },
               ]}
             />
