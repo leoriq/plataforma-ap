@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 
-export default async function StudentDashboard({
+export default function StudentDashboard({
   params,
 }: {
   params: { classId: string }

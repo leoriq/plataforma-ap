@@ -216,7 +216,15 @@ export default function QuestionnaireView({
         },
       ],
     })
-  }, [answersState, displayModal, hideModal, recordings, router])
+  }, [
+    answersState,
+    answers,
+    questionnaire.Questions,
+    displayModal,
+    hideModal,
+    recordings,
+    recordingsUrlsMap,
+  ])
 
   const gradesDb = useMemo(
     () =>
@@ -335,7 +343,7 @@ export default function QuestionnaireView({
         },
       ],
     })
-  }, [displayModal, hideModal, gradesState, router, questionnaire.Questions])
+  }, [displayModal, hideModal, gradesState, questionnaire.Questions])
 
   const handleDeleteQuestionnaire = useCallback(() => {
     async function deleteQuestionnaire() {
