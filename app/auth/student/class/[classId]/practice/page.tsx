@@ -4,6 +4,7 @@ import getAuthorizedSessionUser from '~/utils/getAuthorizedSessionUser'
 
 import styles from './StudentPractice.module.scss'
 import QuestionnaireView from '~/components/molecules/QuestionnaireView'
+import { shuffleArray } from '~/utils/shuffleArray'
 
 export default async function StudentPractice({
   params,
@@ -27,6 +28,11 @@ export default async function StudentPractice({
           Classes: {
             some: {
               id: classId,
+              Students: {
+                some: {
+                  id: user.id,
+                },
+              },
             },
           },
         },
@@ -78,6 +84,12 @@ export default async function StudentPractice({
       audioFileUrl: q.audioFileId && `/api/upload?id=${q.audioFileId}`,
     })),
   }
+
+  questionnaire.Questions.forEach((question) => {
+    if (question.answerType === 'OPTIONS') {
+      shuffleArray(question.options)
+    }
+  })
 
   return <QuestionnaireView questionnaire={questionnaire} showSubmit />
 }

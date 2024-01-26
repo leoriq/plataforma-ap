@@ -229,7 +229,7 @@ export default function QuestionnaireView({
   const gradesDb = useMemo(
     () =>
       questionnaire.Questions.reduce((acc, question) => {
-        if (question.UserAnswer) {
+        if (question.UserAnswer?.[0] && question.UserAnswer[0].grade !== null) {
           acc.push({
             questionId: question.id,
             grade: {
@@ -249,6 +249,8 @@ export default function QuestionnaireView({
     () => new Map(gradesState.map((g) => [g.questionId, g.grade])),
     [gradesState]
   )
+  console.log(questionnaire.Questions)
+
   const setGrades = useCallback(
     (questionId: string) =>
       (e: { target: { name: string; value: string } }) => {
@@ -484,7 +486,7 @@ export default function QuestionnaireView({
               />
             )}
 
-            {showInstructorControls && (
+            {grades.get(question.id) && (
               <>
                 <h3>Grade:</h3>
                 <div className={styles.gradeFields}>
@@ -497,6 +499,7 @@ export default function QuestionnaireView({
                     name="grade"
                     onChange={setGrades(question.id)}
                     errors={gradesErrors?.[index]?.grade?._errors}
+                    disabled={!showInstructorControls}
                   />
                   <FormTextArea
                     label="Comments:"
@@ -504,6 +507,7 @@ export default function QuestionnaireView({
                     name="instructorComment"
                     onChange={setGrades(question.id)}
                     errors={gradesErrors?.[index]?.instructorComment?._errors}
+                    disabled={!showInstructorControls}
                   />
                 </div>
               </>
