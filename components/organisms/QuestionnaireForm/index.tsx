@@ -230,6 +230,19 @@ export default function QuestionnaireForm({ lessonId }: Props) {
   )
 
   const handleSubmit = useCallback(() => {
+    if (errors) {
+      displayModal({
+        title: 'Error',
+        body: 'Please fill all the fields correctly.',
+        buttons: [
+          {
+            text: 'Ok',
+            onClick: hideModal,
+          },
+        ],
+      })
+      return
+    }
     async function createQuestionnaire() {
       try {
         const filesPromisesObj = files.reduce((acc, file) => {
