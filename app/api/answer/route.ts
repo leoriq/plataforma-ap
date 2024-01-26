@@ -41,10 +41,32 @@ export async function POST(request: NextRequest) {
           },
         },
       },
+      include: {
+        UserAnswer: {
+          where: {
+            studentUserId: requestingUser.id,
+          },
+        },
+      },
     })
 
     if (questions.length !== data.length)
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      return NextResponse.json(
+        {
+          error: 'Forbidden',
+          message: 'You cannot answer a question not assigned to you.',
+        },
+        { status: 403 }
+      )
+
+    if (questions.some((question) => question.UserAnswer.length > 0))
+      return NextResponse.json(
+        {
+          error: 'Forbidden',
+          message: 'You cannot answer a question more than once.',
+        },
+        { status: 403 }
+      )
 
     const userAnswer = await prisma.userQuestionAnswer.createMany({
       data: data.map((answer) => ({

@@ -1,0 +1,128 @@
+.outerContainer {
+  max-width: 60rem;
+  flex: 1;
+  margin: 6rem 1rem;
+
+  @media (max-width: 700px) {
+    margin: 2rem 1rem;
+  }
+}
+
+.container {
+  background-color: var(--white);
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  margin: 2rem 0;
+}
+
+.lessonList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  grid-auto-rows: max-content;
+  gap: 1rem;
+
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.lessonItem {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: var(--white);
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
+}
+
+.lessonLink {
+  color: unset;
+  text-decoration: unset;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  h3 {
+    padding: 1.5rem 1rem 0;
+    margin: 0;
+  }
+}
+
+.instructorList {
+  list-style-type: none;
+}
+
+.questionnaireList {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.questionnaireItem {
+  &:first-child {
+    padding-top: 1rem;
+  }
+  &:last-child {
+    padding-bottom: 1rem;
+  }
+
+  padding: 0.25rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: unset;
+  text-decoration: unset;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  h4,
+  p {
+    margin: 0;
+  }
+
+  &.unanswered {
+    svg {
+      display: none;
+    }
+  }
+}
+
+.questionnaireTitleAndCheck {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.checkContainer {
+  width: 1.5rem;
+  height: 1.5rem;
+
+  svg {
+    fill: var(--success);
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+.completionPercentageOuter {
+  width: 100%;
+  height: 0.75rem;
+  background-color: var(--light);
+
+  div {
+    height: 100%;
+    background-color: var(--dark);
+
+    &.completed {
+      background-color: var(--success);
+    }
+  }
+}

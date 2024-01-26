@@ -22,5 +22,5 @@ export default async function MaterialLessonPage({
     return <h1>Lesson not found</h1>
   }
 
-  return <LessonView lesson={lesson} showControls />
+  return <LessonView lesson={lesson} showMaterialControls />
 }

@@ -9,10 +9,10 @@ import DownloadFileIcon from '~/components/atoms/icons/DownloadFileIcon'
 import Button from '~/components/atoms/Button'
 import { useModal } from '~/contexts/ModalContext'
 import api from '~/utils/api'
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 
 interface Props {
-  showControls?: boolean
+  showMaterialControls?: boolean
   lesson: {
     id: string
     title: string
@@ -30,9 +30,10 @@ interface Props {
   }
 }
 
-export default function LessonView({ lesson, showControls }: Props) {
+export default function LessonView({ lesson, showMaterialControls }: Props) {
   const { displayModal, hideModal } = useModal()
   const router = useRouter()
+  const { classId } = useParams()
 
   async function deleteLesson() {
     try {
@@ -120,7 +121,7 @@ export default function LessonView({ lesson, showControls }: Props) {
           </section>
         )}
 
-        {showControls && (
+        {showMaterialControls && (
           <>
             <LinkButton
               href={`/auth/material/lessons/${lesson.id}/edit`}
@@ -134,21 +135,27 @@ export default function LessonView({ lesson, showControls }: Props) {
           </>
         )}
 
-        {(!!lesson.Questionnaires.length || showControls) && (
+        {(!!lesson.Questionnaires.length || showMaterialControls) && (
           <section>
             <h2>Let&apos;s Practice!</h2>
             <div className={styles.questionnaires}>
               {lesson.Questionnaires.map((questionnaire) => (
                 <Link
                   className={styles.questionnaireLink}
-                  href={`/auth/material/questionnaire/${questionnaire.id}`}
+                  href={
+                    showMaterialControls
+                      ? `/auth/material/questionnaire/${questionnaire.id}`
+                      : `/auth/student/class/${
+                          classId?.toString() ?? ''
+                        }/questionnaire/${questionnaire.id}`
+                  }
                   key={questionnaire.id}
                 >
                   <h3>{questionnaire.title}</h3>
                 </Link>
               ))}
             </div>
-            {showControls && (
+            {showMaterialControls && (
               <LinkButton
                 href={`/auth/material/lessons/${lesson.id}/add-questionnaire`}
                 color="success"
