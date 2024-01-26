@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const QuestionnaireCreateRequestZod = z.object({
-  title: z.string(),
+  title: z.string().min(1, 'Title is required').max(100, 'Title is too long'),
   lessonId: z.string().cuid(),
   weight: z
     .number()

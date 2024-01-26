@@ -66,7 +66,12 @@ export default function QuestionnaireForm({ lessonId }: Props) {
   }, [questionnaire, filesMap])
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
+    const { name, value: valueProp } = e.target
+    let value: string | number = valueProp
+    if (name === 'weight') {
+      value = parseInt(valueProp)
+      if (isNaN(value)) value = ''
+    }
     setQuestionnaire((prev) => ({ ...prev, [name]: value }))
   }, [])
 
