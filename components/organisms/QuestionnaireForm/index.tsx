@@ -229,6 +229,13 @@ export default function QuestionnaireForm({ lessonId }: Props) {
     []
   )
 
+  const errors = useMemo(() => {
+    const result = QuestionnaireCreateRequestZod.safeParse(questionnaire)
+    if (result.success) return null
+
+    return result.error.format()
+  }, [questionnaire])
+
   const handleSubmit = useCallback(() => {
     if (errors) {
       displayModal({
@@ -328,14 +335,7 @@ export default function QuestionnaireForm({ lessonId }: Props) {
         },
       ],
     })
-  }, [questionnaire, files, displayModal, hideModal, router])
-
-  const errors = useMemo(() => {
-    const result = QuestionnaireCreateRequestZod.safeParse(questionnaire)
-    if (result.success) return null
-
-    return result.error.format()
-  }, [questionnaire])
+  }, [questionnaire, files, displayModal, hideModal, router, errors])
 
   return (
     <div className={styles.outerContainer}>

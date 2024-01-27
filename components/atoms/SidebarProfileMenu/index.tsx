@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { signOut } from 'next-auth/react'
@@ -26,23 +26,29 @@ export default function SidebarProfileMenu({ user }: Props) {
     isExpanded ? styles.expanded : undefined,
   ].join(' ')
 
+  const imageUrl = useMemo(() => {
+    if (user.profilePictureFileId) {
+      return `/api/upload?id=${user.profilePictureFileId}`
+    }
+
+    return '/avatar-light.png'
+  }, [user.profilePictureFileId])
+
   return (
     <div className={containerClass}>
       <button
         className={styles.userContainer}
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        {!!user.profilePictureFileId && (
-          <div className={styles.imageContainer}>
-            <Image
-              src={`/api/upload?id=${user.profilePictureFileId}`}
-              alt="Profile Picture"
-              fill
-              sizes="3rem"
-              className={styles.profilePicture}
-            />
-          </div>
-        )}
+        <div className={styles.imageContainer}>
+          <Image
+            src={imageUrl}
+            alt="Profile Picture"
+            fill
+            sizes="3rem"
+            className={styles.profilePicture}
+          />
+        </div>
 
         <p>Hi, {firstName}!</p>
       </button>

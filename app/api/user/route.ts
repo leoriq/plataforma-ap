@@ -1,6 +1,8 @@
-import type { User } from '@prisma/client'
+import { createId } from '@paralleldrive/cuid2'
 import { compare, hash } from 'bcrypt'
 import { type NextRequest, NextResponse } from 'next/server'
+import { ZodError } from 'zod'
+import { ProfileRequestZod } from '~/schemas/ProfileRequest'
 import { getServerAuthSession } from '~/server/auth'
 import { prisma } from '~/server/db'
 
@@ -16,15 +18,17 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
 
     const { fullName, email, password, newPassword, profilePictureFileId } =
-      (await request.json()) as User & { newPassword?: string }
+      ProfileRequestZod.parse(await request.json())
 
     let newPasswordHash: string | undefined
+    let accessToken: string | undefined
 
     if (password && requestingUser.password && newPassword) {
-      const passwordMatches = await compare(requestingUser.password, password)
+      const passwordMatches = await compare(password, requestingUser.password)
       if (!passwordMatches)
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       newPasswordHash = await hash(newPassword, 12)
+      accessToken = createId()
     }
 
     const user = await prisma.user.update({
@@ -33,6 +37,7 @@ export async function PATCH(request: NextRequest) {
         fullName,
         email,
         password: newPasswordHash,
+        accessToken,
         profilePictureFileId,
       },
     })
@@ -41,6 +46,9 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json(userWithoutPassword, { status: 200 })
   } catch (error) {
+    if (error instanceof ZodError)
+      return NextResponse.json(error.format(), { status: 400 })
+
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 }

@@ -87,15 +87,13 @@ export const authOptions: NextAuthOptions = {
 
       if (
         token.validatedAt &&
-        new Date(token.validatedAt) >
-          new Date(Date.now() - 1000 * 60 * 60 * 24 * 1)
+        new Date(token.validatedAt) > new Date(Date.now() - 1 * 1000 * 3)
       ) {
         return token
       }
 
-      const userDb = await prisma.user.findFirst({
+      const userDb = await prisma.user.findUnique({
         where: {
-          id: token.sub,
           accessToken: token.user.accessToken,
         },
       })

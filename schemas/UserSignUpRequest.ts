@@ -26,7 +26,7 @@ export const UserSignUpRequestZod = z.object({
     .regex(/[^a-zA-Z0-9]/, {
       message: 'Password must have at least one special character',
     }),
-  profilePictureFileId: z.string().cuid().optional(),
+  profilePictureFileId: z.string().optional(),
 })
 
 export type UserSignUpRequest = z.infer<typeof UserSignUpRequestZod>

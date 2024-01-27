@@ -1,38 +1,20 @@
-import Image from 'next/image'
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { getServerAuthSession } from '~/server/auth'
-import { prisma } from '~/server/db'
+
+import EditProfileForm from '~/components/molecules/EditProfileForm'
+import getAuthorizedSessionUser from '~/utils/getAuthorizedSessionUser'
 
 export default async function ProfilePage() {
-  const session = await getServerAuthSession()
-  if (!session) {
-    redirect('/login')
-  }
-
-  const user = await prisma.user.findUnique({
-    where: {
-      id: session.user.id,
-    },
-  })
+  const user = await getAuthorizedSessionUser()
   if (!user) {
-    redirect('/login')
+    redirect('/sign-out')
   }
 
-  return (
-    <>
-      <h1>{user.fullName}</h1>
-      <p>{user.email}</p>
-      <p>{user.roles}</p>
-      {user.profilePictureFileId && (
-        <Image
-          src={`/api/upload?id=${user.profilePictureFileId}`}
-          alt={user.fullName || user.email}
-          width={200}
-          height={200}
-        />
-      )}
-      <Link href="/auth/profile/edit">Edit</Link>
-    </>
-  )
+  const parsedUser = {
+    id: user.id,
+    email: user.email || '',
+    fullName: user.fullName || '',
+    profilePictureFileId: user.profilePictureFileId || '',
+  }
+
+  return <EditProfileForm user={parsedUser} />
 }
