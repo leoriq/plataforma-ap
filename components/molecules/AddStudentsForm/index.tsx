@@ -9,7 +9,7 @@ import { useModal } from '~/contexts/ModalContext'
 import {
   type StudentCreateRequest,
   StudentCreateRequestZod,
-} from '~/schemas/StudentCreateRequest'
+} from '~/schemas/StudentRequest'
 
 import styles from './AddStudentsForm.module.scss'
 

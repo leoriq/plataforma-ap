@@ -12,8 +12,10 @@ interface Props {
     fullName: string | null
     email: string
   }[]
-  removeUsers?: (ids: string[]) => Promise<void>
+  removeUsers?: (ids: string[]) => Promise<void> | void
+  removeText?: string
   addUsersLink?: string
+  addText?: string
   onClickUser?: (id: string) => void
 }
 
@@ -21,7 +23,9 @@ export default function UserTable({
   title,
   users,
   removeUsers,
+  removeText,
   addUsersLink,
+  addText,
   onClickUser,
 }: Props) {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
@@ -31,13 +35,18 @@ export default function UserTable({
       <h1>{title}</h1>
       <div className={styles.buttonsContainer}>
         {!!removeUsers && (
-          <Button color="danger" className={styles.button}>
-            Remove from {title}
+          <Button
+            color="danger"
+            type="button"
+            className={styles.button}
+            onClick={async () => await removeUsers(selectedIds)}
+          >
+            {removeText || 'Remove Selected'}
           </Button>
         )}
         {!!addUsersLink && (
           <LinkButton color="success" href={addUsersLink}>
-            Add Users to {title}
+            {addText || 'Add New'}
           </LinkButton>
         )}
       </div>
@@ -72,7 +81,7 @@ export default function UserTable({
               }
             >
               {!!removeUsers && (
-                <td>
+                <td className={styles.checkboxContainer}>
                   <input
                     type="checkbox"
                     checked={selectedIds.includes(user.id)}
