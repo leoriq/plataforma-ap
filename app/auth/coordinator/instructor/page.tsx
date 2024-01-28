@@ -19,6 +19,7 @@ export default async function InstructorManagement() {
     <UserTable
       title="Instructors"
       users={instructors}
+      addText="Add Instructor"
       addUsersLink="/auth/coordinator/instructor/add"
     />
   )

@@ -18,6 +18,7 @@ export default async function MaterialManagement() {
     <UserTable
       title="Material"
       users={materials}
+      addText="Add User to Material"
       addUsersLink="/auth/coordinator/material/add"
     />
   )
