@@ -197,48 +197,55 @@ export default async function InstructorStudentPage({
 
       <section className={styles.container}>
         <h2>Attendance</h2>
-        <div className={styles.attendanceContentWrapper}>
-          <table className={styles.attendanceTable}>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Date</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {meetings.map((meeting, index) => (
-                <tr key={meeting.id} className={styles[`row${meeting.status}`]}>
-                  <td>{index + 1}</td>
-                  <td>
-                    {Intl.DateTimeFormat('en-US', {
-                      timeZone: 'UTC',
-                      dateStyle: 'medium',
-                    }).format(meeting.date)}
-                  </td>
-                  <td>{meeting.status}</td>
+        {meetings.length ? (
+          <div className={styles.attendanceContentWrapper}>
+            <table className={styles.attendanceTable}>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Date</th>
+                  <th>Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {meetings.map((meeting, index) => (
+                  <tr
+                    key={meeting.id}
+                    className={styles[`row${meeting.status}`]}
+                  >
+                    <td>{index + 1}</td>
+                    <td>
+                      {Intl.DateTimeFormat('en-US', {
+                        timeZone: 'UTC',
+                        dateStyle: 'medium',
+                      }).format(meeting.date)}
+                    </td>
+                    <td>{meeting.status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-          <div className={styles.chartWrapper}>
-            <ChartClient
-              chartType="PieChart"
-              data={pieChartData}
-              options={{
-                colors: ['#79cdb3', '#404266', '#d5403d'],
-                is3D: true,
-                legend: 'none',
-                backgroundColor: 'transparent',
-              }}
-              className={styles.chart}
-              style={{
-                height: '100%',
-              }}
-            />
+            <div className={styles.chartWrapper}>
+              <ChartClient
+                chartType="PieChart"
+                data={pieChartData}
+                options={{
+                  colors: ['#79cdb3', '#404266', '#d5403d'],
+                  is3D: true,
+                  legend: 'none',
+                  backgroundColor: 'transparent',
+                }}
+                className={styles.chart}
+                style={{
+                  height: '100%',
+                }}
+              />
+            </div>
           </div>
-        </div>
+        ) : (
+          <p>No attendance data.</p>
+        )}
       </section>
     </div>
   )
