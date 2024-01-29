@@ -38,7 +38,7 @@ export default async function StudentClassesPage({
   const redirectPage = searchParams?.redirect ?? 'dashboard'
 
   if (classes.length === 1 && classes[0]) {
-    redirect(`/classes/${classes[0].id}/${redirectPage}`)
+    redirect(`/auth/student/class/${classes[0].id}/${redirectPage}`)
   }
 
   return (

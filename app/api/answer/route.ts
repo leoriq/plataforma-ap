@@ -68,8 +68,26 @@ export async function POST(request: NextRequest) {
         { status: 403 }
       )
 
+    const gradedAnswers = data.map((answer) => {
+      const question = questions.find(
+        (question) => question.id === answer.questionId
+      )
+      if (!question) throw new Error('Question not found')
+      if (question.answerType === 'OPTIONS') {
+        return {
+          ...answer,
+          grade: question.options[0] === answer.answer ? 10 : 0,
+          instructorComment:
+            question.options[0] === answer.answer
+              ? 'Auto graded.'
+              : `Auto graded. The correct answer is ${question.options[0]}`,
+        }
+      }
+      return answer
+    })
+
     const userAnswer = await prisma.userQuestionAnswer.createMany({
-      data: data.map((answer) => ({
+      data: gradedAnswers.map((answer) => ({
         ...answer,
         studentUserId: requestingUser.id,
       })),

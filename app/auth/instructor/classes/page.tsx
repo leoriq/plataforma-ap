@@ -4,6 +4,7 @@ import { prisma } from '~/server/db'
 
 import styles from './ClassesPage.module.scss'
 import LinkButton from '~/components/atoms/LinkButton'
+import { redirect } from 'next/navigation'
 
 export default async function InstructorClassesPage({
   searchParams,
@@ -33,6 +34,14 @@ export default async function InstructorClassesPage({
       })
 
   const redirectPage = searchParams?.redirect ?? 'dashboard'
+
+  if (
+    classes.length === 1 &&
+    classes[0] &&
+    (!isRep || searchParams?.redirect)
+  ) {
+    redirect(`/auth/instructor/class/${classes[0].id}/${redirectPage}`)
+  }
 
   return (
     <div className={styles.container}>
