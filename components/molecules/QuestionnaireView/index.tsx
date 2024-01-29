@@ -229,7 +229,7 @@ export default function QuestionnaireView({
   const gradesDb = useMemo(
     () =>
       questionnaire.Questions.reduce((acc, question) => {
-        if (question.UserAnswer?.[0] && question.UserAnswer[0].grade !== null) {
+        if (question.UserAnswer?.[0]) {
           acc.push({
             questionId: question.id,
             grade: {
