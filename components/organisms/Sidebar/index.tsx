@@ -77,6 +77,10 @@ export default function Sidebar({ user }: Props) {
                   title: 'Material',
                   href: '/auth/coordinator/material',
                 },
+                {
+                  title: 'All Users',
+                  href: '/auth/coordinator/users',
+                },
               ]}
             />
           )}

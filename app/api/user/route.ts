@@ -67,25 +67,17 @@ export async function DELETE(request: NextRequest) {
     if (!requestingUser)
       return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
 
-    const selectedUserId = request.nextUrl.searchParams.get('id')
-    if (!selectedUserId)
-      return NextResponse.json({ error: 'Missing id' }, { status: 400 })
-    const selectedUser = await prisma.user.findUnique({
-      where: { id: selectedUserId },
-    })
-    if (!selectedUser)
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    const { ids } = (await request.json()) as { ids: string[] }
 
     if (requestingUser.roles.includes('COORDINATOR')) {
-      await prisma.user.delete({ where: { id: selectedUserId } })
+      await prisma.user.deleteMany({
+        where: {
+          id: {
+            in: ids,
+          },
+        },
+      })
       return NextResponse.json({ success: true })
-    }
-
-    if (requestingUser.roles.includes('INSTRUCTOR')) {
-      if (selectedUser.roles.includes('STUDENT')) {
-        await prisma.user.delete({ where: { id: selectedUserId } })
-        return NextResponse.json({ success: true })
-      }
     }
 
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })

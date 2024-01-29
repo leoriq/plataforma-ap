@@ -2,8 +2,11 @@
 
 import Button from '../../atoms/Button'
 import styles from './UserTable.module.scss'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import LinkButton from '../../atoms/LinkButton'
+import api from '~/utils/api'
+import { useModal } from '~/contexts/ModalContext'
+import { useRouter } from 'next/navigation'
 
 interface Props {
   title: string
@@ -17,6 +20,7 @@ interface Props {
   addUsersLink?: string
   addText?: string
   onClickUser?: (id: string) => void
+  canDeleteUser?: boolean
 }
 
 export default function UserTable({
@@ -27,34 +31,94 @@ export default function UserTable({
   addUsersLink,
   addText,
   onClickUser,
+  canDeleteUser,
 }: Props) {
+  const { displayModal, hideModal } = useModal()
+  const router = useRouter()
   const [selectedIds, setSelectedIds] = useState<string[]>([])
+
+  const deleteUsersPermanently = useCallback(() => {
+    async function deleteUsersPermanently() {
+      try {
+        await api.delete('/api/user', {
+          data: {
+            ids: selectedIds,
+          },
+        })
+        hideModal()
+        setSelectedIds([])
+      } catch (e) {
+        console.log(e)
+        displayModal({
+          title: 'Error',
+          body: 'Something went wrong. Please try again later.',
+          buttons: [
+            {
+              text: 'OK',
+              onClick: hideModal,
+            },
+          ],
+        })
+      }
+      router.refresh()
+    }
+
+    displayModal({
+      title: 'Delete Users',
+      body: `Are you sure you want to delete ${selectedIds.length} user${
+        selectedIds.length > 1 ? 's' : ''
+      } permanently?`,
+      buttons: [
+        {
+          text: 'Cancel',
+          onClick: hideModal,
+        },
+        {
+          text: 'Delete',
+          onClick: deleteUsersPermanently,
+          color: 'danger',
+        },
+      ],
+    })
+  }, [selectedIds, displayModal, hideModal, router])
 
   return (
     <div className={styles.container}>
       <h1>{title}</h1>
       <div className={styles.buttonsContainer}>
+        {!!addUsersLink && (
+          <LinkButton color="success" href={addUsersLink}>
+            {addText || 'Add New'}
+          </LinkButton>
+        )}
         {!!removeUsers && (
           <Button
             color="danger"
             type="button"
             className={styles.button}
             onClick={async () => await removeUsers(selectedIds)}
+            disabled={selectedIds.length === 0}
           >
             {removeText || 'Remove Selected'}
           </Button>
         )}
-        {!!addUsersLink && (
-          <LinkButton color="success" href={addUsersLink}>
-            {addText || 'Add New'}
-          </LinkButton>
+        {!!canDeleteUser && (
+          <Button
+            color="danger"
+            type="button"
+            className={styles.button}
+            onClick={deleteUsersPermanently}
+            disabled={selectedIds.length === 0}
+          >
+            Delete Permanently
+          </Button>
         )}
       </div>
 
       <table className={styles.table}>
         <thead>
           <tr>
-            {!!removeUsers && (
+            {(!!removeUsers || canDeleteUser) && (
               <th>
                 <input
                   type="checkbox"
@@ -80,7 +144,7 @@ export default function UserTable({
                 selectedIds.includes(user.id) ? styles.checked : undefined
               }
             >
-              {!!removeUsers && (
+              {(!!removeUsers || canDeleteUser) && (
                 <td className={styles.checkboxContainer}>
                   <input
                     type="checkbox"
