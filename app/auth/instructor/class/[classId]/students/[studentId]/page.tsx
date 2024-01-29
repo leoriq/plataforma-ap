@@ -1,4 +1,5 @@
 import { prisma } from '~/server/db'
+import Image from 'next/image'
 
 import styles from './InstructorStudentPage.module.scss'
 import ChartClient from '~/components/atoms/ChartClient'
@@ -80,6 +81,10 @@ export default async function InstructorStudentPage({
     return <div>Student not found in class</div>
   }
 
+  const imageUrl = student.profilePictureFileId
+    ? `/api/upload?id=${student.profilePictureFileId}`
+    : undefined
+
   const questionnaires = studentClass.Collection.Lessons.flatMap(
     (lesson) => lesson.Questionnaires
   )
@@ -151,11 +156,17 @@ export default async function InstructorStudentPage({
       <section className={styles.container}>
         <h2>Info</h2>
         <div className={styles.info}>
-          <p>Full name: {student.fullName ?? 'No data.'}</p>
-          <p>Email: {student.email}</p>
-          <p>Registered at: {student.createdAt.toLocaleString()}</p>
-
-          <p>Classes: {student.StudentClass.map((c) => c.name).join(', ')}</p>
+          {!!imageUrl && (
+            <div className={styles.imageContainer}>
+              <Image src={imageUrl} alt="Profile Picture" fill />
+            </div>
+          )}
+          <div className={styles.textInfo}>
+            <p>Full name: {student.fullName ?? 'No data.'}</p>
+            <p>Email: {student.email}</p>
+            <p>Registered at: {student.createdAt.toLocaleString()}</p>
+            <p>Classes: {student.StudentClass.map((c) => c.name).join(', ')}</p>
+          </div>
         </div>
       </section>
 

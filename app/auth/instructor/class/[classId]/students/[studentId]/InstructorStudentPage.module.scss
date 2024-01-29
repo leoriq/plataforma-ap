@@ -14,13 +14,33 @@
 }
 
 .info {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  column-gap: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2rem;
+  justify-content: center;
+}
 
-  p {
-    width: max-content;
+.imageContainer {
+  position: relative;
+  width: 10rem;
+  height: 10rem;
+  border-radius: 11rem;
+  overflow: hidden;
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
+
+  img {
+    object-fit: cover;
   }
+}
+
+.textInfo {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 2rem;
+  justify-content: space-between;
+  min-width: 18rem;
 }
 
 .gradeTable {
