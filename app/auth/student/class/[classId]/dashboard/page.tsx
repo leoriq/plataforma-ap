@@ -125,22 +125,30 @@ export default async function StudentDashboard({
     })
   )
 
-  const lessonsInfos = classObj.Collection.Lessons.map((lesson) => ({
-    id: lesson.id,
-    title: lesson.title,
-    completionPercentage: Math.round(
-      (lesson.Questionnaires.filter(
-        (questionnaire) => !unansweredQuestionnairesIdsSet.has(questionnaire.id)
-      ).length / lesson.Questionnaires.length || 1) * 100
-    ),
-    Questionnaires: lesson.Questionnaires.map((questionnaire) => ({
-      id: questionnaire.id,
-      title: questionnaire.title,
-      answered: !unansweredQuestionnairesIdsSet.has(questionnaire.id),
-      graded: !ungradedQuestionnairesIdsSet.has(questionnaire.id),
-      grade: questionnaireGradeMap.get(questionnaire.id),
-    })),
-  }))
+  const lessonsInfos = classObj.Collection.Lessons.map((lesson) => {
+    const completionPercentage = lesson.Questionnaires.length
+      ? Math.round(
+          (lesson.Questionnaires.filter(
+            (questionnaire) =>
+              !unansweredQuestionnairesIdsSet.has(questionnaire.id)
+          ).length /
+            lesson.Questionnaires.length) *
+            100
+        )
+      : 100
+    return {
+      id: lesson.id,
+      title: lesson.title,
+      completionPercentage,
+      Questionnaires: lesson.Questionnaires.map((questionnaire) => ({
+        id: questionnaire.id,
+        title: questionnaire.title,
+        answered: !unansweredQuestionnairesIdsSet.has(questionnaire.id),
+        graded: !ungradedQuestionnairesIdsSet.has(questionnaire.id),
+        grade: questionnaireGradeMap.get(questionnaire.id),
+      })),
+    }
+  })
 
   return (
     <div className={styles.outerContainer}>
