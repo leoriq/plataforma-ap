@@ -17,6 +17,29 @@
   margin: 2rem 0;
 }
 
+.instructors {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  column-gap: 2rem;
+}
+
+.instructorInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.instructorImageContainer {
+  position: relative;
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 99999px;
+  overflow: hidden;
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
+}
+
 .lessonList {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
@@ -50,10 +73,6 @@
     padding: 1.5rem 1rem 1rem;
     margin: 0;
   }
-}
-
-.instructorList {
-  list-style-type: none;
 }
 
 .questionnaireList {

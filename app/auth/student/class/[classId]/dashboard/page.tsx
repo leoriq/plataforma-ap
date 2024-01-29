@@ -6,6 +6,7 @@ import getAuthorizedSessionUser from '~/utils/getAuthorizedSessionUser'
 import CheckIcon from '~/components/atoms/icons/CheckIcon'
 import classNames from 'classnames'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default async function StudentDashboard({
   params,
@@ -146,17 +147,27 @@ export default async function StudentDashboard({
       <h1>Welcome to {classObj.name}!</h1>
 
       <section className={styles.container}>
-        <h2>ClassInfo</h2>
+        <h2>Class Info</h2>
         <p>{classObj.description}</p>
         <div>
-          <p>Instructors:</p>
-          <ul className={styles.instructorList}>
+          <div className={styles.instructors}>
+            <p>Instructors:</p>
             {classObj.Instructors.map((instructor) => (
-              <li key={instructor.id}>
-                <p>{instructor.fullName}</p>
-              </li>
+              <div className={styles.instructorInfo}>
+                {instructor.profilePictureFileId && (
+                  <div className={styles.instructorImageContainer}>
+                    <Image
+                      src={`/api/upload?id=${instructor.profilePictureFileId}`}
+                      sizes="3rem"
+                      fill
+                      alt="Instructor profile picture"
+                    />
+                  </div>
+                )}
+                <p>{instructor.fullName ?? instructor.email}</p>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       </section>
 
