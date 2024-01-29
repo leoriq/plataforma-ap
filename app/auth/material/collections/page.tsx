@@ -19,9 +19,13 @@ export default async function CollectionsPage() {
     <div className={styles.container}>
       <h1>Collections</h1>
       <ul>
-        {collections.map((collection) => (
-          <CollectionItem collection={collection} key={collection.id} />
-        ))}
+        {collections.length ? (
+          collections.map((collection) => (
+            <CollectionItem collection={collection} key={collection.id} />
+          ))
+        ) : (
+          <p>No collections found.</p>
+        )}
       </ul>
     </div>
   )
