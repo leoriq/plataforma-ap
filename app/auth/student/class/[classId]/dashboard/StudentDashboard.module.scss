@@ -38,6 +38,10 @@
   border-radius: 99999px;
   overflow: hidden;
   box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
+
+  img {
+    object-fit: cover;
+  }
 }
 
 .lessonList {
