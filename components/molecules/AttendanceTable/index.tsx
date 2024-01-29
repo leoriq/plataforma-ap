@@ -27,6 +27,7 @@ interface Props {
     Students: {
       id: string
       fullName: string | null
+      email: string
     }[]
   }
 }
@@ -38,6 +39,9 @@ export default function AttendanceTable({ class: classObj }: Props) {
   const [synchronousMeetings, setSynchronousMeetings] = useState(
     classObj.SynchronousMeeting
   )
+  useEffect(() => {
+    setSynchronousMeetings(classObj.SynchronousMeeting)
+  }, [classObj.SynchronousMeeting])
 
   const attendedMeetingsByStudentMap = useMemo(
     () =>
@@ -522,7 +526,7 @@ export default function AttendanceTable({ class: classObj }: Props) {
 
             {classObj.Students.map((student) => (
               <tr key={student.id}>
-                <td>{student.fullName}</td>
+                <td>{student.fullName ?? student.email}</td>
                 {synchronousMeetings.map((meeting) => {
                   const value = attendedMeetingsByStudentMap
                     .get(student.id)

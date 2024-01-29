@@ -24,7 +24,13 @@ export default async function ClassAttendancePage({
           ExcusedStudents: { select: { id: true } },
         },
       },
-      Students: true,
+      Students: {
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+        },
+      },
     },
   })
 

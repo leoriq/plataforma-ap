@@ -51,7 +51,7 @@ export default async function StudentDashboard({
               },
             },
             orderBy: {
-              publicationDate: 'desc',
+              publicationDate: 'asc',
             },
             include: {
               Questionnaires: {
