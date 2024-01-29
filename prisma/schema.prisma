@@ -75,7 +75,7 @@ model SynchronousMeeting {
 
     classId String
 
-    Class             Class  @relation(fields: [classId], references: [id])
+    Class             Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
     AttendingStudents User[] @relation("attended")
     ExcusedStudents   User[] @relation("excusedAbsence")
     AbsentStudents    User[] @relation("absence")
@@ -179,8 +179,8 @@ model UserQuestionAnswer {
     audioFileId   String? @unique
     studentUserId String
 
-    Question Question @relation(fields: [questionId], references: [id])
-    Audio    File?    @relation(fields: [audioFileId], references: [id])
+    Question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+    Audio    File?    @relation(fields: [audioFileId], references: [id], onDelete: Restrict)
     Student  User     @relation(fields: [studentUserId], references: [id])
 
     @@unique([questionId, studentUserId])

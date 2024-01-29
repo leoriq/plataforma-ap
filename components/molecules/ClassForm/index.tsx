@@ -20,6 +20,7 @@ import Select from 'react-select'
 import api from '~/utils/api'
 
 interface Props {
+  showDelete?: boolean
   collections: LessonCollection[]
   instructors: User[]
   class?: Class & {
@@ -32,6 +33,7 @@ export default function ClassForm({
   collections,
   instructors,
   class: dbClass,
+  showDelete,
 }: Props) {
   const { displayModal, hideModal } = useModal()
   const router = useRouter()
@@ -158,6 +160,53 @@ export default function ClassForm({
     }
   }, [classData, router, displayModal, hideModal, dbClass, errors])
 
+  const handleDelete = useCallback(() => {
+    if (!dbClass) return
+    async function deleteClass() {
+      if (!dbClass) return
+      try {
+        await api.delete('/api/class', { data: { id: dbClass.id } })
+        router.push('/auth/instructor/classes')
+        router.refresh()
+        hideModal()
+      } catch (error) {
+        console.log(error)
+        displayModal({
+          title: 'Error',
+          body: 'Something went wrong. Please try again.',
+          buttons: [
+            {
+              text: 'OK',
+              onClick: () => {
+                hideModal()
+              },
+            },
+          ],
+        })
+      }
+    }
+
+    displayModal({
+      title: 'Are you sure?',
+      body: 'This will delete the class and all associated data.',
+      buttons: [
+        {
+          text: 'Cancel',
+          onClick: () => {
+            hideModal()
+          },
+        },
+        {
+          text: 'Delete',
+          color: 'danger',
+          onClick: async () => {
+            await deleteClass()
+          },
+        },
+      ],
+    })
+  }, [dbClass, router, displayModal, hideModal])
+
   return (
     <div className={styles.container}>
       <h1>{!dbClass ? 'Create' : 'Edit'} Class</h1>
@@ -223,6 +272,11 @@ export default function ClassForm({
         >
           {!dbClass ? 'Create Class' : 'Save'}
         </Button>
+        {showDelete && (
+          <Button type="button" color="danger" onClick={handleDelete}>
+            Delete Class
+          </Button>
+        )}
       </form>
     </div>
   )

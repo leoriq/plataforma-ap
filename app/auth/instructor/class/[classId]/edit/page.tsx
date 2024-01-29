@@ -50,6 +50,7 @@ export default async function EditClassPage({
       instructors={instructors}
       collections={collections}
       class={responseClass}
+      showDelete
     />
   )
 }
