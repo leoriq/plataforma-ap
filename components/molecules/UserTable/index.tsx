@@ -91,7 +91,7 @@ export default function UserTable({
             {addText || 'Add New'}
           </LinkButton>
         )}
-        {!!removeUsers && (
+        {!!removeUsers && !!users.length && (
           <Button
             color="danger"
             type="button"
@@ -102,7 +102,7 @@ export default function UserTable({
             {removeText || 'Remove Selected'}
           </Button>
         )}
-        {!!canDeleteUser && (
+        {!!canDeleteUser && !!users.length && (
           <Button
             color="danger"
             type="button"
@@ -118,7 +118,7 @@ export default function UserTable({
       <table className={styles.table}>
         <thead>
           <tr>
-            {(!!removeUsers || canDeleteUser) && (
+            {(!!removeUsers || canDeleteUser) && !!users.length && (
               <th>
                 <input
                   type="checkbox"
@@ -178,7 +178,9 @@ export default function UserTable({
           ))}
           {users.length === 0 && (
             <tr>
-              <td colSpan={2}>No {title.toLowerCase()} found.</td>
+              <td colSpan={2}>
+                <p className={styles.name}>No {title.toLowerCase()} found.</p>
+              </td>
             </tr>
           )}
         </tbody>

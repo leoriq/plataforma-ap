@@ -151,12 +151,16 @@ export default async function ClassDashboard({
       <section className={styles.container}>
         <h2>Attendance</h2>
 
-        <div className={styles.chartWrapper}>
-          <BarChartClient
-            series={attendanceSeries}
-            xAxis={[{ data: xAxis, scaleType: 'band' }]}
-          />
-        </div>
+        {!xAxis.length ? (
+          <p>No data.</p>
+        ) : (
+          <div className={styles.chartWrapper}>
+            <BarChartClient
+              series={attendanceSeries}
+              xAxis={[{ data: xAxis, scaleType: 'band' }]}
+            />
+          </div>
+        )}
       </section>
 
       <div className={styles.doubleColumn}>
@@ -170,12 +174,18 @@ export default async function ClassDashboard({
               </tr>
             </thead>
             <tbody>
-              {classObj.Students.map((student) => (
-                <tr key={student.id}>
-                  <td>{student.fullName ?? student.email}</td>
-                  <td>{studentsAverages.get(student.id)?.toFixed(2)}</td>
+              {classObj.Students.length ? (
+                classObj.Students.map((student) => (
+                  <tr key={student.id}>
+                    <td>{student.fullName ?? student.email}</td>
+                    <td>{studentsAverages.get(student.id)?.toFixed(2)}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={2}>No students in this class.</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </section>
@@ -191,14 +201,20 @@ export default async function ClassDashboard({
               </tr>
             </thead>
             <tbody>
-              {allQuestionnaires.map((questionnaire) => (
-                <tr key={questionnaire.id}>
-                  <td>{questionnaire.title}</td>
-                  <td>
-                    {questionnairesAverages.get(questionnaire.id)?.toFixed(2)}
-                  </td>
+              {allQuestionnaires.length ? (
+                allQuestionnaires.map((questionnaire) => (
+                  <tr key={questionnaire.id}>
+                    <td>{questionnaire.title}</td>
+                    <td>
+                      {questionnairesAverages.get(questionnaire.id)?.toFixed(2)}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={2}>No activities in this class.</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </section>

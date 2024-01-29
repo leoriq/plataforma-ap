@@ -35,7 +35,11 @@ export default async function ClassAttendancePage({
       <h1>Attendance</h1>
 
       <section className={styles.container}>
-        <AttendanceTable class={classObj} />
+        {classObj.Students.length ? (
+          <AttendanceTable class={classObj} />
+        ) : (
+          <p>No students in this class.</p>
+        )}
       </section>
     </div>
   )
