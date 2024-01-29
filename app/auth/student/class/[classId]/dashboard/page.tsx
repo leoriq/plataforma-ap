@@ -153,7 +153,7 @@ export default async function StudentDashboard({
           <div className={styles.instructors}>
             <p>Instructors:</p>
             {classObj.Instructors.map((instructor) => (
-              <div className={styles.instructorInfo}>
+              <div className={styles.instructorInfo} key={instructor.id}>
                 {instructor.profilePictureFileId && (
                   <div className={styles.instructorImageContainer}>
                     <Image

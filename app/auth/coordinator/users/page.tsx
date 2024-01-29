@@ -1,5 +1,5 @@
 import { prisma } from '~/server/db'
-import UserTable from '~/components/molecules/UserTable'
+import AllUsersTable from '~/components/organisms/AllUsersTable'
 
 export default async function CoordinatorAllUsers() {
   const users = await prisma.user.findMany({
@@ -10,5 +10,5 @@ export default async function CoordinatorAllUsers() {
     },
   })
 
-  return <UserTable canDeleteUser title="All Users" users={users} />
+  return <AllUsersTable users={users} />
 }
