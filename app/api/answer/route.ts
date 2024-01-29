@@ -80,7 +80,9 @@ export async function POST(request: NextRequest) {
           instructorComment:
             question.options[0] === answer.answer
               ? 'Auto graded.'
-              : `Auto graded. The correct answer is ${question.options[0]}`,
+              : `Auto graded. The correct answer is ${
+                  question.options[0] ?? ''
+                }`,
         }
       }
       return answer
