@@ -30,6 +30,10 @@
       &:last-child {
         border-top-right-radius: 2px;
       }
+
+      input {
+        padding: 0.8rem;
+      }
     }
   }
 
@@ -53,7 +57,7 @@
 
     td {
       input {
-        padding: 1rem;
+        padding: 0.8rem;
       }
     }
   }
