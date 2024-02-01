@@ -3,50 +3,56 @@ import {
   GetObjectCommand,
   PutObjectCommand,
 } from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { NextResponse, type NextRequest } from 'next/server'
+import { ZodError } from 'zod'
 import { env } from '~/env.mjs'
+import { UploadRequestZod } from '~/schemas/UploadRequest'
 import { getServerAuthSession } from '~/server/auth'
 import { prisma } from '~/server/db'
 import { r2 } from '~/server/r2'
 
 export async function POST(request: NextRequest) {
-  const session = await getServerAuthSession()
-  if (!session)
-    return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
-  const requestingUser = await prisma.user.findUnique({
-    where: { accessToken: session.user.accessToken },
-  })
-  if (!requestingUser)
-    return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
-
-  const data = await request.formData()
-  const file: File | null = data.get('file') as unknown as File
-  const title = data.get('title') as string
-
-  const bytes = await file.arrayBuffer()
-  const buffer = Buffer.from(bytes)
-
-  const contentType = file.type
-  console.log(contentType)
-
-  const dbFile = await prisma.file.create({
-    data: {
-      name: file.name,
-      title,
-      uploadedById: requestingUser.id,
-    },
-  })
-
-  await r2.send(
-    new PutObjectCommand({
-      Bucket: env.R2_BUCKET_NAME,
-      Key: dbFile.id,
-      Body: buffer,
-      ContentType: contentType,
+  try {
+    const session = await getServerAuthSession()
+    if (!session)
+      return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
+    const requestingUser = await prisma.user.findUnique({
+      where: { accessToken: session.user.accessToken },
     })
-  )
+    if (!requestingUser)
+      return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
 
-  return NextResponse.json({ file: dbFile })
+    const data = UploadRequestZod.parse(await request.json())
+
+    const dbFile = await prisma.file.create({
+      data: {
+        name: data.name,
+        title: data.title,
+        uploadedById: requestingUser.id,
+      },
+    })
+
+    const url = await getSignedUrl(
+      r2,
+      new PutObjectCommand({
+        Bucket: env.R2_BUCKET_NAME,
+        Key: dbFile.id,
+        ContentType: data.type,
+      }),
+      { expiresIn: 3600 }
+    )
+
+    return NextResponse.json({ url, id: dbFile.id })
+  } catch (error) {
+    if (error instanceof ZodError)
+      return NextResponse.json(error.format(), { status: 400 })
+
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 }
+    )
+  }
 }
 
 export async function GET(request: NextRequest) {

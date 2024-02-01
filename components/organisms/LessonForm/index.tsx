@@ -19,6 +19,7 @@ import { useRouter } from 'next/navigation'
 import { useModal } from '~/contexts/ModalContext'
 import LessonView from '../../molecules/LessonView'
 import FormTextArea from '~/components/atoms/FormTextArea'
+import { uploadDocument } from '~/utils/uploadDocument'
 
 interface Props {
   collectionId?: string
@@ -230,16 +231,10 @@ export default function LessonForm({ collectionId, lesson: dbLesson }: Props) {
         .filter((document) => !document.id)
         .map(async (document) => {
           if (!document.title) throw new Error('No file title')
-          const formData = new FormData()
-          formData.append('file', document.file)
-          formData.append('title', document.title)
-          const promise = api.post('/api/upload', formData)
-          return promise
+          return uploadDocument(document.file, document.title)
         })
 
-      const documentsIds = (await Promise.all(documentPromises)).map(
-        (response: { data: { file: { id: string } } }) => response.data.file.id
-      )
+      const documentsIds = await Promise.all(documentPromises)
 
       const lessonRequest = {
         ...lesson,
