@@ -98,26 +98,19 @@ export default function QuestionnaireView({
     [answers]
   )
 
-  const [recordings, setRecordings] = useState<Recording[]>([])
+  const [recordings, setRecordings] = useState<Recording>({})
   const addRecording = useCallback((questionId: string, blob: Blob) => {
     setRecordings((recordings) => {
-      const recording = recordings.find((r) => r[questionId])
-      if (recording) {
-        recording[questionId] = blob
-        return [...recordings]
-      } else {
-        return [...recordings, { [questionId]: blob }]
-      }
+      const newRecordings = { ...recordings }
+      newRecordings[questionId] = blob
+      return newRecordings
     })
   }, [])
   const recordingsUrlsMap = useMemo(
     () =>
-      recordings.reduce((acc, recording) => {
-        Object.entries(recording).forEach(([questionId, blob]) => {
-          acc.set(questionId, URL.createObjectURL(blob))
-        })
-        return acc
-      }, new Map<string, string>()),
+      new Map(
+        Object.entries(recordings).map(([k, v]) => [k, URL.createObjectURL(v)])
+      ),
     [recordings]
   )
 
@@ -145,20 +138,19 @@ export default function QuestionnaireView({
 
     async function submitAnswers() {
       try {
-        const recordingsPromisesObj = recordings.map((recording) => {
-          const questionId = Object.keys(recording)[0] as string
-          const blob = recording[questionId] as Blob
+        const recordingsPromisesObj = Object.entries(recordings).map(
+          ([questionId, blob]) => {
+            const formData = new FormData()
+            formData.append('file', blob)
+            const promise = api.post('/api/upload', formData)
 
-          const formData = new FormData()
-          formData.append('file', blob)
-          const promise = api.post('/api/upload', formData)
-
-          return {
-            promise,
-            questionId,
-            id: '',
+            return {
+              promise,
+              questionId,
+              id: '',
+            }
           }
-        })
+        )
 
         const recordingPromises = recordingsPromisesObj.map(
           (obj) => obj.promise
