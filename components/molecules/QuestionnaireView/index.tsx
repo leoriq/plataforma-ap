@@ -15,6 +15,7 @@ import api from '~/utils/api'
 import { useRouter } from 'next/navigation'
 import FormInput from '~/components/atoms/FormInput'
 import { type GradeRequest, GradeRequestZod } from '~/schemas/GradeRequest'
+import convertWebmToMp3 from '~/utils/convertWebmToMp3'
 
 interface Props {
   disabled?: boolean
@@ -138,10 +139,11 @@ export default function QuestionnaireView({
 
     async function submitAnswers() {
       try {
-        const recordingsPromisesObj = Object.entries(recordings).map(
-          ([questionId, blob]) => {
+        const blobPromises = Object.entries(recordings).map(
+          async ([questionId, blob]) => {
+            const blobMp3 = await convertWebmToMp3(blob)
             const formData = new FormData()
-            formData.append('file', blob)
+            formData.append('file', blobMp3)
             const promise = api.post('/api/upload', formData)
 
             return {
@@ -151,6 +153,8 @@ export default function QuestionnaireView({
             }
           }
         )
+
+        const recordingsPromisesObj = await Promise.all(blobPromises)
 
         const recordingPromises = recordingsPromisesObj.map(
           (obj) => obj.promise
