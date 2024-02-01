@@ -12,6 +12,7 @@ import { ProfileRequestZod } from '~/schemas/ProfileRequest'
 import Dropzone from 'react-dropzone'
 import { useModal } from '~/contexts/ModalContext'
 import { signOut } from 'next-auth/react'
+import { uploadDocument } from '~/utils/uploadDocument'
 
 interface Props {
   user: {
@@ -82,14 +83,7 @@ export default function EditProfileForm({ user }: Props) {
     let profilePictureFileId: string | undefined
 
     if (newImage) {
-      const imageFormData = new FormData()
-      imageFormData.append('file', newImage)
-      imageFormData.append('title', 'profileImage')
-      profilePictureFileId = (
-        (await api.post('/api/upload', imageFormData)).data as {
-          file: { id: string }
-        }
-      ).file.id
+      profilePictureFileId = await uploadDocument(newImage, 'profileImage')
     }
 
     await api.patch('/api/user', { ...formData, profilePictureFileId })

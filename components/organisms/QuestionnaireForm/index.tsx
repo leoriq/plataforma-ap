@@ -18,6 +18,7 @@ import { useModal } from '~/contexts/ModalContext'
 import api from '~/utils/api'
 import { useRouter } from 'next/navigation'
 import type { AxiosResponse } from 'axios'
+import { uploadDocument } from '~/utils/uploadDocument'
 
 interface Props {
   lessonId: string
@@ -254,9 +255,7 @@ export default function QuestionnaireForm({ lessonId }: Props) {
       try {
         const filesPromisesObj = files.reduce((acc, file) => {
           if (file.audio) {
-            const audioFormData = new FormData()
-            audioFormData.append('file', file.audio)
-            const promise = api.post('/api/upload', audioFormData)
+            const promise = uploadDocument(file.audio)
             acc.push({
               promise,
               type: 'audio',
@@ -264,9 +263,7 @@ export default function QuestionnaireForm({ lessonId }: Props) {
             })
           }
           if (file.image) {
-            const imageFormData = new FormData()
-            imageFormData.append('file', file.image)
-            const promise = api.post('/api/upload', imageFormData)
+            const promise = uploadDocument(file.image)
             acc.push({
               promise,
               type: 'image',
@@ -274,12 +271,9 @@ export default function QuestionnaireForm({ lessonId }: Props) {
             })
           }
           return acc
-        }, [] as { promise: Promise<AxiosResponse>; type: 'audio' | 'image'; questionIndex: number; id?: string }[])
+        }, [] as { promise: Promise<string>; type: 'audio' | 'image'; questionIndex: number; id?: string }[])
         const filesPromises = filesPromisesObj.map((obj) => obj.promise)
-        const filesIds = (await Promise.all(filesPromises)).map(
-          (response: { data: { file: { id: string } } }) =>
-            response.data.file.id
-        )
+        const filesIds = await Promise.all(filesPromises)
         filesPromisesObj.forEach((obj, index) => {
           obj.id = filesIds[index]
         })
