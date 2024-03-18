@@ -7,7 +7,7 @@ export const QuestionnaireCreateRequestZod = z.object({
     .number()
     .int()
     .min(0, 'Weight must be at least 0')
-    .max(100, 'Weight must be at most 100'),
+    .max(1000, 'Weight must be at most 1000'),
   Questions: z.array(
     z
       .object({
@@ -18,7 +18,7 @@ export const QuestionnaireCreateRequestZod = z.object({
           .number()
           .int()
           .min(0, 'Weight must be at least 0')
-          .max(100, 'Weight must be at most 100'),
+          .max(1000, 'Weight must be at most 1000'),
         imageFileId: z.string().optional(),
         audioFileId: z.string().optional(),
         index: z.number().int().nonnegative(),
