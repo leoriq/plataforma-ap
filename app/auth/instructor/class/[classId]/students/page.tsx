@@ -13,13 +13,29 @@ export default async function ClassStudentsPage({
   const user = await getAuthorizedSessionUser()
   if (!user) return null
 
-  const classObj = await prisma.class.findUnique({
-    where: { id: classId, Instructors: { some: { id: user.id } } },
-    include: {
-      Students: true,
-      Instructors: true,
-    },
-  })
+  const classObj = user.roles.includes('REP_INSTRUCTOR')
+    ? await prisma.class.findUnique({
+        where: { id: classId },
+        include: {
+          Students: true,
+          Instructors: true,
+        },
+      })
+    : await prisma.class.findFirst({
+        where: {
+          id: classId,
+          Instructors: {
+            some: {
+              id: user.id,
+            },
+          },
+        },
+        include: {
+          Students: true,
+          Instructors: true,
+        },
+      })
+
   if (!classObj) redirect('/auth/instructor/classes?redirect=students')
 
   const safeStudents = classObj.Students.map((student) => ({
