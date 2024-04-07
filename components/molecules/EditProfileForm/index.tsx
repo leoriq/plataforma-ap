@@ -76,7 +76,7 @@ export default function EditProfileForm({ user }: Props) {
           },
         ],
       })
-      console.log(errors)
+      console.error(errors)
       return
     }
 

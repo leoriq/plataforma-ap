@@ -301,7 +301,7 @@ export default function QuestionnaireForm({ lessonId }: Props) {
         router.push(`/auth/material/questionnaire/${id}`)
         hideModal()
       } catch (error) {
-        console.log(error)
+        console.error(error)
         displayModal({
           title: 'Error',
           body: 'Something went wrong. Please try again later.',

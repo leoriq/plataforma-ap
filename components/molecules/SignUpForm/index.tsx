@@ -52,7 +52,7 @@ export default function SignUpForm() {
     try {
       await api.patch('/api/user/sign-up', formData)
     } catch (error) {
-      console.log(error)
+      console.error(error)
       if (error instanceof AxiosError) {
         if (error.response?.status === 500) {
           setGeneralError('Something went wrong. Please try again later')
@@ -72,8 +72,8 @@ export default function SignUpForm() {
         email: formData.email,
         password: formData.password,
       })
-    } catch (e) {
-      console.log(e)
+    } catch (error) {
+      console.error(error)
     }
     router.push('/login')
     router.refresh()

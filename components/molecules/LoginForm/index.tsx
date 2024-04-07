@@ -29,7 +29,8 @@ export default function LoginForm() {
         setError('Check your email or password')
         return
       }
-    } catch (e) {
+    } catch (error) {
+      console.error(error)
       setError('Something went wrong')
       return
     }

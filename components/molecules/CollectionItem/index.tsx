@@ -61,7 +61,7 @@ export default function CollectionItem({ collection }: Props) {
       router.refresh()
       hideModal()
     } catch (error) {
-      console.log(error)
+      console.error(error)
       displayModal({
         title: 'Error',
         body: 'An error has occurred while deleting the collection. Please try again.',

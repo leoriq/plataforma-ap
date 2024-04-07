@@ -47,8 +47,8 @@ export default function UserTable({
         })
         hideModal()
         setSelectedIds([])
-      } catch (e) {
-        console.log(e)
+      } catch (error) {
+        console.error(error)
         displayModal({
           title: 'Error',
           body: 'Something went wrong. Please try again later.',

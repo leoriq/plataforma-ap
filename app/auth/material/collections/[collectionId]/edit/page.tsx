@@ -21,7 +21,5 @@ export default async function EditCollectionPage({
     description: collection.description ?? undefined,
   }
 
-  console.log(formattedCollection)
-
   return <CollectionForm collection={formattedCollection} />
 }
