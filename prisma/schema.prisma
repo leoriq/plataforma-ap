@@ -181,7 +181,7 @@ model UserQuestionAnswer {
 
     Question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
     Audio    File?    @relation(fields: [audioFileId], references: [id], onDelete: Restrict)
-    Student  User     @relation(fields: [studentUserId], references: [id])
+    Student  User     @relation(fields: [studentUserId], references: [id], onDelete: Cascade)
 
     @@unique([questionId, studentUserId])
 }
