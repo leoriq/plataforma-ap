@@ -11,6 +11,8 @@ import { type ChangeEvent, useCallback, useMemo, useState } from 'react'
 import {
   type QuestionnaireCreateRequest,
   QuestionnaireCreateRequestZod,
+  type QuestionnaireUpdateRequest,
+  QuestionnaireUpdateRequestZod,
 } from '~/schemas/QuestionnaireRequest'
 import FormTextArea from '~/components/atoms/FormTextArea'
 import Image from 'next/image'
@@ -18,9 +20,27 @@ import { useModal } from '~/contexts/ModalContext'
 import api from '~/utils/api'
 import { useRouter } from 'next/navigation'
 import { uploadDocument } from '~/utils/uploadDocument'
+import { AxiosError } from 'axios'
 
 interface Props {
-  lessonId: string
+  lessonId?: string
+  questionnaire?: {
+    id: string
+    title: string
+    weight: number
+    Questions: {
+      id: string
+      title: string
+      description?: string | null
+      weight: number
+      videoId?: string | null
+      answerType: AnswerType
+      options: string[]
+      imageFileId?: string | null
+      audioFileId?: string | null
+      index: number
+    }[]
+  }
 }
 
 interface QuestionFiles {
@@ -31,17 +51,27 @@ interface QuestionFiles {
   imageUrl?: string
 }
 
-export default function QuestionnaireForm({ lessonId }: Props) {
+export default function QuestionnaireForm({
+  lessonId,
+  questionnaire: dbQuestionnaire,
+}: Props) {
   const { displayModal, hideModal } = useModal()
   const router = useRouter()
 
-  const [questionnaire, setQuestionnaire] =
-    useState<QuestionnaireCreateRequest>({
-      lessonId,
-      title: '',
-      weight: 1,
-      Questions: [],
-    })
+  const startingQuestionnaire = useMemo(() => {
+    if (!dbQuestionnaire)
+      return {
+        lessonId: lessonId ?? '',
+        title: '',
+        weight: 1,
+        Questions: [],
+      }
+    return dbQuestionnaire
+  }, [dbQuestionnaire, lessonId])
+
+  const [questionnaire, setQuestionnaire] = useState<
+    QuestionnaireCreateRequest | QuestionnaireUpdateRequest
+  >(startingQuestionnaire)
 
   const [files, setFiles] = useState<QuestionFiles[]>([])
   const filesMap = useMemo(
@@ -57,8 +87,12 @@ export default function QuestionnaireForm({ lessonId }: Props) {
       Questions: questionnaire.Questions.map((q, index) => {
         return {
           id: index.toString(),
-          imageFileUrl: filesMap.get(index)?.imageUrl,
-          audioFileUrl: filesMap.get(index)?.audioUrl,
+          imageFileUrl: q.imageFileId
+            ? `/api/upload?id=${q.imageFileId}`
+            : filesMap.get(index)?.imageUrl,
+          audioFileUrl: q.audioFileId
+            ? `/api/upload?id=${q.audioFileId}`
+            : filesMap.get(index)?.audioUrl,
           ...q,
         }
       }),
@@ -139,6 +173,15 @@ export default function QuestionnaireForm({ lessonId }: Props) {
   }, [])
 
   const addImageFile = useCallback((questionIndex: number, file?: File) => {
+    if (!file) {
+      setQuestionnaire((prev) => ({
+        ...prev,
+        Questions: prev.Questions.map((q, i) =>
+          i === questionIndex ? { ...q, imageFileId: null } : q
+        ),
+      }))
+    }
+
     setFiles((prev) => {
       const prevFile = prev.find((f) => f.questionIndex === questionIndex)
       return [
@@ -154,6 +197,14 @@ export default function QuestionnaireForm({ lessonId }: Props) {
   }, [])
 
   const addAudioFile = useCallback((questionIndex: number, file?: File) => {
+    if (!file) {
+      setQuestionnaire((prev) => ({
+        ...prev,
+        Questions: prev.Questions.map((q, i) =>
+          i === questionIndex ? { ...q, audioFileId: null } : q
+        ),
+      }))
+    }
     setFiles((prev) => {
       const prevFile = prev.find((f) => f.questionIndex === questionIndex)
       return [
@@ -230,13 +281,16 @@ export default function QuestionnaireForm({ lessonId }: Props) {
   )
 
   const errors = useMemo(() => {
-    const result = QuestionnaireCreateRequestZod.safeParse(questionnaire)
+    const result = !dbQuestionnaire
+      ? QuestionnaireCreateRequestZod.safeParse(questionnaire)
+      : QuestionnaireUpdateRequestZod.safeParse(questionnaire)
+
     if (result.success) return null
 
     return result.error.format()
-  }, [questionnaire])
+  }, [dbQuestionnaire, questionnaire])
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     if (errors) {
       displayModal({
         title: 'Error',
@@ -250,7 +304,8 @@ export default function QuestionnaireForm({ lessonId }: Props) {
       })
       return
     }
-    async function createQuestionnaire() {
+
+    async function createOrUpdateQuestionnaire() {
       try {
         const filesPromisesObj = files.reduce((acc, file) => {
           if (file.audio) {
@@ -271,11 +326,13 @@ export default function QuestionnaireForm({ lessonId }: Props) {
           }
           return acc
         }, [] as { promise: Promise<string>; type: 'audio' | 'image'; questionIndex: number; id?: string }[])
+
         const filesPromises = filesPromisesObj.map((obj) => obj.promise)
         const filesIds = await Promise.all(filesPromises)
         filesPromisesObj.forEach((obj, index) => {
           obj.id = filesIds[index]
         })
+
         const filesMap = new Map(
           filesPromisesObj.map((obj) => [
             `${obj.questionIndex}-${obj.type}`,
@@ -288,22 +345,34 @@ export default function QuestionnaireForm({ lessonId }: Props) {
           Questions: questionnaire.Questions.map((q) => {
             return {
               ...q,
-              imageFileId: filesMap.get(`${q.index}-image`),
-              audioFileId: filesMap.get(`${q.index}-audio`),
+              imageFileId: filesMap.get(`${q.index}-image`) || q.imageFileId,
+              audioFileId: filesMap.get(`${q.index}-audio`) || q.audioFileId,
             }
           }),
         }
 
         const response: { data: { questionnaire: { id: string } } } =
-          await api.post('/api/questionnaire', questionnaireWithFiles)
+          !dbQuestionnaire
+            ? await api.post('/api/questionnaire', questionnaireWithFiles)
+            : await api.put('/api/questionnaire', questionnaireWithFiles)
+
         const { id } = response.data.questionnaire
         router.push(`/auth/material/questionnaire/${id}`)
+        router.refresh()
         hideModal()
       } catch (error) {
         console.error(error)
+        let message = 'Something went wrong. Please try again later.'
+
+        if (error instanceof AxiosError) {
+          if (error.response?.data) {
+            message = String(error.response.data)
+          }
+        }
+
         displayModal({
           title: 'Error',
-          body: 'Something went wrong. Please try again later.',
+          body: message,
           buttons: [
             {
               text: 'Ok',
@@ -313,9 +382,15 @@ export default function QuestionnaireForm({ lessonId }: Props) {
         })
       }
     }
+
+    if (dbQuestionnaire) {
+      await createOrUpdateQuestionnaire()
+      return
+    }
+
     displayModal({
       title: 'Are you sure?',
-      body: 'You wont be able to edit this questionnaire after creation. Please make sure everything is correct.',
+      body: 'You wont be able to edit this questionnaire after someone has answered a question from it.',
       buttons: [
         {
           text: 'Cancel',
@@ -324,16 +399,24 @@ export default function QuestionnaireForm({ lessonId }: Props) {
         {
           text: 'Create',
           color: 'success',
-          onClick: createQuestionnaire,
+          onClick: createOrUpdateQuestionnaire,
         },
       ],
     })
-  }, [questionnaire, files, displayModal, hideModal, router, errors])
+  }, [
+    dbQuestionnaire,
+    questionnaire,
+    files,
+    displayModal,
+    hideModal,
+    router,
+    errors,
+  ])
 
   return (
     <div className={styles.outerContainer}>
       <div className={styles.formContainer}>
-        <h1>Create a Questionnaire</h1>
+        <h1>{!dbQuestionnaire ? 'Create' : 'Edit'} a Questionnaire</h1>
         <form className={styles.form}>
           <h2>Info</h2>
           <FormInput
@@ -377,34 +460,25 @@ export default function QuestionnaireForm({ lessonId }: Props) {
                 label="Description:"
                 name="description"
                 onChange={(e) => handleChangeQuestion(e, index)}
-                value={question.description}
+                value={question.description ?? ''}
                 errors={errors?.Questions?.[index]?.description?._errors}
               />
               <FormInput
                 label="Video Id:"
                 name="videoId"
                 onChange={(e) => handleChangeQuestion(e, index)}
-                value={question.videoId}
+                value={question.videoId ?? ''}
                 errors={errors?.Questions?.[index]?.videoId?._errors}
               />
               <h4>Image</h4>
-              {!filesMap.get(index)?.image ? (
-                <Dropzone
-                  onDrop={(file) => addImageFile(index, file[0])}
-                  accept={{ 'image/*': [] }}
-                >
-                  {({ getRootProps, getInputProps }) => (
-                    <div className={styles.drop} {...getRootProps()}>
-                      <input {...getInputProps()} />
-                      <p>Drag and drop an image here, or click to select one</p>
-                    </div>
-                  )}
-                </Dropzone>
-              ) : (
+              {!!filesMap.get(index)?.image || question.imageFileId ? (
                 <>
                   <div className={styles.imageContainer}>
                     <Image
-                      src={filesMap.get(index)?.imageUrl ?? ''}
+                      src={
+                        filesMap.get(index)?.imageUrl ||
+                        `/api/upload?id=${question.imageFileId ?? ''}`
+                      }
                       alt="Selected image"
                       fill
                     />
@@ -417,24 +491,27 @@ export default function QuestionnaireForm({ lessonId }: Props) {
                     Remove Image
                   </Button>
                 </>
-              )}
-              <h4>Audio</h4>
-              {!filesMap.get(index)?.audio ? (
+              ) : (
                 <Dropzone
-                  onDrop={(file) => addAudioFile(index, file[0])}
-                  accept={{ 'audio/*': [] }}
+                  onDrop={(file) => addImageFile(index, file[0])}
+                  accept={{ 'image/*': [] }}
                 >
                   {({ getRootProps, getInputProps }) => (
                     <div className={styles.drop} {...getRootProps()}>
                       <input {...getInputProps()} />
-                      <p>Drag and drop an audio here, or click to select one</p>
+                      <p>Drag and drop an image here, or click to select one</p>
                     </div>
                   )}
                 </Dropzone>
-              ) : (
+              )}
+              <h4>Audio</h4>
+              {!!filesMap.get(index)?.audio || question.audioFileId ? (
                 <>
                   <audio
-                    src={filesMap.get(index)?.audioUrl}
+                    src={
+                      filesMap.get(index)?.audioUrl ||
+                      `/api/upload?id=${question.audioFileId ?? ''}`
+                    }
                     controls
                     className={styles.audio}
                   />
@@ -446,6 +523,18 @@ export default function QuestionnaireForm({ lessonId }: Props) {
                     Remove Audio
                   </Button>
                 </>
+              ) : (
+                <Dropzone
+                  onDrop={(file) => addAudioFile(index, file[0])}
+                  accept={{ 'audio/*': [] }}
+                >
+                  {({ getRootProps, getInputProps }) => (
+                    <div className={styles.drop} {...getRootProps()}>
+                      <input {...getInputProps()} />
+                      <p>Drag and drop an audio here, or click to select one</p>
+                    </div>
+                  )}
+                </Dropzone>
               )}
 
               <label>
@@ -520,12 +609,12 @@ export default function QuestionnaireForm({ lessonId }: Props) {
           <Button
             type="submit"
             color="success"
-            onClick={(e) => {
+            onClick={async (e) => {
               e.preventDefault()
-              handleSubmit()
+              await handleSubmit()
             }}
           >
-            Create Questionnaire
+            {!dbQuestionnaire ? 'Create' : 'Save'} Questionnaire
           </Button>
         </form>
       </div>

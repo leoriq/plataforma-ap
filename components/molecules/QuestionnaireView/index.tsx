@@ -17,6 +17,7 @@ import FormInput from '~/components/atoms/FormInput'
 import { type GradeRequest, GradeRequestZod } from '~/schemas/GradeRequest'
 import convertWebmToMp3 from '~/utils/convertWebmToMp3'
 import { uploadDocument } from '~/utils/uploadDocument'
+import LinkButton from '~/components/atoms/LinkButton'
 
 interface Props {
   disabled?: boolean
@@ -242,7 +243,6 @@ export default function QuestionnaireView({
     () => new Map(gradesState.map((g) => [g.questionId, g.grade])),
     [gradesState]
   )
-  console.error(questionnaire.Questions)
 
   const setGrades = useCallback(
     (questionId: string) =>
@@ -522,14 +522,21 @@ export default function QuestionnaireView({
             </Button>
           )}
           {showMaterialControls && (
-            <Button
-              type="button"
-              onClick={handleDeleteQuestionnaire}
-              disabled={disabled}
-              color="danger"
-            >
-              Delete Questionnaire
-            </Button>
+            <>
+              <LinkButton
+                href={`/auth/material/questionnaire/${questionnaire.id}/edit`}
+              >
+                Edit Questionnaire
+              </LinkButton>
+              <Button
+                type="button"
+                onClick={handleDeleteQuestionnaire}
+                disabled={disabled}
+                color="danger"
+              >
+                Delete Questionnaire
+              </Button>
+            </>
           )}
           {showInstructorControls && (
             <Button type="button" color="success" onClick={handleSubmitGrade}>
