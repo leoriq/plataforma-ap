@@ -151,7 +151,10 @@ export default async function InstructorStudentPage({
   return (
     <div className={styles.outerContainer}>
       <h1>
-        {student.fullName ?? student.email} - {studentClass.name}
+        <span className={styles.fullName}>
+          {student.fullName ?? student.email}
+        </span>
+        &nbsp;- {studentClass.name}
       </h1>
       <section className={styles.container}>
         <h2>Info</h2>

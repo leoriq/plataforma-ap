@@ -59,6 +59,9 @@
         position: sticky;
         left: 0;
         background-color: inherit;
+
+        max-width: 40vw;
+        word-wrap: break-word;
       }
     }
   }
