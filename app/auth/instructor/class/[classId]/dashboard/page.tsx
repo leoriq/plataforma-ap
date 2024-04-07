@@ -68,15 +68,17 @@ export default async function ClassDashboard({
             (acc, question) => acc + question.weight,
             0
           )
-          const questionnaireGrade =
-            student.Answers.reduce((accAnswers, answer) => {
-              if (answer.Question.questionnaireId === questionnaire.id) {
-                if (answer.grade !== null) {
-                  return accAnswers + answer.grade * answer.Question.weight
+
+          const questionnaireGrade = !questionsTotalWeight
+            ? 0
+            : student.Answers.reduce((accAnswers, answer) => {
+                if (answer.Question.questionnaireId === questionnaire.id) {
+                  if (answer.grade !== null) {
+                    return accAnswers + answer.grade * answer.Question.weight
+                  }
                 }
-              }
-              return accAnswers
-            }, 0) / questionsTotalWeight
+                return accAnswers
+              }, 0) / questionsTotalWeight
 
           return accQuestionnaires + questionnaireGrade * questionnaire.weight
         }, 0) / questionnairesTotalWeight
@@ -91,19 +93,20 @@ export default async function ClassDashboard({
         (acc, question) => acc + question.weight,
         0
       )
-      const questionnaireAverage =
-        classObj.Students.reduce((accStudents, student) => {
-          const studentAnswer = student.Answers.find(
-            (answer) => answer.Question.questionnaireId === questionnaire.id
-          )
-          if (studentAnswer) {
-            return (
-              accStudents +
-              (studentAnswer.grade ?? 0) * studentAnswer.Question.weight
+      const questionnaireAverage = !questionsTotalWeight
+        ? 0
+        : classObj.Students.reduce((accStudents, student) => {
+            const studentAnswer = student.Answers.find(
+              (answer) => answer.Question.questionnaireId === questionnaire.id
             )
-          }
-          return accStudents
-        }, 0) / questionsTotalWeight
+            if (studentAnswer) {
+              return (
+                accStudents +
+                (studentAnswer.grade ?? 0) * studentAnswer.Question.weight
+              )
+            }
+            return accStudents
+          }, 0) / questionsTotalWeight
 
       return [questionnaire.id, questionnaireAverage]
     })
