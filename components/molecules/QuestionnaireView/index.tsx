@@ -177,7 +177,8 @@ export default function QuestionnaireView({
 
         location.reload()
         hideModal()
-      } catch (err) {
+      } catch (error) {
+        console.error(error)
         displayModal({
           title: 'Error',
           body: 'There was an error submitting the answers.',
@@ -241,7 +242,7 @@ export default function QuestionnaireView({
     () => new Map(gradesState.map((g) => [g.questionId, g.grade])),
     [gradesState]
   )
-  console.log(questionnaire.Questions)
+  console.error(questionnaire.Questions)
 
   const setGrades = useCallback(
     (questionId: string) =>
@@ -256,7 +257,7 @@ export default function QuestionnaireView({
           else if (parsedValue < 0) parsedValue = 0
           else if (parsedValue > 10) parsedValue = 10
         }
-        console.log(parsedValue)
+        console.error(parsedValue)
 
         setGradesState((grades) =>
           grades.map((g) => {
@@ -306,7 +307,8 @@ export default function QuestionnaireView({
         )
 
         location.reload()
-      } catch (err) {
+      } catch (error) {
+        console.error(error)
         displayModal({
           title: 'Error',
           body: 'There was an error submitting the grades.',
@@ -352,7 +354,8 @@ export default function QuestionnaireView({
         )
         router.refresh()
         hideModal()
-      } catch (err) {
+      } catch (error) {
+        console.error(error)
         displayModal({
           title: 'Error',
           body: 'There was an error deleting the questionnaire.',

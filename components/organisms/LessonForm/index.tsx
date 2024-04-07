@@ -212,7 +212,7 @@ export default function LessonForm({ collectionId, lesson: dbLesson }: Props) {
 
   async function handleSubmit() {
     if (errors) {
-      console.log(errors)
+      console.error(errors)
       displayModal({
         title: 'Error',
         body: 'Please fill all the fields correctly.',
@@ -250,7 +250,7 @@ export default function LessonForm({ collectionId, lesson: dbLesson }: Props) {
       router.push('/auth/material/collections')
       router.refresh()
     } catch (error) {
-      console.log(error)
+      console.error(error)
       displayModal({
         title: 'Error',
         body: 'An error occurred while creating the lesson. Please fix any errors and try again.',

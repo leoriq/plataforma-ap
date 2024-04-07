@@ -43,20 +43,25 @@ export default function SignUpForm() {
 
   const handleSubmit = useCallback(async () => {
     setForceShowErrors(true)
+
     if (errors || formData.password !== formData.passwordConfirmation) {
       setGeneralError('Please fix the errors above and try again')
+      return
     }
+
     try {
       await api.patch('/api/user/sign-up', formData)
     } catch (error) {
+      console.error(error)
       if (error instanceof AxiosError) {
         if (error.response?.status === 500) {
-          setGeneralError('Something went wrong. Try again later')
+          setGeneralError('Something went wrong. Please try again later')
           return
         }
         setGeneralError(
-          (error.response?.data as string) ||
-            'Something went wrong. Try again later'
+          error.response?.data
+            ? String(error.response.data)
+            : 'Something went wrong. Try again later'
         )
       }
       return
@@ -68,8 +73,8 @@ export default function SignUpForm() {
         email: formData.email,
         password: formData.password,
       })
-    } catch (e) {
-      console.log(e)
+    } catch (error) {
+      console.error(error)
     }
     router.push('/login')
     router.refresh()

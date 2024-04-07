@@ -26,8 +26,8 @@ export default function StudentsTable({ students, classId }: Props) {
     async function removeUsers() {
       try {
         await api.delete(`/api/class/students`, { data: { ids, classId } })
-      } catch (err) {
-        console.error(err)
+      } catch (error) {
+        console.error(error)
         displayModal({
           title: 'Error',
           body: 'There was an error removing the students. Please try again.',

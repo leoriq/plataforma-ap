@@ -46,8 +46,8 @@ export default function AddUserForm({ role, redirectUrl }: Props) {
       await api.post('/api/user/create-link-role', payload)
       router.push(redirectUrl)
       router.refresh()
-    } catch (err) {
-      console.log(err)
+    } catch (error) {
+      console.error(error)
       displayModal({
         title: 'Error',
         body: 'There was an error creating the users. Please try again.',

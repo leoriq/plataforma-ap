@@ -185,8 +185,8 @@ export default function AttendanceTable({ class: classObj }: Props) {
             prev.filter((meeting) => meeting.id !== meetingId)
           )
           hideModal()
-        } catch (err) {
-          console.error(err)
+        } catch (error) {
+          console.error(error)
           displayModal({
             title: 'Error',
             body: 'There was an error deleting the meeting. Try again later',
@@ -410,8 +410,8 @@ export default function AttendanceTable({ class: classObj }: Props) {
       await api.post('/api/meeting', payload)
       router.refresh()
       setNewMeetings([])
-    } catch (err) {
-      console.error(err)
+    } catch (error) {
+      console.error(error)
       displayModal({
         title: 'Error',
         body: 'There was an error saving the attendance. Try again later',

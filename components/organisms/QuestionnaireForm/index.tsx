@@ -17,7 +17,6 @@ import Image from 'next/image'
 import { useModal } from '~/contexts/ModalContext'
 import api from '~/utils/api'
 import { useRouter } from 'next/navigation'
-import type { AxiosResponse } from 'axios'
 import { uploadDocument } from '~/utils/uploadDocument'
 
 interface Props {
@@ -301,7 +300,7 @@ export default function QuestionnaireForm({ lessonId }: Props) {
         router.push(`/auth/material/questionnaire/${id}`)
         hideModal()
       } catch (error) {
-        console.log(error)
+        console.error(error)
         displayModal({
           title: 'Error',
           body: 'Something went wrong. Please try again later.',

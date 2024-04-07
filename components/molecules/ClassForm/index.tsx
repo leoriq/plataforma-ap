@@ -105,7 +105,7 @@ export default function ClassForm({
 
   const handleSubmit = useCallback(async () => {
     if (errors) {
-      console.log(errors)
+      console.error(errors)
       displayModal({
         title: 'Fix the Errors',
         body: 'Please fix the errors before submitting.',
@@ -144,7 +144,7 @@ export default function ClassForm({
       router.push('/auth/instructor/classes')
       router.refresh()
     } catch (error) {
-      console.log(error)
+      console.error(error)
       displayModal({
         title: 'Error',
         body: 'Something went wrong. Please try again.',
@@ -170,7 +170,7 @@ export default function ClassForm({
         router.refresh()
         hideModal()
       } catch (error) {
-        console.log(error)
+        console.error(error)
         displayModal({
           title: 'Error',
           body: 'Something went wrong. Please try again.',

@@ -42,7 +42,7 @@ export default function LessonView({ lesson, showMaterialControls }: Props) {
       router.refresh()
       hideModal()
     } catch (error) {
-      console.log(error)
+      console.error(error)
       displayModal({
         title: 'Error',
         body: 'An error has occurred while deleting the lesson. Please try again.',

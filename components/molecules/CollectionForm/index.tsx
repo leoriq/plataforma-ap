@@ -57,7 +57,7 @@ export default function CollectionForm({ collection: startingData }: Props) {
       router.push('/auth/material/collections')
       router.refresh()
     } catch (error) {
-      console.log(error)
+      console.error(error)
       displayModal({
         title: 'Error',
         body: 'Something went wrong. Please try again.',

@@ -45,8 +45,8 @@ export default function AddStudentForm() {
       await api.post('/api/class/students', payload)
       router.push(`/auth/instructor/class/${classId}/students`)
       router.refresh()
-    } catch (err) {
-      console.log(err)
+    } catch (error) {
+      console.error(error)
       displayModal({
         title: 'Error',
         body: 'There was an error creating or joining the students. Please try again.',
