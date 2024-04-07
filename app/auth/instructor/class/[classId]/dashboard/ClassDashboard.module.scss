@@ -7,7 +7,6 @@
 .container {
   background-color: var(--white);
   border-radius: 2px;
-  overflow: hidden;
   box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
   padding: 1rem;
   margin: 2rem 0;
@@ -27,7 +26,6 @@
 
   section {
     flex: 1;
-    min-width: 25rem;
   }
 }
 
@@ -41,7 +39,7 @@
 
     th {
       color: var(--light);
-      height: 3rem;
+      padding: 1rem;
 
       &:first-child {
         border-top-left-radius: 2px;
@@ -64,11 +62,12 @@
       }
 
       td {
+        max-width: 60vw;
         padding: 1rem;
+        word-wrap: break-word;
 
         &:last-child {
           text-align: center;
-          width: 8rem;
         }
       }
     }

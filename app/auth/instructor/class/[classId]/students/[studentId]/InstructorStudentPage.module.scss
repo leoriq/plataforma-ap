@@ -4,6 +4,10 @@
   margin: 6rem 1rem;
 }
 
+.fullName {
+  word-break: break-all;
+}
+
 .container {
   background-color: var(--white);
   border-radius: 2px;

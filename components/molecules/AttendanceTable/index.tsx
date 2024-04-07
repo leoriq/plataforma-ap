@@ -251,7 +251,7 @@ export default function AttendanceTable({ class: classObj }: Props) {
     if (added) {
       const cell = newestMeetingRef.current
 
-      if (cell) cell.scrollIntoView({ behavior: 'smooth' })
+      if (cell) cell.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
       setAdded(false)
     }
   }, [added])
