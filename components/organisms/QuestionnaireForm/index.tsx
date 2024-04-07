@@ -17,7 +17,6 @@ import Image from 'next/image'
 import { useModal } from '~/contexts/ModalContext'
 import api from '~/utils/api'
 import { useRouter } from 'next/navigation'
-import type { AxiosResponse } from 'axios'
 import { uploadDocument } from '~/utils/uploadDocument'
 
 interface Props {
