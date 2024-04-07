@@ -11,9 +11,11 @@
 .container {
   display: flex;
   overflow: auto;
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.2);
 }
 
 .table {
+  min-width: 100%;
   border-collapse: collapse;
   width: max-content;
 
