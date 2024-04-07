@@ -43,19 +43,23 @@ export default function SignUpForm() {
 
   const handleSubmit = useCallback(async () => {
     setForceShowErrors(true)
+
     if (errors || formData.password !== formData.passwordConfirmation) {
       setGeneralError('Please fix the errors above and try again')
+      return
     }
+
     try {
       await api.patch('/api/user/sign-up', formData)
     } catch (error) {
+      console.log(error)
       if (error instanceof AxiosError) {
         if (error.response?.status === 500) {
-          setGeneralError('Something went wrong. Try again later')
+          setGeneralError('Something went wrong. Please try again later')
           return
         }
         setGeneralError(
-          (error.response?.data as string) ||
+          (error.response?.data?.toString() as string) ||
             'Something went wrong. Try again later'
         )
       }
