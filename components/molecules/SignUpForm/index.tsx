@@ -59,8 +59,9 @@ export default function SignUpForm() {
           return
         }
         setGeneralError(
-          (error.response?.data?.toString() as string) ||
-            'Something went wrong. Try again later'
+          error.response?.data
+            ? String(error.response.data)
+            : 'Something went wrong. Try again later'
         )
       }
       return
