@@ -1,3 +1,4 @@
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import { redirect } from 'next/navigation'
 import { type NextRequest, NextResponse } from 'next/server'
 import { ZodError } from 'zod'
@@ -68,31 +69,17 @@ export async function PUT(request: NextRequest) {
       await request.json()
     )
 
-    const originalQuestionnaire = await prisma.questionnaire.findUnique({
-      where: { id: data.id },
-      select: {
+    const questionnaire = await prisma.questionnaire.update({
+      where: {
+        id: data.id,
         Questions: {
-          select: {
+          every: {
             UserAnswer: {
-              select: { id: true },
-              take: 1,
+              none: {},
             },
           },
         },
       },
-    })
-
-    if (!originalQuestionnaire)
-      return NextResponse.json('Questionnaire not found', { status: 404 })
-
-    if (originalQuestionnaire.Questions.some((q) => q.UserAnswer.length > 0))
-      return NextResponse.json(
-        'Questionnaire cannot be edited because it has already been answered',
-        { status: 400 }
-      )
-
-    const questionnaire = await prisma.questionnaire.update({
-      where: { id: data.id },
       data: {
         ...data,
         Questions: {
@@ -118,7 +105,19 @@ export async function PUT(request: NextRequest) {
     if (error instanceof ZodError)
       return NextResponse.json(error.format(), { status: 400 })
 
-    return NextResponse.json('Internal Server Error', { status: 500 })
+    if (
+      error instanceof PrismaClientKnownRequestError &&
+      error.code === 'P2025'
+    ) {
+      return NextResponse.json(
+        'This questionnaire might have already been answered, or it does not exist',
+        { status: 400 }
+      )
+    }
+
+    return NextResponse.json('Something went wrong, please try again later', {
+      status: 500,
+    })
   }
 }
 
