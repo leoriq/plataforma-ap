@@ -17,6 +17,11 @@ export const env = createEnv({
       process.env.VERCEL ? z.string().min(1) : z.string().url()
     ),
 
+    CRON_SECRET:
+      process.env.NODE_ENV === 'production'
+        ? z.string().min(1)
+        : z.string().min(1).optional(),
+
     R2_ACCESS_KEY_ID:
       process.env.NODE_ENV === 'production'
         ? z.string().min(1)
@@ -50,6 +55,7 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    CRON_SECRET: process.env.CRON_SECRET,
     R2_ACCESS_KEY_ID: process.env.R2_ACCESS_KEY_ID,
     R2_SECRET_ACCESS_KEY: process.env.R2_SECRET_ACCESS_KEY,
     R2_BUCKET_NAME: process.env.R2_BUCKET_NAME,
