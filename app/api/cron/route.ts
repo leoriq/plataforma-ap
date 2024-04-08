@@ -5,6 +5,8 @@ import { r2 } from '~/server/r2'
 import { env } from '~/env.mjs'
 
 export async function GET(request: NextRequest) {
+  if (!env.CRON_SECRET)
+    return NextResponse.json('Cron secret is not set', { status: 500 })
   if (request.headers.get('Authorization') !== `Bearer ${env.CRON_SECRET}`) {
     return NextResponse.json('Unauthorized', { status: 401 })
   }
