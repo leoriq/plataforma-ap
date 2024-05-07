@@ -28,6 +28,7 @@ export function ModalProvider({ children }: { children: ReactNode }) {
 
   function hideModal() {
     setShowModal(false)
+    console.log('hideModal')
   }
 
   return (
