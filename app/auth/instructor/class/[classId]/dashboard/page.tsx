@@ -1,16 +1,12 @@
-import { prisma } from '~/server/db'
-import styles from './ClassDashboard.module.scss'
-import { redirect } from 'next/navigation'
-import BarChartClient from '~/components/atoms/BarChartClient'
+import { redirect } from 'next/navigation';
+import BarChartClient from '~/components/atoms/BarChartClient';
+import { prisma } from '~/server/db';
+import styles from './ClassDashboard.module.scss';
 
-export default async function ClassDashboard({
-  params,
-}: {
-  params: { classId?: string }
-}) {
-  const { classId } = params
+export default async function ClassDashboard({ params }: { params: { classId?: string } }) {
+  const { classId } = params;
   if (!classId || classId === 'redirect')
-    redirect('/auth/instructor/classes?redirect=dashboard')
+    redirect('/auth/instructor/classes?redirect=dashboard');
 
   const classObj = await prisma.class.findUnique({
     where: { id: params.classId },
@@ -31,6 +27,7 @@ export default async function ClassDashboard({
               Question: true,
             },
           },
+          ExternalGrade: true,
         },
       },
       Collection: {
@@ -48,76 +45,81 @@ export default async function ClassDashboard({
         },
       },
     },
-  })
+  });
 
-  if (!classObj) redirect('/auth/instructor/classes?redirect=dashboard')
+  if (!classObj) redirect('/auth/instructor/classes?redirect=dashboard');
 
   const allQuestionnaires = classObj.Collection.Lessons.flatMap(
     (lesson) => lesson.Questionnaires
-  )
+  );
   const questionnairesTotalWeight = allQuestionnaires.reduce(
     (total, questionnaire) => total + questionnaire.weight,
     0
-  )
+  );
 
   const studentsAverages = new Map(
     classObj.Students.map((student) => {
-      const averageGrade =
+      const externalGradesTotalWeight = student.ExternalGrade.reduce((acc, grade) => acc + grade.weight, 0);
+      const externalGradesTotal = student.ExternalGrade.reduce((acc, grade) => acc + grade.grade * grade.weight, 0);
+
+      const averageGrade = (
         allQuestionnaires.reduce((accQuestionnaires, questionnaire) => {
           const questionsTotalWeight = questionnaire.Questions.reduce(
             (acc, question) => acc + question.weight,
             0
-          )
+          );
 
           const questionnaireGrade = !questionsTotalWeight
             ? 0
             : student.Answers.reduce((accAnswers, answer) => {
-                if (answer.Question.questionnaireId === questionnaire.id) {
-                  if (answer.grade !== null) {
-                    return accAnswers + answer.grade * answer.Question.weight
-                  }
+              if (answer.Question.questionnaireId === questionnaire.id) {
+                if (answer.grade !== null) {
+                  return accAnswers + answer.grade * answer.Question.weight;
                 }
-                return accAnswers
-              }, 0) / questionsTotalWeight
+              }
+              return accAnswers;
+            }, 0) / questionsTotalWeight;
 
-          return accQuestionnaires + questionnaireGrade * questionnaire.weight
-        }, 0) / questionnairesTotalWeight
+          return accQuestionnaires + questionnaireGrade * questionnaire.weight;
+        }, 0) +
+        externalGradesTotal
+      ) / (questionnairesTotalWeight + externalGradesTotalWeight);
 
-      return [student.id, averageGrade]
+      return [student.id, averageGrade];
     })
-  )
+  );
 
   const questionnairesAverages = new Map(
     allQuestionnaires.map((questionnaire) => {
       const questionsTotalWeight = questionnaire.Questions.reduce(
         (acc, question) => acc + question.weight,
         0
-      )
+      );
       const questionnaireAverage = !questionsTotalWeight
         ? 0
         : classObj.Students.reduce((accStudents, student) => {
-            const studentAnswer = student.Answers.find(
-              (answer) => answer.Question.questionnaireId === questionnaire.id
-            )
-            if (studentAnswer) {
-              return (
-                accStudents +
-                (studentAnswer.grade ?? 0) * studentAnswer.Question.weight
-              )
-            }
-            return accStudents
-          }, 0) / questionsTotalWeight
+          const studentAnswer = student.Answers.find(
+            (answer) => answer.Question.questionnaireId === questionnaire.id
+          );
+          if (studentAnswer) {
+            return (
+              accStudents +
+              (studentAnswer.grade ?? 0) * studentAnswer.Question.weight
+            );
+          }
+          return accStudents;
+        }, 0) / questionsTotalWeight;
 
-      return [questionnaire.id, questionnaireAverage]
+      return [questionnaire.id, questionnaireAverage];
     })
-  )
+  );
 
   const meetingAttendance = classObj.SynchronousMeeting.map((meeting) => ({
     date: meeting.date,
     totalAbsent: meeting.AbsentStudents.length,
     totalExcused: meeting.ExcusedStudents.length,
     totalPresent: meeting.AttendingStudents.length,
-  }))
+  }));
 
   const attendanceSeries = [
     {
@@ -138,14 +140,15 @@ export default async function ClassDashboard({
       stack: 'A',
       color: '#d5403d',
     },
-  ]
+  ];
+
   const xAxis = meetingAttendance.map((meeting) =>
     Intl.DateTimeFormat('en-US', {
       timeZone: 'UTC',
       month: 'short',
       day: 'numeric',
     }).format(meeting.date)
-  )
+  );
 
   return (
     <div className={styles.outerContainer}>
