@@ -21,7 +21,7 @@
     "@ffmpeg/util": "^0.12.1",
     "@mui/x-charts": "^6.19.1",
     "@paralleldrive/cuid2": "^2.2.2",
-    "@prisma/client": "^5.8.1",
+    "@prisma/client": "^6.6.0",
     "@t3-oss/env-nextjs": "^0.3.1",
     "@vercel/speed-insights": "^1.0.10",
     "axios": "^1.6.1",
@@ -48,7 +48,7 @@
     "@typescript-eslint/parser": "^5.59.6",
     "eslint": "^8.40.0",
     "eslint-config-next": "^13.4.2",
-    "prisma": "^5.8.1",
+    "prisma": "^6.6.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.3"
   },
