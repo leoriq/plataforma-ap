@@ -63,6 +63,7 @@ model User {
     MeetingsExcused   SynchronousMeeting[] @relation("excusedAbsence")
     MeetingsAbsent    SynchronousMeeting[] @relation("absence")
     Answers           UserQuestionAnswer[]
+    ExternalGrade     ExternalGrade[]
 }
 
 model SynchronousMeeting {
@@ -163,6 +164,16 @@ model Question {
     Image         File?                @relation("image", fields: [audioFileId], references: [id], onDelete: Restrict)
     Audio         File?                @relation("audio", fields: [imageFileId], references: [id], onDelete: Restrict)
     UserAnswer    UserQuestionAnswer[]
+}
+
+model ExternalGrade {
+    id            String  @id @default(cuid())
+    studentUserId String
+    description   String?
+    grade         Int
+    weight        Int
+
+    Student User @relation(fields: [studentUserId], references: [id], onDelete: Cascade)
 }
 
 model UserQuestionAnswer {
